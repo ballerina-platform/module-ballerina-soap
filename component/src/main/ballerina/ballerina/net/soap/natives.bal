@@ -167,7 +167,9 @@ function createResponse (http:Response resp, SoapVersion soapVersion) (Response)
         }
         response.headers = headersXML;
     }
-    response.payload = resp.getXmlPayload().selectChildren("Body").children();
+    //selecting only element nodes
+    //todo support multiple elements
+    response.payload = resp.getXmlPayload().selectChildren("Body").children().elements()[0];
     return response;
 }
 
