@@ -12,14 +12,14 @@ The Soap connector allows you to send a ordinary xml request to a soap backend b
 ##### Fire and Forget
 Sends the request without waiting for any response from the service (even an error).
 
-###### Arguments
+###### Parameters
 * **path**: Resource path
 * **request**: Request to be sent
 
 ##### Send Robust
 Sends the request and receives an error if any.
 
-###### Arguments
+###### Parameters
 * **path**: Resource path
 * **request**: Request to be sent
 
@@ -30,7 +30,7 @@ Sends the request and receives an error if any.
 
 Sends request and expects a response.
 
-###### Arguments
+###### Parameters
 * **path**: Resource path
 * **request**: Request to be sent
 

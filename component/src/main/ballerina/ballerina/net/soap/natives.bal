@@ -124,7 +124,7 @@ public connector SoapClient (string serviceUri, http:Options connectorOptions) {
 
         Response soapResponse = {};
         resp, httpError = httpConnector.post(path, req);
-        if (resp != null) {
+        if (resp != null && httpError == null) {
             soapResponse = createSOAPResponse(resp, soapVersion);
         }
         return soapResponse, getSoapError(httpError);
@@ -136,14 +136,15 @@ public connector SoapClient (string serviceUri, http:Options connectorOptions) {
 @Param { value:"httpError: The HttpConnectorError" }
 @Return { value:"SoapError: The SoapError obtained from the HttpConnectorError" }
 function getSoapError(http:HttpConnectorError httpError) (SoapError) {
-    SoapError soapError = {};
     if (httpError != null) {
+        SoapError soapError = {};
         soapError.msg = httpError.msg;
         soapError.cause = httpError.cause;
         soapError.stackTrace = httpError.stackTrace;
         soapError.errorCode = httpError.statusCode;
+        return soapError;
     }
-    return soapError;
+    return null;
 }
 
 @Description { value:"Prepare a SOAP envelope with the xml to be sent." }
