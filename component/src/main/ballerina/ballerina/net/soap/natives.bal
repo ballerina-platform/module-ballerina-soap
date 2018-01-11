@@ -81,80 +81,101 @@ public struct SoapError {
 }
 
 @Description { value:"SOAP client connector." }
-public connector SoapClient () {
+@Param { value:"serviceUri: Url of the service" }
+@Param { value:"connectorOptions: connector options" }
+public connector SoapClient (string serviceUri, http:Options connectorOptions) {
 
-    @Description { value:"Send Robust requests." }
+    endpoint<http:HttpClient> httpConnector {
+        create http:HttpClient(serviceUri, connectorOptions);
+    }
+
+    @Description { value:"Send Robust requests.Sends the request and possibly receives an error" }
+    @Param { value:"path: Resource path " }
     @Param { value:"request: Request to be sent" }
-    @Param { value:"endpointURL: Endpoint the request should be sent" }
     @Return { value:"SoapError: The error if an error occurred" }
-    action sendRobust (Request request, string endpointURL) (SoapError) {
-        return null;
+    action sendRobust (string path, Request request) (SoapError) {
+        http:Request req = fillSOAPEnvelope(request, initSoapVersion(request.soapVersion));
+        http:HttpConnectorError httpError = {};
+        //In the send robust scenario response is ignored, but the error if it exists is returned
+        _, httpError = httpConnector.post(path, req);
+        return getSoapError(httpError);
     }
 
-    @Description { value:"Fire and forget requests." }
+    @Description { value:"Fire and forget requests. Sends the request without the possibility of any response from the
+     service (even an error)" }
+    @Param { value:"path: Resource path " }
     @Param { value:"request: Request to be sent" }
-    @Param { value:"endpointURL: Endpoint the request should be sent" }
-    action fireAndForget (Request request, string endpointURL) {
-
+    action fireAndForget (string path, Request request) {
+        http:Request req = fillSOAPEnvelope(request, initSoapVersion(request.soapVersion));
+        //In the fire and forget scenario both the response and the error are ignored.
+        _, _ = httpConnector.post(path, req);
     }
 
-    @Description { value:"Send request an expect a response." }
+    @Description { value:"Sends request and expects a response." }
+    @Param { value:"path: Resource path " }
     @Param { value:"request: Request to be sent" }
-    @Param { value:"endpointURL: Endpoint the request should be sent" }
     @Return { value:"Response: The response received from the backend" }
     @Return { value:"SoapError: The error if an error occurred" }
-    action sendReceive (Request request, string endpointURL) (Response, SoapError) {
-        endpoint<http:HttpClient> httpConnector {
-            create http:HttpClient(endpointURL, getConnectorConfigs());
-        }
-
-        SoapVersion soapVersion = init(request.soapVersion);
-        xml soapEnv = startEnvelop(soapVersion);
-        xml soapPayload = addSoapHeaders(request, soapVersion);
-        if (request.payload != null) {
-            xml body = addSoapBody(request.payload, soapVersion);
-            soapPayload = soapPayload + body;
-        }
-        soapEnv.setChildren(soapPayload);
-        http:Request req = {};
+    action sendReceive (string path, Request request) (Response, SoapError) {
+        SoapVersion soapVersion = initSoapVersion(request.soapVersion);
+        http:Request req = fillSOAPEnvelope(request, soapVersion);
         http:Response resp = {};
         http:HttpConnectorError httpError = {};
-        req.setXmlPayload(soapEnv);
-        if (soapVersion == SoapVersion.SOAP11) {
-            req.setHeader("Content-Type", "text/xml");
-            req.addHeader("SOAPAction", request.soapAction);
-        } else {
-            req.setHeader("Content-Type", "application/soap+xml");
-        }
+
         Response soapResponse = {};
-        SoapError soapError = {};
-        resp, httpError = httpConnector.post("", req);
-        if (resp != null) {
-            soapResponse = createResponse(resp, soapVersion);
+        resp, httpError = httpConnector.post(path, req);
+        if (resp != null && httpError == null) {
+            soapResponse = createSOAPResponse(resp, soapVersion);
         }
-        if (httpError != null) {
-            soapError.msg = httpError.msg;
-            soapError.cause = httpError.cause;
-            soapError.stackTrace = httpError.stackTrace;
-            soapError.errorCode = httpError.statusCode;
-        }
-        return soapResponse, soapError;
+        return soapResponse, getSoapError(httpError);
     }
 
 }
 
-function getConnectorConfigs() (http:Options) {
-    http:Options option = {
-                              ssl: {
-                                       trustStoreFile:"${ballerina.home}/bre/security/client-truststore.jks",
-                                       trustStorePassword:"wso2carbon"
-                                   },
-                              followRedirects: {}
-                          };
-    return option;
+@Description { value:"Returns a SoapError from the HttpConnectorError" }
+@Param { value:"httpError: The HttpConnectorError" }
+@Return { value:"SoapError: The SoapError obtained from the HttpConnectorError" }
+function getSoapError(http:HttpConnectorError httpError) (SoapError) {
+    if (httpError != null) {
+        SoapError soapError = {};
+        soapError.msg = httpError.msg;
+        soapError.cause = httpError.cause;
+        soapError.stackTrace = httpError.stackTrace;
+        soapError.errorCode = httpError.statusCode;
+        return soapError;
+    }
+    return null;
 }
 
-function createResponse (http:Response resp, SoapVersion soapVersion) (Response) {
+@Description { value:"Prepare a SOAP envelope with the xml to be sent." }
+@Param { value:"request: The request to be sent" }
+@Param { value:"soapVersion: The soap version of the request" }
+@Return { value:"http:Request: Returns the soap Request as http:Request with the soap envelope" }
+function fillSOAPEnvelope (Request request, SoapVersion soapVersion) (http:Request) {
+    xml soapEnv = createSoapEnvelop(soapVersion);
+    xml soapPayload = createSoapHeader(request, soapVersion);
+    if (request.payload != null) {
+        xml body = createSoapBody(request.payload, soapVersion);
+        soapPayload = soapPayload + body;
+    }
+    soapEnv.setChildren(soapPayload);
+    http:Request req = {};
+
+    req.setXmlPayload(soapEnv);
+    if (soapVersion == SoapVersion.SOAP11) {
+        req.setHeader("Content-Type", "text/xml");
+        req.addHeader("SOAPAction", request.soapAction);
+    } else {
+        req.setHeader("Content-Type", "application/soap+xml");
+    }
+    return req;
+}
+
+@Description { value:"Creates the soap response from the http Response" }
+@Param { value:"resp: The http response" }
+@Param { value:"soapVersion: The soap version of the request" }
+@Return { value:"Response: The soap response created from the http response" }
+function createSOAPResponse (http:Response resp, SoapVersion soapVersion) (Response) {
     Response response = {};
     response.soapVersion = soapVersion;
     xml soapHeaders = resp.getXmlPayload().selectChildren("Header").children();
@@ -167,19 +188,23 @@ function createResponse (http:Response resp, SoapVersion soapVersion) (Response)
         }
         response.headers = headersXML;
     }
-    //selecting only element nodes
-    //todo support multiple elements
     response.payload = resp.getXmlPayload().selectChildren("Body").children().elements()[0];
     return response;
 }
 
-function init (SoapVersion soapVersion) (SoapVersion) {
+@Description { value:"Initializes the SoapVersion if it's null" }
+@Param { value:"soapVersion: The given soapVersion " }
+@Return { value:"SoapVersion: Returns SoapVersion.SOAP11 if given SoapVersion is null else returns the same SoapVersion" }
+function initSoapVersion (SoapVersion soapVersion) (SoapVersion) {
     if (soapVersion == null) {
         soapVersion = SoapVersion.SOAP11;
     }
     return soapVersion;
 }
 
+@Description { value:"Provides the namespace for the given soap version." }
+@Param { value:"soapVersion: The soap version of the request" }
+@Return { value:"string: The namespace for the given soap version" }
 function getNamespace (SoapVersion soapVersion) (string) {
     if (soapVersion == SoapVersion.SOAP11) {
         return "http://schemas.xmlsoap.org/soap/envelope/";
@@ -187,6 +212,9 @@ function getNamespace (SoapVersion soapVersion) (string) {
     return "http://www.w3.org/2003/05/soap-envelope";
 }
 
+@Description { value:"Provides the encoding style for the given soap version" }
+@Param { value:"soapVersion: The soap version of the request" }
+@Return { value:"string: the encoding style for the given soap version" }
 function getEncodingStyle (SoapVersion soapVersion) (string) {
     if (soapVersion == SoapVersion.SOAP11) {
         return "http://schemas.xmlsoap.org/soap/encoding/";
@@ -194,7 +222,10 @@ function getEncodingStyle (SoapVersion soapVersion) (string) {
     return "http://www.w3.org/2003/05/soap-encoding";
 }
 
-function startEnvelop (SoapVersion soapVersion) (xml) {
+@Description { value:"Provides an empty soap envelope for the given soap version" }
+@Param { value:"soapVersion: The soap version of the request" }
+@Return { value:"xml: xml with the empty soap envelope" }
+function createSoapEnvelop (SoapVersion soapVersion) (xml) {
     string namespace = getNamespace(soapVersion);
     string encodingStyle = getEncodingStyle(soapVersion);
     return xml `<soap:Envelope
@@ -203,7 +234,11 @@ function startEnvelop (SoapVersion soapVersion) (xml) {
                      </soap:Envelope>`;
 }
 
-function addSoapHeaders (Request request, SoapVersion soapVersion) (xml) {
+@Description { value:"Provides the soap headers in the request as xml" }
+@Param { value:"request: Request to be sent" }
+@Param { value:"soapVersion: The soap version of the request" }
+@Return { value:"xml: xml with the empty soap header" }
+function createSoapHeader (Request request, SoapVersion soapVersion) (xml) {
     string namespace = getNamespace(soapVersion);
     xml headersRoot = xml `<soap:Header xmlns:soap="{{namespace}}"></soap:Header>`;
     xml headerElement;
@@ -218,35 +253,45 @@ function addSoapHeaders (Request request, SoapVersion soapVersion) (xml) {
         headerElement = headersXML;
     }
     if (request.to != "") {
-        headerElement = addWSAddressingHeaders(request);
+        if (headerElement != null) {
+            headerElement = headerElement + getWSAddressingHeaders(request);
+        } else {
+            headerElement = getWSAddressingHeaders(request);
+        }
     }
     if (request.username != "") {
-        headerElement = addWSSecUsernameTokenHeaders(request);
+        if (headerElement != null) {
+            headerElement = headerElement + getWSSecUsernameTokenHeaders(request);
+        } else {
+            headerElement = getWSSecUsernameTokenHeaders(request);
+        }
     }
     if (headerElement != null) {
         headersRoot.setChildren(headerElement);
     }
     return headersRoot;
 }
-
-function addSoapBody (xml payload, SoapVersion soapVersion) (xml) {
+@Description { value:"Provides the soap body in the request as xml" }
+@Param { value:"request: Request to be sent" }
+@Param { value:"soapVersion: The soap version of the request" }
+@Return { value:"xml: xml with the empty soap body" }
+function createSoapBody (xml payload, SoapVersion soapVersion) (xml) {
     string namespace = getNamespace(soapVersion);
     xml bodyRoot = xml `<soap:Body xmlns:soap="{{namespace}}"></soap:Body>`;
     bodyRoot.setChildren(payload);
     return bodyRoot;
 }
 
-function addWSAddressingHeaders (Request request) (xml) {
+@Description { value:"Provides the WS addressing header" }
+@Param { value:"request: Request to be sent" }
+@Return { value:"xml: xml with the WS addressing header" }
+function getWSAddressingHeaders (Request request) (xml) {
     xml headerElement;
     xmlns "https://www.w3.org/2005/08/addressing" as wsa;
     xml toElement = xml `<wsa:To>{{request.to}}</wsa:To>`;
     headerElement = toElement;
     xml actionElement = xml `<wsa:Action>{{request.wsaAction}}</wsa:Action>`;
     headerElement = headerElement + actionElement;
-    if (request.messageId != "") {
-        xml messageIDElement = xml `<wsa:MessageID>{{request.messageId}}</wsa:MessageID>`;
-        headerElement = headerElement + messageIDElement;
-    }
     if (request.relatesTo != "") {
         xml relatesToElement = xml `<wsa:RelatesTo>{{request.relatesTo}}</wsa:RelatesTo>`;
         if (request.relationshipType != "") {
@@ -259,7 +304,14 @@ function addWSAddressingHeaders (Request request) (xml) {
         headerElement = headerElement + fromElement;
     }
     if (request.replyTo != "") {
-        xml replyToElement = xml `<wsa:From>{{request.replyTo}}</wsa:From>`;
+        if (request.messageId != "") {
+            xml messageIDElement = xml `<wsa:MessageID>{{request.messageId}}</wsa:MessageID>`;
+            headerElement = headerElement + messageIDElement;
+        }else{
+            error  err = {msg: "If ReplyTo element is present, wsa:MessageID MUST be present"};
+            throw err;
+        }
+        xml replyToElement = xml `<wsa:ReplyTo><wsa:Address>{{request.replyTo}}</wsa:Address></wsa:ReplyTo>`;
         headerElement = headerElement + replyToElement;
     }
     if (request.faultTo != "") {
@@ -269,7 +321,10 @@ function addWSAddressingHeaders (Request request) (xml) {
     return headerElement;
 }
 
-function addWSSecUsernameTokenHeaders (Request request) (xml) {
+@Description { value:"Provides the WS Secure Username Token Headers" }
+@Param { value:"request: Request to be sent" }
+@Return { value:"xml: xml with the WS Secure Username Token Headers" }
+function getWSSecUsernameTokenHeaders (Request request) (xml) {
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" as wsse;
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" as wsu;
     xml securityRoot = xml `<wsse:Security></wsse:Security>`;
