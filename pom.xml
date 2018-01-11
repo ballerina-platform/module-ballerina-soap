@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ballerinalang</groupId>
     <artifactId>connector-soap-parent</artifactId>
-    <version>0.95.1</version>
+    <version>0.95.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Ballerina - SOAP Parent</name>
 
@@ -29,7 +29,7 @@
         <url>https://github.com/ballerinalang/connector-soap.git</url>
         <developerConnection>scm:git:https://github.com/ballerinalang/connector-soap.git</developerConnection>
         <connection>scm:git:https://github.com/ballerinalang/connector-soap.git</connection>
-        <tag>v0.95.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <repositories>
