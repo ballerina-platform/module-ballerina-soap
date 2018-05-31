@@ -22,10 +22,10 @@ public type SoapConnector object {
         http:Client clientEP;
     }
 
-    public function sendReceive(string path, Request request) returns (Response|error);
+    public function sendReceive(string path, Request request) returns (Response|SoapError);
 };
 
-public function SoapConnector::sendReceive(string path, Request request) returns (Response|error) {
+public function SoapConnector::sendReceive(string path, Request request) returns (Response|SoapError) {
     endpoint http:Client httpClient = self.clientEP;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, request = req);
