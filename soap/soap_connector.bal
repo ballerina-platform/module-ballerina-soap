@@ -16,12 +16,23 @@
 
 import ballerina/http;
 
+documentation {
+    SOAP client connector.
+    F{{ser}} Unique identifier of the account
+    F{{client}} Http client endpoint
+}
 public type SoapConnector object {
 
     public {
         http:Client clientEP;
     }
 
+    documentation {
+        Sends request and expects a response
+        P{{path}} Resource path
+        P{{request}} Request to be sent
+        R{{}} If success, returns the response object, else returns `SoapError` object
+    }
     public function sendReceive(string path, Request request) returns (Response|SoapError);
 };
 

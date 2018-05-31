@@ -18,9 +18,11 @@ import ballerina/io;
 import ballerina/http;
 import ballerina/time;
 
-////@Description { value:"Provides the namespace for the given soap version." }
-////@Param { value:"soapVersion: The soap version of the request" }
-////@Return { value:"string: The namespace for the given soap version" }
+documentation {
+    Provides the namespace for the given SOAP version.
+    P{{soapVersion}} The SOAP version of the request
+    R{{}} The namespace for the given SOAP version
+}
 function getNamespace(SoapVersion soapVersion) returns string {
     if (soapVersion == SOAP11) {
         return SOAP11_NAMESPACE;
@@ -28,9 +30,11 @@ function getNamespace(SoapVersion soapVersion) returns string {
     return SOAP12_NAMESPACE;
 }
 
-//@Description { value:"Provides the encoding style for the given soap version" }
-//@Param { value:"soapVersion: The soap version of the request" }
-//@Return { value:"string: the encoding style for the given soap version" }
+documentation {
+    Provides the encoding style for the given SOAP version
+    P{{soapVersion}} The SOAP version of the request
+    R{{}} The encoding style for the given SOAP version
+}
 function getEncodingStyle(SoapVersion soapVersion) returns string {
     if (soapVersion == SOAP11) {
         return SOAP11_ENCODING_STYLE;
@@ -38,9 +42,11 @@ function getEncodingStyle(SoapVersion soapVersion) returns string {
     return SOAP12_ENCODING_STYLE;
 }
 
-//@Description { value:"Provides an empty soap envelope for the given soap version" }
-//@Param { value:"soapVersion: The soap version of the request" }
-//@Return { value:"xml: xml with the empty soap envelope" }
+documentation {
+    Provides an empty SOAP envelope for the given SOAP version
+    P{{soapVersion}} The SOAP version of the request
+    R{{}} XML with the empty SOAP envelope
+}
 function createSoapEnvelop(SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     string encodingStyle = getEncodingStyle(soapVersion);
@@ -50,9 +56,11 @@ function createSoapEnvelop(SoapVersion soapVersion) returns xml {
                      </soap:Envelope>`;
 }
 
-//@Description { value:"Provides the WS addressing header" }
-//@Param { value:"request: Request to be sent" }
-//@Return { value:"xml: xml with the WS addressing header" }
+documentation {
+    Provides the WS addressing header
+    P{{request}} The request to be sent
+    R{{headerElement}} XML with the WS addressing header
+}
 function getWSAddressingHeaders(Request request) returns xml {
     xmlns "https://www.w3.org/2005/08/addressing" as wsa;
 
@@ -94,9 +102,11 @@ function getWSAddressingHeaders(Request request) returns xml {
     return headerElement;
 }
 
-//@Description { value:"Provides the WS Secure Username Token Headers" }
-//@Param { value:"request: Request to be sent" }
-//@Return { value:"xml: xml with the WS Secure Username Token Headers" }
+documentation {
+    Provides the WS secure username token headers
+    P{{request}} The request to be sent
+    R{{securityRoot}} XML with the WS secure username token headers
+}
 function getWSSecreUsernameTokenHeaders(Request request) returns xml {
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" as wsse;
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" as wsu;
@@ -119,10 +129,12 @@ function getWSSecreUsernameTokenHeaders(Request request) returns xml {
     return securityRoot;
 }
 
-//@Description { value:"Provides the soap headers in the request as xml" }
-//@Param { value:"request: Request to be sent" }
-//@Param { value:"soapVersion: The soap version of the request" }
-//@Return { value:"xml: xml with the empty soap header" }
+documentation {
+    Provides the SOAP headers in the request as XML
+    P{{request}} The request to be sent
+    P{{soapVersion}} The SOAP version of the request
+    R{{headersRoot}} XML with the empty SOAP header
+}
 function createSoapHeader(Request request, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     xml headersRoot = xml `<soap:Header xmlns:soap="{{namespace}}"></soap:Header>`;
@@ -154,10 +166,12 @@ function createSoapHeader(Request request, SoapVersion soapVersion) returns xml 
     return headersRoot;
 }
 
-//@Description { value:"Provides the soap body in the request as xml" }
-//@Param { value:"request: Request to be sent" }
-//@Param { value:"soapVersion: The soap version of the request" }
-//@Return { value:"xml: xml with the empty soap body" }
+documentation {
+    Provides the SOAP body in the request as XML
+    P{{payload}} The payload to be sent
+    P{{soapVersion}} The SOAP version of the request
+    R{{bodyRoot}} XML with the empty SOAP body
+}
 function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     xml bodyRoot = xml `<soap:Body xmlns:soap="{{namespace}}"></soap:Body>`;
@@ -165,10 +179,12 @@ function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
     return bodyRoot;
 }
 
-//@Description { value:"Prepare a SOAP envelope with the xml to be sent." }
-//@Param { value:"request: The request to be sent" }
-//@Param { value:"soapVersion: The soap version of the request" }
-//@Return { value:"http:Request: Returns the soap Request as http:Request with the soap envelope" }
+documentation {
+    Prepare a SOAP envelope with the XML to be sent
+    P{{request}} The request to be sent
+    P{{soapVersion}} The SOAP version of the request
+    R{{req}} The SOAP Request as `http:Request` with the SOAP envelope
+}
 function fillSOAPEnvelope(Request request, SoapVersion soapVersion) returns http:Request {
     xml soapPayload = createSoapHeader(request, soapVersion);
     xml requestPayload = request.payload;
@@ -190,14 +206,16 @@ function fillSOAPEnvelope(Request request, SoapVersion soapVersion) returns http
     return req;
 }
 
-//@Description { value:"Creates the soap response from the http Response" }
-//@Param { value:"resp: The http response" }
-//@Param { value:"soapVersion: The soap version of the request" }
-//@Return { value:"Response: The soap response created from the http response" }
-function createSOAPResponse(http:Response resp, SoapVersion soapVersion) returns (Response|error) {
-    Response response = {};
-    response.soapVersion = soapVersion;
-    xml payload = check resp.getXmlPayload();
+documentation {
+    Creates the SOAP response from the HTTP Response
+    P{{resp}} The request to be sent
+    P{{soapVersion}} The SOAP version of the request
+    R{{soapResponse}} The SOAP response created from the `http:Response`
+}
+function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns (Response|error) {
+    Response soapResponse = {};
+    soapResponse.soapVersion = soapVersion;
+    xml payload = check response.getXmlPayload();
     xml soapHeaders = payload["Header"].*;
     if (!soapHeaders.isEmpty()) {
         int i = 0;
@@ -206,9 +224,9 @@ function createSOAPResponse(http:Response resp, SoapVersion soapVersion) returns
             headersXML[i] = soapHeaders[i];
             i++;
         }
-        response.headers = headersXML;
+        soapResponse.headers = headersXML;
     }
-    payload = check resp.getXmlPayload();
-    response.payload = payload["Body"].*;
-    return response;
+    payload = check response.getXmlPayload();
+    soapResponse.payload = payload["Body"].*;
+    return soapResponse;
 }

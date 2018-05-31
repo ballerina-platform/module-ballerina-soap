@@ -16,6 +16,11 @@
 
 import ballerina/http;
 
+documentation {
+    Object for SOAP client endpoint.
+    F{{soapConfig}} Reference to `SoapConfiguration` type
+    F{{soapConnector}} Reference to `SoapConnector` type
+}
 public type Client object {
 
     public {
@@ -23,10 +28,17 @@ public type Client object {
         SoapConnector soapConnector;
     }
 
+    documentation {
+        Initialize SOAP endpoint
+        P{{soapConfig}} SOAP configuraion
+    }
     public function init(SoapConfiguration soapConfig);
 
+    documentation {
+        Get initialized SOAP connector
+        R{{}} The SOAP connector
+    }
     public function getCallerActions() returns SoapConnector;
-
 };
 
 public type SoapConfiguration {
