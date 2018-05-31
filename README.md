@@ -4,44 +4,6 @@ The SOAP connector allows you to send a ordinary XML request to a soap backend b
 construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers and the body in a
 SOAP message.
 
-## Getting started
-
-1.  Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide to download and install Ballerina.
-
-2.  To use Twilio endpoint, you need to provide the following:
-
-       - Account SId
-       - Auth Token
-       - Authy API Key
-
-       *Please note that, providing Authy API Key is required only if you are going to use Authy related APIs*
-
-3. Create a new Ballerina project by executing the following command.
-
-	```shell
-	   <PROJECT_ROOT_DIRECTORY>$ ballerina init
-	```
-
-4. Import the Twilio package to your Ballerina program as follows.
-
-	```ballerina
-	    import wso2/twilio;
-
-	    function main (string... args) {
-            endpoint twilio:Client twilioClient {
-                 accountSId:config:getAsString(ACCOUNT_SID),
-                 authToken:config:getAsString(AUTH_TOKEN),
-                 xAuthyKey:config:getAsString(AUTHY_API_KEY)
-            };
-
-		var details = twilioClient -> getAccountDetails();
-		match details {
-		    Account account => io:println(account);
-		    TwilioError twilioError => test:assertFail(msg = twilioError.message);
-		}
-	   }
-	```
-
 ## Getting Started
 
 Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide to download and install Ballerina.
@@ -77,11 +39,12 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
         }
     ```
 
-You may run this example using the following steps
- 1. First [run the axis2 server](https://docs.wso2.com/display/EI620/Setting+Up+the+ESB+Samples#SettingUptheESBSamples-StartingtheAxis2server).
- 2. Save the example in a ballerina file (eg.: `soapExample.bal`)
- 3. Run the file using the command `ballerina run soapExample.bal`
- 4. You will get a response similar to the following
+You may run this example using the following steps:
+
+1. First [run the axis2 server](https://docs.wso2.com/display/EI620/Setting+Up+the+ESB+Samples#SettingUptheESBSamples-StartingtheAxis2server).
+2. Save the example in a ballerina file (eg.: `soapExample.bal`)
+3. Run the file using the command `ballerina run soapExample.bal`
+4. You will get a response similar to the following
 
     ```xml
         <?xml version="1.0" encoding="UTF-8"?>
