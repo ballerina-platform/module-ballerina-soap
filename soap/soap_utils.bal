@@ -18,21 +18,6 @@ import ballerina/io;
 import ballerina/http;
 import ballerina/time;
 
-//@Description { value:"Returns a SoapError from the HttpConnectorError" }
-//@Param { value:"httpError: The HttpConnectorError" }
-//@Return { value:"SoapError: The SoapError obtained from the HttpConnectorError" }
-//function getSoapError(error httpError) returns SoapError {
-//    if (httpError != null) {
-//        SoapError soapError = {};
-//        soapError.msg = httpError.msg;
-//        soapError.cause = httpError.cause;
-//        soapError.stackTrace = httpError.stackTrace;
-//        soapError.errorCode = httpError.statusCode;
-//        return soapError;
-//    }
-//    return null;
-//}
-
 ////@Description { value:"Provides the namespace for the given soap version." }
 ////@Param { value:"soapVersion: The soap version of the request" }
 ////@Return { value:"string: The namespace for the given soap version" }
@@ -225,13 +210,3 @@ function createSOAPResponse(http:Response resp, SoapVersion soapVersion) returns
     //response.payload = check resp.getXmlPayload().selectChildren("Body").children().elements()[0];
     return response;
 }
-
-//@Description { value:"Initializes the SoapVersion if it's null" }
-//@Param { value:"soapVersion: The given soapVersion " }
-//@Return { value:"SoapVersion: Returns SoapVersion.SOAP11 if given SoapVersion is null else returns the same SoapVersion" }
-//function initSoapVersion(SoapVersion soapVersion) returns SoapVersion {
-//    if (soapVersion == null) {
-//        soapVersion = SOAP11;
-//    }
-//    return soapVersion;
-//}
