@@ -61,7 +61,7 @@ documentation {
     P{{request}} The request to be sent
     R{{headerElement}} XML with the WS addressing header
 }
-function getWSAddressingHeaders(Request request) returns xml {
+function getWSAddressingHeaders(SoapRequest request) returns xml {
     xmlns "https://www.w3.org/2005/08/addressing" as wsa;
 
     xml toElement = xml `<wsa:To>{{request.to}}</wsa:To>`;
@@ -107,7 +107,7 @@ documentation {
     P{{request}} The request to be sent
     R{{securityRoot}} XML with the WS secure username token headers
 }
-function getWSSecreUsernameTokenHeaders(Request request) returns xml {
+function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" as wsse;
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" as wsu;
 
@@ -135,7 +135,7 @@ documentation {
     P{{soapVersion}} The SOAP version of the request
     R{{headersRoot}} XML with the empty SOAP header
 }
-function createSoapHeader(Request request, SoapVersion soapVersion) returns xml {
+function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     xml headersRoot = xml `<soap:Header xmlns:soap="{{namespace}}"></soap:Header>`;
     xml headerElement;
@@ -185,7 +185,7 @@ documentation {
     P{{soapVersion}} The SOAP version of the request
     R{{req}} The SOAP Request as `http:Request` with the SOAP envelope
 }
-function fillSOAPEnvelope(Request request, SoapVersion soapVersion) returns http:Request {
+function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns http:Request {
     xml soapPayload = createSoapHeader(request, soapVersion);
     xml requestPayload = request.payload;
     if (!requestPayload.isEmpty()) {
@@ -208,12 +208,12 @@ function fillSOAPEnvelope(Request request, SoapVersion soapVersion) returns http
 
 documentation {
     Creates the SOAP response from the HTTP Response
-    P{{resp}} The request to be sent
+    P{{response}} The request to be sent
     P{{soapVersion}} The SOAP version of the request
     R{{soapResponse}} The SOAP response created from the `http:Response`
 }
-function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns (Response|error) {
-    Response soapResponse = {};
+function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns (SoapResponse|error) {
+    SoapResponse soapResponse = {};
     soapResponse.soapVersion = soapVersion;
     xml payload = check response.getXmlPayload();
     xml soapHeaders = payload["Header"].*;

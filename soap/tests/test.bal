@@ -35,14 +35,14 @@ function testSendReceive() {
                         </m0:request>
                     </m0:getQuote>`;
 
-    Request soapRequest = {
+    SoapRequest soapRequest = {
         soapAction: "urn:getQuote",
         payload: body
     };
 
     var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
     match details {
-        Response response => io:println(response);
+        SoapResponse soapResponse => io:println(soapResponse);
         SoapError soapError => test:assertFail(msg = soapError.message);
     }
 }

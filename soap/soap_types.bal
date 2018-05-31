@@ -36,7 +36,7 @@ documentation {
     F{{password}} The value for the password parameter used for WS-Security Username Token
     F{{passwordType}}
 }
-public type Request {
+public type SoapRequest {
     xml[] headers;
     xml payload;
     SoapVersion soapVersion = SOAP11;
@@ -66,7 +66,7 @@ documentation {
     F{{messageId}} The value for the messageId parameter used for WS-Addressing
     F{{relatesTo}} The value for the relationship parameter used for WS-Addressing. In the form of a (URI, QName) pair
 }
-public type Response {
+public type SoapResponse {
     xml[] headers;
     xml payload;
     SoapVersion soapVersion;

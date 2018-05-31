@@ -18,8 +18,7 @@ import ballerina/http;
 
 documentation {
     SOAP client connector.
-    F{{ser}} Unique identifier of the account
-    F{{client}} Http client endpoint
+    F{{clientEP}} Http client endpoint
 }
 public type SoapConnector object {
 
@@ -33,10 +32,10 @@ public type SoapConnector object {
         P{{request}} Request to be sent
         R{{}} If success, returns the response object, else returns `SoapError` object
     }
-    public function sendReceive(string path, Request request) returns (Response|SoapError);
+    public function sendReceive(string path, SoapRequest request) returns (SoapResponse|SoapError);
 };
 
-public function SoapConnector::sendReceive(string path, Request request) returns (Response|SoapError) {
+public function SoapConnector::sendReceive(string path, SoapRequest request) returns (SoapResponse|SoapError) {
     endpoint http:Client httpClient = self.clientEP;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, request = req);
