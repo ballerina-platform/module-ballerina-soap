@@ -10,7 +10,6 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
 
 ### Usage Example
 
-    ```ballerina
     import wso2/soap;
 
     function main (string... args) {
@@ -31,13 +30,12 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
             payload: body
         };
 
-        var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+        var details = soapClient->sendSoapRequest("/services/SimpleStockQuoteService", soapRequest);
         match details {
             soap:SoapResponse soapResponse => io:println(soapResponse);
             soap:SoapError soapError => test:assertFail(msg = soapError.message);
         }
     }
-    ```
 
 You may run this example using the following steps:
 

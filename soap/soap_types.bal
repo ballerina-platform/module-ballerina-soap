@@ -26,15 +26,15 @@ documentation {
     F{{soapAction}} The value of SOAP Action to send to the endpoint
     F{{^"from"}} The value for the source endpoint parameter used for WS-Addressing
     F{{to}} The value for the destination parameter used for WS-Addressing
-    F{{wsaAction}}
+    F{{wsaAction}} The value for the action parameter used for WS-Addressing
+    F{{relatesTo}} The value for the relationship parameter used for WS-Addressing. In the form of a (URI, QName) pair
+    F{{relationshipType}} The value for the relationship type parameter used for WS-Addressing
     F{{replyTo}} The value for the reply endpoint parameter used for WS-Addressing. This element must be present if a reply is expected. If this element is present, messageId must be present
-    F{{relationshipType}}
     F{{faultTo}} The value for the fault endpoint parameter used for WS-Addressing. If this element is present, messageId must be present
     F{{messageId}} The value for the messageId parameter used for WS-Addressing
-    F{{relatesTo}} The value for the relationship parameter used for WS-Addressing. In the form of a (URI, QName) pair
     F{{username}} The value for the username parameter used for WS-Security Username Token
     F{{password}} The value for the password parameter used for WS-Security Username Token
-    F{{passwordType}}
+    F{{passwordType}} The value for the password type parameter used for WS-Security Username Token
 }
 public type SoapRequest {
     xml[] headers;
@@ -44,11 +44,11 @@ public type SoapRequest {
     string ^"from";
     string to;
     string wsaAction;
-    string replyTo;
+    string relatesTo;
     string relationshipType;
+    string replyTo;
     string faultTo;
     string messageId;
-    string relatesTo;
     string username;
     string password;
     string passwordType;
@@ -58,25 +58,11 @@ documentation {
     F{{headers}} The array of SOAP headers for the SOAP envelop receives from the endpoint
     F{{payload}} The xml of SOAP payload for the SOAP envelop receives from the endpoint
     F{{soapVersion}} The version of SOAP
-    F{{^"from"}} The value for the source endpoint parameter used for WS-Addressing
-    F{{to}} The value for the destination parameter used for WS-Addressing
-    F{{wsaAction}}
-    F{{replyTo}} The value for the reply endpoint parameter used for WS-Addressing. This element must be present if a reply is expected. If this element is present, messageId must be present
-    F{{faultTo}} The value for the fault endpoint parameter used for WS-Addressing. If this element is present, messageId must be present
-    F{{messageId}} The value for the messageId parameter used for WS-Addressing
-    F{{relatesTo}} The value for the relationship parameter used for WS-Addressing. In the form of a (URI, QName) pair
 }
 public type SoapResponse {
     xml[] headers;
     xml payload;
     SoapVersion soapVersion;
-    string ^"from";
-    string to;
-    string wsaAction;
-    string replyTo;
-    string faultTo;
-    string messageId;
-    string relatesTo;
 };
 
 documentation {

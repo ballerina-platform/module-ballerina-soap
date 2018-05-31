@@ -32,10 +32,10 @@ public type SoapConnector object {
         P{{request}} Request to be sent
         R{{}} If success, returns the response object, else returns `SoapError` object
     }
-    public function sendReceive(string path, SoapRequest request) returns (SoapResponse|SoapError);
+    public function sendSoapRequest(string path, SoapRequest request) returns (SoapResponse|SoapError);
 };
 
-public function SoapConnector::sendReceive(string path, SoapRequest request) returns (SoapResponse|SoapError) {
+public function SoapConnector::sendSoapRequest(string path, SoapRequest request) returns (SoapResponse|SoapError) {
     endpoint http:Client httpClient = self.clientEP;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, request = req);

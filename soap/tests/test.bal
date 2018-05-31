@@ -27,7 +27,7 @@ endpoint Client soapClient {
 @test:Config
 function testSendReceive() {
     io:println("\n ---------------------------------------------------------------------------");
-    log:printInfo("soapClient -> sendReceive()");
+    log:printInfo("soapClient -> sendSoapRequest()");
 
     xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                         <m0:request>
@@ -40,7 +40,7 @@ function testSendReceive() {
         payload: body
     };
 
-    var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+    var details = soapClient->sendSoapRequest("/services/SimpleStockQuoteService", soapRequest);
     match details {
         SoapResponse soapResponse => io:println(soapResponse);
         SoapError soapError => test:assertFail(msg = soapError.message);
