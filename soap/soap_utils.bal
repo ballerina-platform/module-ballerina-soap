@@ -17,6 +17,7 @@
 import ballerina/io;
 import ballerina/http;
 import ballerina/time;
+import ballerina/mime;
 
 documentation {
     Provides the namespace for the given SOAP version.
@@ -198,10 +199,10 @@ function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns 
     http:Request req = new;
     req.setXmlPayload(soapEnv);
     if (soapVersion == SOAP11) {
-        req.setHeader("Content-Type", "text/xml");
+        req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
         req.addHeader("SOAPAction", request.soapAction);
     } else {
-        req.setHeader("Content-Type", "application/soap+xml");
+        req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
     }
     return req;
 }
