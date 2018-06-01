@@ -27,7 +27,7 @@ public type SoapConnector object {
     }
 
     documentation {
-        Sends request and expects a response
+        Sends request and expects a response.
         P{{path}} Resource path
         P{{request}} Request to be sent
         R{{}} If success, returns the response object, else returns `SoapError` object

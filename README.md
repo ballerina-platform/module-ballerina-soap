@@ -1,6 +1,6 @@
 # SOAP Connector
 
-The SOAP connector allows you to send a ordinary XML request to a soap backend by specifying the necessary details to
+The SOAP connector allows you to send an ordinary XML request to a soap backend by specifying the necessary details to
 construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers and the body in a
 SOAP message.
 

@@ -31,7 +31,7 @@ function getNamespace(SoapVersion soapVersion) returns string {
 }
 
 documentation {
-    Provides the encoding style for the given SOAP version
+    Provides the encoding style for the given SOAP version.
     P{{soapVersion}} The SOAP version of the request
     R{{}} The encoding style for the given SOAP version
 }
@@ -43,7 +43,7 @@ function getEncodingStyle(SoapVersion soapVersion) returns string {
 }
 
 documentation {
-    Provides an empty SOAP envelope for the given SOAP version
+    Provides an empty SOAP envelope for the given SOAP version.
     P{{soapVersion}} The SOAP version of the request
     R{{}} XML with the empty SOAP envelope
 }
@@ -57,7 +57,7 @@ function createSoapEnvelop(SoapVersion soapVersion) returns xml {
 }
 
 documentation {
-    Provides the WS addressing header
+    Provides the WS addressing header.
     P{{request}} The request to be sent
     R{{headerElement}} XML with the WS addressing header
 }
@@ -103,7 +103,7 @@ function getWSAddressingHeaders(SoapRequest request) returns xml {
 }
 
 documentation {
-    Provides the WS secure username token headers
+    Provides the WS secure username token headers.
     P{{request}} The request to be sent
     R{{securityRoot}} XML with the WS secure username token headers
 }
@@ -130,7 +130,7 @@ function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
 }
 
 documentation {
-    Provides the SOAP headers in the request as XML
+    Provides the SOAP headers in the request as XML.
     P{{request}} The request to be sent
     P{{soapVersion}} The SOAP version of the request
     R{{headersRoot}} XML with the empty SOAP header
@@ -167,7 +167,7 @@ function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns 
 }
 
 documentation {
-    Provides the SOAP body in the request as XML
+    Provides the SOAP body in the request as XML.
     P{{payload}} The payload to be sent
     P{{soapVersion}} The SOAP version of the request
     R{{bodyRoot}} XML with the empty SOAP body
@@ -180,7 +180,7 @@ function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
 }
 
 documentation {
-    Prepare a SOAP envelope with the XML to be sent
+    Prepare a SOAP envelope with the XML to be sent.
     P{{request}} The request to be sent
     P{{soapVersion}} The SOAP version of the request
     R{{req}} The SOAP Request as `http:Request` with the SOAP envelope
@@ -207,7 +207,7 @@ function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns 
 }
 
 documentation {
-    Creates the SOAP response from the HTTP Response
+    Creates the SOAP response from the HTTP Response.
     P{{response}} The request to be sent
     P{{soapVersion}} The SOAP version of the request
     R{{soapResponse}} The SOAP response created from the `http:Response`

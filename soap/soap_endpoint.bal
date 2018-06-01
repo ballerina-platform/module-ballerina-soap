@@ -29,13 +29,13 @@ public type Client object {
     }
 
     documentation {
-        Initialize SOAP endpoint
+        Initialize SOAP endpoint.
         P{{soapConfig}} SOAP configuraion
     }
     public function init(SoapConfiguration soapConfig);
 
     documentation {
-        Get initialized SOAP connector
+        Get initialized SOAP connector.
         R{{}} The SOAP connector
     }
     public function getCallerActions() returns SoapConnector;

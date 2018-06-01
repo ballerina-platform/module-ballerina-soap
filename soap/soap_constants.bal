@@ -14,9 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.package soap;
 
+// SOAP related constants
 @final string SOAP11_NAMESPACE ="http://schemas.xmlsoap.org/soap/envelope/";
 @final string SOAP12_NAMESPACE ="http://www.w3.org/2003/05/soap-envelope";
 @final string SOAP11_ENCODING_STYLE ="http://schemas.xmlsoap.org/soap/encoding/";
 @final string SOAP12_ENCODING_STYLE ="http://www.w3.org/2003/05/soap-encoding";
 
+// Symbols
 @final string EMPTY_STRING ="";
