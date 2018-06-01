@@ -26,7 +26,6 @@ endpoint Client soapClient {
 
 @test:Config
 function testSendReceive() {
-    io:println("\n ---------------------------------------------------------------------------");
     log:printInfo("soapClient -> sendSoapRequest()");
 
     xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
