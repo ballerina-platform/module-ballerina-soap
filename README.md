@@ -1,80 +1,50 @@
-# Ballerina Soap Connector
+# SOAP Connector
 
-The Soap connector allows you to send a ordinary xml request to a soap backend by specifying the necessary details to construct a soap envelope. It abstracts out the details of the creation of a soap envelope, headers and the body in a soap message.
+The SOAP connector allows you to send an ordinary XML request to a soap backend by specifying the necessary details to
+construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers and the body in a
+SOAP message.
 
 ## Getting Started
 
-1. Download the Ballerina tool distribution by navigating to https://ballerinalang.org/downloads/
-2. Navigate to https://github.com/ballerinalang/connector-soap/releases Download and Extract ballerina-soap-connector-{version}.zip and copy ballerina-soap-connector-{vesion}.jar into the `<ballerina-tools>/bre/lib` folder.
-
-## Working With Soap Connector Actions
-
-##### Fire and Forget
-Sends the request without waiting for any response from the service (even an error).
-
-###### Parameters
-* **path**: Resource path
-* **request**: Request to be sent
-
-##### Send Robust
-Sends the request and receives an error if any.
-
-###### Parameters
-* **path**: Resource path
-* **request**: Request to be sent
-
-###### Return value
-* **SoapError**: The error if an error occurred
-
-##### Send and Receive
-
-Sends request and expects a response.
-
-###### Parameters
-* **path**: Resource path
-* **request**: Request to be sent
-
-###### Return Value
-* **Response**: The response received from the backend
-* **SoapError**: The error if an error occurred
+Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide to download and install Ballerina.
 
 ### Usage Example
 
-    import ballerina.net.soap;
-    
-    public function main (string[] args) {
-        endpoint<soap:SoapClient> soapClient {
-            create soap:SoapClient("http://localhost:9000", {});
+    import wso2/soap;
+
+    function main (string... args) {
+        endpoint soap:Client soapClient {
+            clientConfig: {
+                url: "http://localhost:9000"
+            }
         }
-    
+
         xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
-                      <m0:request>
-                         <m0:symbol>WSO2</m0:symbol>
-                      </m0:request>
-                   </m0:getQuote>`;
-        soap:SoapVersion version11 = soap:SoapVersion.SOAP11;
-    
-        soap:Request soapRequest = {
-                                       soapAction:"urn:getQuote",
-                                       soapVersion:version11,
-                                       payload:body
-                                   };
-    
-        soap:Response soapResponse;
-        soap:SoapError soapError;
-        soapResponse, soapError = soapClient.sendReceive("/services/SimpleStockQuoteService", soapRequest);
-    
-        xml payload = soapResponse.payload;
-        println(payload);
+                            <m0:request>
+                                <m0:symbol>WSO2</m0:symbol>
+                            </m0:request>
+                        </m0:getQuote>`;
+
+        soap:SoapRequest soapRequest = {
+            soapAction: "urn:getQuote",
+            payload: body
+        };
+
+        var details = soapClient->sendSoapRequest("/services/SimpleStockQuoteService", soapRequest);
+        match details {
+            soap:SoapResponse soapResponse => io:println(soapResponse);
+            soap:SoapError soapError => test:assertFail(msg = soapError.message);
+        }
     }
 
-You may run this example using the following steps
- 1. First [run the axis2 server](https://docs.wso2.com/display/EI620/Setting+Up+the+ESB+Samples#SettingUptheESBSamples-StartingtheAxis2server).
- 2. Save the example in a file say soapExample.bal
- 3. Run the file using the command `ballerina run soapExample.bal`
- 4. You will get a response similar to the following
-    
+You may run this example using the following steps:
 
+1. First [run the axis2 server](https://docs.wso2.com/display/EI620/Setting+Up+the+ESB+Samples#SettingUptheESBSamples-StartingtheAxis2server).
+2. Save the example in a ballerina file (eg.: `soapExample.bal`)
+3. Run the file using the command `ballerina run soapExample.bal`
+4. You will get a response similar to the following
+
+    ```xml
     <?xml version="1.0" encoding="UTF-8"?>
     <ns:getQuoteResponse xmlns:ns="http://services.samples">
        <ns:return xmlns:ax21="http://services.samples/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ax21:GetQuoteResponse">
@@ -94,6 +64,4 @@ You may run this example using the following steps
           <ax21:volume>16449</ax21:volume>
        </ns:return>
     </ns:getQuoteResponse>
-
-
-
+    ```
