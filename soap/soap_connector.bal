@@ -38,7 +38,7 @@ public type SoapConnector object {
         Send Robust requests.Sends the request and possibly receives an error.
         P{{path}} Resource path
         P{{request}} Request to be sent
-        R{{}} If success, returns the response object, else returns `SoapError` object
+        R{{}} If success, returns nothing, else returns `SoapError` object
     }
     public function sendRobust(string path, SoapRequest request) returns SoapError?;
 
@@ -46,7 +46,6 @@ public type SoapConnector object {
         Fire and forget requests. Sends the request without the possibility of any response from the service (even an error).
         P{{path}} Resource path
         P{{request}} Request to be sent
-        R{{}} If success, returns the response object, else returns `SoapError` object
     }
     public function fireAndForget(string path, SoapRequest request);
 
