@@ -40,7 +40,7 @@ public type SoapConnector object {
         P{{request}} Request to be sent
         R{{}} If success, returns the response object, else returns `SoapError` object
     }
-    public function sendRobust(string path, SoapRequest request) returns ()|SoapError;
+    public function sendRobust(string path, SoapRequest request) returns SoapError?;
 
     documentation {
         Fire and forget requests. Sends the request without the possibility of any response from the service (even an error).
@@ -66,7 +66,7 @@ public function SoapConnector::sendReceive(string path, SoapRequest request) ret
     }
 }
 
-public function SoapConnector::sendRobust(string path, SoapRequest request) returns ()|SoapError {
+public function SoapConnector::sendRobust(string path, SoapRequest request) returns SoapError? {
     endpoint http:Client httpClient = self.clientEP;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, request = req);
