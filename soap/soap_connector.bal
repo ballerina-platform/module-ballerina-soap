@@ -32,10 +32,26 @@ public type SoapConnector object {
         P{{request}} Request to be sent
         R{{}} If success, returns the response object, else returns `SoapError` object
     }
-    public function sendSoapRequest(string path, SoapRequest request) returns (SoapResponse|SoapError);
+    public function sendReceive(string path, SoapRequest request) returns SoapResponse|SoapError;
+
+    documentation {
+        Send Robust requests.Sends the request and possibly receives an error.
+        P{{path}} Resource path
+        P{{request}} Request to be sent
+        R{{}} If success, returns `nill`, else returns `SoapError` object
+    }
+    public function sendRobust(string path, SoapRequest request) returns SoapError?;
+
+    documentation {
+        Fire and forget requests. Sends the request without the possibility of any response from the service (even an error).
+        P{{path}} Resource path
+        P{{request}} Request to be sent
+    }
+    public function fireAndForget(string path, SoapRequest request);
+
 };
 
-public function SoapConnector::sendSoapRequest(string path, SoapRequest request) returns (SoapResponse|SoapError) {
+public function SoapConnector::sendReceive(string path, SoapRequest request) returns SoapResponse|SoapError {
     endpoint http:Client httpClient = self.clientEP;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, request = req);
@@ -47,4 +63,24 @@ public function SoapConnector::sendSoapRequest(string path, SoapRequest request)
             return err;
         }
     }
+}
+
+public function SoapConnector::sendRobust(string path, SoapRequest request) returns SoapError? {
+    endpoint http:Client httpClient = self.clientEP;
+    http:Request req = fillSOAPEnvelope(request, request.soapVersion);
+    var response = httpClient->post(path, request = req);
+    match response {
+        http:Response httpResponse => {
+            return ();
+        }
+        error err => {
+            return err;
+        }
+    }
+}
+
+public function SoapConnector::fireAndForget(string path, SoapRequest request) {
+    endpoint http:Client httpClient = self.clientEP;
+    http:Request req = fillSOAPEnvelope(request, request.soapVersion);
+    var response = httpClient->post(path, request = req);
 }

@@ -1,0 +1,8 @@
+[project]
+license = "Apache-2.0"
+org-name = "wso2"
+version = "0.3.1"
+authors = ["WSO2"]
+homepage = "https://wso2.com/"
+repository = "https://github.com/wso2-ballerina/package-soap"
+keywords = ["soap"]
