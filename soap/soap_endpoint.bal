@@ -30,7 +30,7 @@ public type Client object {
 
     documentation {
         Initialize SOAP endpoint.
-        P{{soapConfig}} SOAP configuraion
+        P{{config}} SOAP configuraion
     }
     public function init(SoapConfiguration config);
 
