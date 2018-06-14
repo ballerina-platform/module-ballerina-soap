@@ -36,7 +36,7 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
             payload: body
         };
 
-        var details = soapClient->sendSoapRequest("/services/SimpleStockQuoteService", soapRequest);
+        var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
         match details {
             soap:SoapResponse soapResponse => io:println(soapResponse);
             soap:SoapError soapError => io:println(soapError);
