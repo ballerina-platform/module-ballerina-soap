@@ -142,7 +142,6 @@ function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns 
     xml headerElement;
     xml[] headers = request.headers;
     if (lengthof headers != 0) {
-        xml[] headers = request.headers;
         int i = 1;
         xml headersXML = headers[0];
         while (i < lengthof headers) {

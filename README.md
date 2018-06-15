@@ -4,6 +4,12 @@ The SOAP connector allows you to send an ordinary XML request to a soap backend 
 construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers and the body in a
 SOAP message.
 
+## Compatibility
+
+| Ballerina Language Version  | SOAP Version   |
+|:---------------------------:|:--------------:|
+| 0.974.1                     | 1.1 & 1.2      |
+
 ## Getting Started
 
 Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide to download and install Ballerina.
@@ -30,10 +36,10 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
             payload: body
         };
 
-        var details = soapClient->sendSoapRequest("/services/SimpleStockQuoteService", soapRequest);
+        var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
         match details {
             soap:SoapResponse soapResponse => io:println(soapResponse);
-            soap:SoapError soapError => test:assertFail(msg = soapError.message);
+            soap:SoapError soapError => io:println(soapError);
         }
     }
 

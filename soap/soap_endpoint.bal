@@ -30,9 +30,9 @@ public type Client object {
 
     documentation {
         Initialize SOAP endpoint.
-        P{{soapConfig}} SOAP configuraion
+        P{{config}} SOAP configuraion
     }
-    public function init(SoapConfiguration soapConfig);
+    public function init(SoapConfiguration config);
 
     documentation {
         Get initialized SOAP connector.
@@ -45,8 +45,8 @@ public type SoapConfiguration {
     http:ClientEndpointConfig clientConfig;
 };
 
-public function Client::init(SoapConfiguration soapConfig) {
-    self.soapConnector.clientEP.init(soapConfig.clientConfig);
+public function Client::init(SoapConfiguration config) {
+    self.soapConnector.clientEP.init(config.clientConfig);
 }
 
 public function Client::getCallerActions() returns SoapConnector {
