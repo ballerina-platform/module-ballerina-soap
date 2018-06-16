@@ -8,7 +8,7 @@ SOAP message.
 
 | Ballerina Language Version  | SOAP Version   |
 |:---------------------------:|:--------------:|
-| 0.974.1                     | 1.1 & 1.2      |
+| 0.975.0                     | 1.1 & 1.2      |
 
 ## Getting Started
 
