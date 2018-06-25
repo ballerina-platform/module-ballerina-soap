@@ -16,6 +16,7 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
 
 ### Usage Example
 
+    import ballerina/io;
     import wso2/soap;
 
     function main (string... args) {
@@ -23,7 +24,7 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
             clientConfig: {
                 url: "http://localhost:9000"
             }
-        }
+        };
 
         xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                             <m0:request>
