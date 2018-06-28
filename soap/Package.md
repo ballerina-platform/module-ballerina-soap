@@ -15,13 +15,12 @@ SOAP message.
 ## Sample
 
 First, import the `wso2/soap` package into the Ballerina project.
-```
+```ballerina
 import wso2/soap;
 ```
 
 Instantiate the connector by giving backend URL details in the HTTP client config.
-
-```
+```ballerina
 endpoint soap:Client soapClient {
     clientConfig: {
         url: "http://localhost:9000"
@@ -30,7 +29,7 @@ endpoint soap:Client soapClient {
 ```
 
 The `sendSoapRequest` function send a soap request to initiated backend url with the given `SoapRequest` object.
-```
+```ballerina
 xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                     <m0:request>
                         <m0:symbol>WSO2</m0:symbol>
