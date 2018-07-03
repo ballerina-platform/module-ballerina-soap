@@ -9,18 +9,17 @@ SOAP message.
 ## Compatibility
 |                          |    Version     |
 |:------------------------:|:--------------:|
-| Ballerina Language       | 0.973.0        |
+| Ballerina Language       | 0.975.0        |
 | SOAP Version             | 1.1 & 1.2      |
 
 ## Sample
 
-First, import the `wso2/scim2` package into the Ballerina project.
+First, import the `wso2/soap` package into the Ballerina project.
 ```ballerina
 import wso2/soap;
 ```
 
 Instantiate the connector by giving backend URL details in the HTTP client config.
-
 ```ballerina
 endpoint soap:Client soapClient {
     clientConfig: {
@@ -45,6 +44,6 @@ soap:SoapRequest soapRequest = {
 var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
 match details {
     soap:SoapResponse soapResponse => io:println(soapResponse);
-    soap:SoapError soapError => test:assertFail(msg = soapError.message);
+    soap:SoapError soapError => io:println(soapError);
 }
 ```
