@@ -20,7 +20,6 @@ import wso2/soap;
 ```
 
 Instantiate the connector by giving backend URL details in the HTTP client config.
-
 ```ballerina
 endpoint soap:Client soapClient {
     clientConfig: {
