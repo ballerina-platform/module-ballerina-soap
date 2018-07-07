@@ -36,7 +36,7 @@ documentation {
     F{{password}} The value for the password parameter used for WS-Security Username Token
     F{{passwordType}} The value for the password type parameter used for WS-Security Username Token
 }
-public type SoapRequest {
+public type SoapRequest record {
     xml[] headers;
     xml payload;
     SoapVersion soapVersion = SOAP11;
@@ -59,7 +59,7 @@ documentation {
     F{{payload}} The xml of SOAP payload for the SOAP envelop receives from the endpoint
     F{{soapVersion}} The version of SOAP
 }
-public type SoapResponse {
+public type SoapResponse record {
     xml[] headers;
     xml payload;
     SoapVersion soapVersion;
@@ -69,7 +69,7 @@ documentation {
     F{{message}} The value for the error message
     F{{cause}} The value for the cause
 }
-public type SoapError {
+public type SoapError record {
     string message;
     error? cause;
 };

@@ -22,9 +22,7 @@ documentation {
 }
 public type SoapConnector object {
 
-    public {
-        http:Client clientEP;
-    }
+    public http:Client clientEP;
 
     documentation {
         Sends request and expects a response.
@@ -51,7 +49,7 @@ public type SoapConnector object {
 
 };
 
-public function SoapConnector::sendReceive(string path, SoapRequest request) returns SoapResponse|SoapError {
+function SoapConnector::sendReceive(string path, SoapRequest request) returns SoapResponse|SoapError {
     endpoint http:Client httpClient = self.clientEP;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, req);
@@ -65,7 +63,7 @@ public function SoapConnector::sendReceive(string path, SoapRequest request) ret
     }
 }
 
-public function SoapConnector::sendRobust(string path, SoapRequest request) returns SoapError? {
+function SoapConnector::sendRobust(string path, SoapRequest request) returns SoapError? {
     endpoint http:Client httpClient = self.clientEP;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, req);
@@ -79,7 +77,7 @@ public function SoapConnector::sendRobust(string path, SoapRequest request) retu
     }
 }
 
-public function SoapConnector::fireAndForget(string path, SoapRequest request) {
+function SoapConnector::fireAndForget(string path, SoapRequest request) {
     endpoint http:Client httpClient = self.clientEP;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, req);
