@@ -19,11 +19,9 @@ import ballerina/io;
 import ballerina/mime;
 import ballerina/time;
 
-documentation {
-    Provides the namespace for the given SOAP version.
-    P{{soapVersion}} The SOAP version of the request
-    R{{}} The namespace for the given SOAP version
-}
+# Provides the namespace for the given SOAP version.
+# + soapVersion - The SOAP version of the request
+# + return - The namespace for the given SOAP version
 function getNamespace(SoapVersion soapVersion) returns string {
     if (soapVersion == SOAP11) {
         return SOAP11_NAMESPACE;
@@ -31,11 +29,9 @@ function getNamespace(SoapVersion soapVersion) returns string {
     return SOAP12_NAMESPACE;
 }
 
-documentation {
-    Provides the encoding style for the given SOAP version.
-    P{{soapVersion}} The SOAP version of the request
-    R{{}} The encoding style for the given SOAP version
-}
+# Provides the encoding style for the given SOAP version.
+# + soapVersion - The SOAP version of the request
+# + return - The encoding style for the given SOAP version
 function getEncodingStyle(SoapVersion soapVersion) returns string {
     if (soapVersion == SOAP11) {
         return SOAP11_ENCODING_STYLE;
@@ -43,11 +39,9 @@ function getEncodingStyle(SoapVersion soapVersion) returns string {
     return SOAP12_ENCODING_STYLE;
 }
 
-documentation {
-    Provides an empty SOAP envelope for the given SOAP version.
-    P{{soapVersion}} The SOAP version of the request
-    R{{}} XML with the empty SOAP envelope
-}
+# Provides an empty SOAP envelope for the given SOAP version.
+# + soapVersion - The SOAP version of the request
+# + return - XML with the empty SOAP envelope
 function createSoapEnvelop(SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     string encodingStyle = getEncodingStyle(soapVersion);
@@ -57,11 +51,9 @@ function createSoapEnvelop(SoapVersion soapVersion) returns xml {
                      </soap:Envelope>`;
 }
 
-documentation {
-    Provides the WS addressing header.
-    P{{request}} The request to be sent
-    R{{headerElement}} XML with the WS addressing header
-}
+# Provides the WS addressing header.
+# + request - The request to be sent
+# + return - XML with the WS addressing header
 function getWSAddressingHeaders(SoapRequest request) returns xml {
     xmlns "https://www.w3.org/2005/08/addressing" as wsa;
 
@@ -103,11 +95,9 @@ function getWSAddressingHeaders(SoapRequest request) returns xml {
     return headerElement;
 }
 
-documentation {
-    Provides the WS secure username token headers.
-    P{{request}} The request to be sent
-    R{{securityRoot}} XML with the WS secure username token headers
-}
+# Provides the WS secure username token headers.
+# + request - The request to be sent
+# + return - XML with the WS secure username token headers
 function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" as wsse;
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" as wsu;
@@ -130,12 +120,10 @@ function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
     return securityRoot;
 }
 
-documentation {
-    Provides the SOAP headers in the request as XML.
-    P{{request}} The request to be sent
-    P{{soapVersion}} The SOAP version of the request
-    R{{headersRoot}} XML with the empty SOAP header
-}
+# Provides the SOAP headers in the request as XML.
+# + request - The request to be sent
+# + soapVersion - The SOAP version of the request
+# + return - XML with the empty SOAP header
 function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     xml headersRoot = xml `<soap:Header xmlns:soap="{{namespace}}"></soap:Header>`;
@@ -166,12 +154,10 @@ function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns 
     return headersRoot;
 }
 
-documentation {
-    Provides the SOAP body in the request as XML.
-    P{{payload}} The payload to be sent
-    P{{soapVersion}} The SOAP version of the request
-    R{{bodyRoot}} XML with the empty SOAP body
-}
+# Provides the SOAP body in the request as XML.
+# + payload - The payload to be sent
+# + soapVersion - The SOAP version of the request
+# + return - XML with the empty SOAP body
 function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     xml bodyRoot = xml `<soap:Body xmlns:soap="{{namespace}}"></soap:Body>`;
@@ -179,12 +165,10 @@ function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
     return bodyRoot;
 }
 
-documentation {
-    Prepare a SOAP envelope with the XML to be sent.
-    P{{request}} The request to be sent
-    P{{soapVersion}} The SOAP version of the request
-    R{{req}} The SOAP Request as `http:Request` with the SOAP envelope
-}
+# Prepare a SOAP envelope with the XML to be sent.
+# + request - The request to be sent
+# + soapVersion - The SOAP version of the request
+# + return - The SOAP Request as `http:Request` with the SOAP envelope
 function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns http:Request {
     xml soapPayload = createSoapHeader(request, soapVersion);
     xml requestPayload = request.payload;
@@ -206,12 +190,10 @@ function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns 
     return req;
 }
 
-documentation {
-    Creates the SOAP response from the HTTP Response.
-    P{{response}} The request to be sent
-    P{{soapVersion}} The SOAP version of the request
-    R{{soapResponse}} The SOAP response created from the `http:Response`
-}
+# Creates the SOAP response from the HTTP Response.
+# + response - The request to be sent
+# + soapVersion - The SOAP version of the request
+# + return - The SOAP response created from the `http:Response`
 function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns (SoapResponse|error) {
     SoapResponse soapResponse = {};
     soapResponse.soapVersion = soapVersion;
