@@ -17,24 +17,28 @@
 import ballerina/http;
 
 # SOAP client connector.
-# + clientEP - Http client endpoint
+#
+# + clientEP - HTTP client endpoint
 public type SoapConnector object {
 
     public http:Client clientEP;
 
     # Sends request and expects a response.
+    #
     # + path - Resource path
     # + request - Request to be sent
     # + return - If success, returns the response object, else returns `SoapError` object
     public function sendReceive(string path, SoapRequest request) returns SoapResponse|SoapError;
 
     # Send Robust requests.Sends the request and possibly receives an error.
+    #
     # + path - Resource path
     # + request - Request to be sent
-    # + return - If success, returns `nill`, else returns `SoapError` object
+    # + return - If success, returns `nil`, else returns `SoapError` object
     public function sendRobust(string path, SoapRequest request) returns SoapError?;
 
     # Fire and forget requests. Sends the request without the possibility of any response from the service (even an error).
+    #
     # + path - Resource path
     # + request - Request to be sent
     public function fireAndForget(string path, SoapRequest request);

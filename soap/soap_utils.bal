@@ -20,6 +20,7 @@ import ballerina/mime;
 import ballerina/time;
 
 # Provides the namespace for the given SOAP version.
+#
 # + soapVersion - The SOAP version of the request
 # + return - The namespace for the given SOAP version
 function getNamespace(SoapVersion soapVersion) returns string {
@@ -30,6 +31,7 @@ function getNamespace(SoapVersion soapVersion) returns string {
 }
 
 # Provides the encoding style for the given SOAP version.
+#
 # + soapVersion - The SOAP version of the request
 # + return - The encoding style for the given SOAP version
 function getEncodingStyle(SoapVersion soapVersion) returns string {
@@ -40,6 +42,7 @@ function getEncodingStyle(SoapVersion soapVersion) returns string {
 }
 
 # Provides an empty SOAP envelope for the given SOAP version.
+#
 # + soapVersion - The SOAP version of the request
 # + return - XML with the empty SOAP envelope
 function createSoapEnvelop(SoapVersion soapVersion) returns xml {
@@ -52,6 +55,7 @@ function createSoapEnvelop(SoapVersion soapVersion) returns xml {
 }
 
 # Provides the WS addressing header.
+#
 # + request - The request to be sent
 # + return - XML with the WS addressing header
 function getWSAddressingHeaders(SoapRequest request) returns xml {
@@ -96,6 +100,7 @@ function getWSAddressingHeaders(SoapRequest request) returns xml {
 }
 
 # Provides the WS secure username token headers.
+#
 # + request - The request to be sent
 # + return - XML with the WS secure username token headers
 function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
@@ -121,6 +126,7 @@ function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
 }
 
 # Provides the SOAP headers in the request as XML.
+#
 # + request - The request to be sent
 # + soapVersion - The SOAP version of the request
 # + return - XML with the empty SOAP header
@@ -155,6 +161,7 @@ function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns 
 }
 
 # Provides the SOAP body in the request as XML.
+#
 # + payload - The payload to be sent
 # + soapVersion - The SOAP version of the request
 # + return - XML with the empty SOAP body
@@ -166,6 +173,7 @@ function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
 }
 
 # Prepare a SOAP envelope with the XML to be sent.
+#
 # + request - The request to be sent
 # + soapVersion - The SOAP version of the request
 # + return - The SOAP Request as `http:Request` with the SOAP envelope
@@ -191,6 +199,7 @@ function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns 
 }
 
 # Creates the SOAP response from the HTTP Response.
+#
 # + response - The request to be sent
 # + soapVersion - The SOAP version of the request
 # + return - The SOAP response created from the `http:Response`

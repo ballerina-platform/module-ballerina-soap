@@ -20,6 +20,7 @@ public type SoapVersion "SOAP11"|"SOAP12";
 @final public SoapVersion SOAP12 = "SOAP12";
 
 # Represents SOAP request.
+#
 # + headers - The array of SOAP headers for the SOAP envelop to send to the endpoint
 # + payload - The xml of SOAP payload for the SOAP envelop to send to the endpoint
 # + soapVersion - The version of SOAP
@@ -30,9 +31,9 @@ public type SoapVersion "SOAP11"|"SOAP12";
 # + relatesTo - The value for the relationship parameter used for WS-Addressing. In the form of a (URI, QName) pair
 # + relationshipType - The value for the relationship type parameter used for WS-Addressing
 # + replyTo - The value for the reply endpoint parameter used for WS-Addressing. This element must be present if a reply
-# is expected. If this element is present, messageId must be present
+#             is expected. If this element is present, messageId must be present
 # + faultTo - The value for the fault endpoint parameter used for WS-Addressing. If this element is present, messageId
-# must be present
+#             must be present
 # + messageId - The value for the messageId parameter used for WS-Addressing
 # + username - The value for the username parameter used for WS-Security Username Token
 # + password - The value for the password parameter used for WS-Security Username Token
@@ -56,6 +57,7 @@ public type SoapRequest record {
 };
 
 # Represents SOAP response.
+#
 # + headers - The array of SOAP headers for the SOAP envelop receives from the endpoint
 # + payload - The xml of SOAP payload for the SOAP envelop receives from the endpoint
 # + soapVersion - The version of SOAP
@@ -66,6 +68,7 @@ public type SoapResponse record {
 };
 
 # Represents SOAP error.
+#
 # + message - The value for the error message
 # + cause - The value for the cause
 public type SoapError record {
