@@ -10,7 +10,7 @@ SOAP message.
 
 | Ballerina Language Version  | SOAP Version   |
 |:---------------------------:|:--------------:|
-| 0.981.0                     | 1.1 & 1.2      |
+| 0.982.0                     | 1.1 & 1.2      |
 
 ## Getting Started
 
