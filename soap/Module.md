@@ -1,6 +1,6 @@
 Connects to SOAP backend from Ballerina. 
 
-# Package Overview
+# Module Overview
 
 The SOAP connector allows you to send an ordinary XML request to a soap backend by specifying the necessary details to
 construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers and the body in a
@@ -9,12 +9,12 @@ SOAP message.
 ## Compatibility
 |                          |    Version     |
 |:------------------------:|:--------------:|
-| Ballerina Language       | 0.982.0        |
+| Ballerina Language       | 0.983.0        |
 | SOAP Version             | 1.1 & 1.2      |
 
 ## Sample
 
-First, import the `wso2/soap` package into the Ballerina project.
+First, import the `wso2/soap` module into the Ballerina project.
 ```ballerina
 import wso2/soap;
 ```
