@@ -12,7 +12,7 @@
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
-// under the License.package soap;
+// under the License.
 
 import ballerina/http;
 import ballerina/io;
@@ -213,7 +213,7 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
         xml[] headersXML = [];
         while (i < lengthof soapHeaders) {
             headersXML[i] = soapHeaders[i];
-            i++;
+            i += 1;
         }
         soapResponse.headers = headersXML;
     }

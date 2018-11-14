@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wso2-ballerina/package-soap.svg?branch=master)](https://travis-ci.org/wso2-ballerina/package-soap)
+[![Build Status](https://travis-ci.org/wso2-ballerina/module-soap.svg?branch=master)](https://travis-ci.org/wso2-ballerina/module-soap)
 
 # SOAP Connector
 
@@ -10,7 +10,7 @@ SOAP message.
 
 | Ballerina Language Version  | SOAP Version   |
 |:---------------------------:|:--------------:|
-| 0.982.0                     | 1.1 & 1.2      |
+| 0.983.0                     | 1.1 & 1.2      |
 
 ## Getting Started
 

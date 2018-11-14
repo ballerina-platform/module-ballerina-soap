@@ -12,7 +12,7 @@
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
-// under the License.package soap;
+// under the License.
 
 public type SoapVersion "SOAP11"|"SOAP12";
 
@@ -64,7 +64,7 @@ public type SoapRequest record {
 public type SoapResponse record {
     xml[] headers;
     xml payload;
-    SoapVersion soapVersion;
+    SoapVersion soapVersion = SOAP11;
 };
 
 # Represents SOAP error.
