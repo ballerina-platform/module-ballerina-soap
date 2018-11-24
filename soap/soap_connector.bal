@@ -49,14 +49,10 @@ remote function SoapConnector.sendRobust(string path, SoapRequest request) retur
     http:Client httpClient = self.soapClient;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, req);
-    match response {
-        http:Response httpResponse => {
-            return ();
-        }
-        error err => {
-            return err;
-        }
+    if (response is error) {
+        return response;
     }
+    return ();
 }
 
 remote function SoapConnector.fireAndForget(string path, SoapRequest request) {

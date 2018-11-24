@@ -84,7 +84,8 @@ function getWSAddressingHeaders(SoapRequest request) returns xml {
             xml messageIDElement = xml `<wsa:MessageID>{{request.messageId}}</wsa:MessageID>`;
             headerElement += messageIDElement;
         } else {
-            error err = error(SOAP_ERROR_CODE, { message: "If ReplyTo element is present, wsa:MessageID MUST be present" });
+            error err = error(SOAP_ERROR_CODE, { message: "If ReplyTo element is present, wsa:MessageID MUST be present"
+            });
             panic err;
         }
         xml replyToElement = xml `<wsa:ReplyTo><wsa:Address>{{request.replyTo}}</wsa:Address></wsa:ReplyTo>`;
@@ -203,27 +204,31 @@ function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns 
 #
 # + response - The request to be sent
 # + soapVersion - The SOAP version of the request
-# + return - The SOAP response created from the `http:Response`
+# + return - The SOAP response created from the `http:Response` or `error` object when reading the payload
 function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns SoapResponse|error {
-    xml payload = check response.getXmlPayload();
-    xml soapHeaders = payload["Header"].*;
-    xml[] soapResponseHeaders = [];
+    var payload = response.getXmlPayload();
+    if (payload is xml) {
+        xml soapHeaders = payload["Header"].*;
+        xml[] soapResponseHeaders = [];
 
-    if (!soapHeaders.isEmpty()) {
-        int i = 0;
-        xml[] headersXML = [];
-        while (i < soapHeaders.length()) {
-            headersXML[i] = soapHeaders[i];
-            i += 1;
+        if (!soapHeaders.isEmpty()) {
+            int i = 0;
+            xml[] headersXML = [];
+            while (i < soapHeaders.length()) {
+                headersXML[i] = soapHeaders[i];
+                i += 1;
+            }
+            soapResponseHeaders = headersXML;
         }
-        soapResponseHeaders = headersXML;
-    }
-    xml soapResponsePayload = payload["Body"].*;
+        xml soapResponsePayload = payload["Body"].*;
 
-    SoapResponse soapResponse = {
-        headers: soapResponseHeaders,
-        payload: soapResponsePayload,
-        soapVersion: soapVersion
-    };
-    return soapResponse;
+        SoapResponse soapResponse = {
+            headers: soapResponseHeaders,
+            payload: soapResponsePayload,
+            soapVersion: soapVersion
+        };
+        return soapResponse;
+    } else {
+        return payload;
+    }
 }

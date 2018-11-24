@@ -41,9 +41,10 @@ function testSendReceive() {
         payload: body
     };
 
-    var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
-    match details {
-        SoapResponse soapResponse => io:println(soapResponse);
-        error err => test:assertFail(msg = <string>err.detail().message);
+    var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+    if (response is SoapResponse) {
+        io:println(response);
+    } else {
+        test:assertFail(msg = <string>response.detail().message);
     }
 }
