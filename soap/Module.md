@@ -9,7 +9,7 @@ SOAP message.
 ## Compatibility
 |                          |    Version     |
 |:------------------------:|:--------------:|
-| Ballerina Language       | 0.983.0        |
+| Ballerina Language       | 0.985.0        |
 | SOAP Version             | 1.1 & 1.2      |
 
 ## Sample
@@ -21,11 +21,13 @@ import wso2/soap;
 
 Instantiate the connector by giving backend URL details in the HTTP client config.
 ```ballerina
-endpoint soap:Client soapClient {
+soap:SoapConfiguration soapConfig = {
     clientConfig: {
         url: "http://localhost:9000"
     }
-}
+};
+
+soap:Client soapClient = new(soapConfig);
 ```
 
 The `sendSoapRequest` function send a soap request to initiated backend url with the given `SoapRequest` object.
@@ -41,9 +43,10 @@ soap:SoapRequest soapRequest = {
     payload: body
 };
 
-var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
-match details {
-    soap:SoapResponse soapResponse => io:println(soapResponse);
-    soap:SoapError soapError => io:println(soapError);
-}
+var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+    if (response is soap:SoapResponse) {
+        io:println(response);
+    } else {
+        test:assertFail(msg = <string>response.detail().message);
+    }
 ```
