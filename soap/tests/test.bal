@@ -18,11 +18,13 @@ import ballerina/io;
 import ballerina/log;
 import ballerina/test;
 
-endpoint Client soapClient {
+SoapConfiguration soapConfig = {
     clientConfig: {
         url: "http://localhost:9000"
     }
 };
+
+Client soapClient = new(soapConfig);
 
 @test:Config
 function testSendReceive() {
@@ -42,6 +44,6 @@ function testSendReceive() {
     var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
     match details {
         SoapResponse soapResponse => io:println(soapResponse);
-        SoapError soapError => test:assertFail(msg = soapError.message);
+        error err => test:assertFail(msg = <string>err.detail().message);
     }
 }
