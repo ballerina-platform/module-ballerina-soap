@@ -18,32 +18,42 @@ import ballerina/http;
 
 # Object for SOAP client endpoint.
 #
-# + soapConfig - Reference to `SoapConfiguration` type
 # + soapConnector - Reference to `SoapConnector` type
-public type Client object {
+public type Client client object {
 
-    public SoapConfiguration soapConfig;
     public SoapConnector soapConnector;
 
-    # Initialize SOAP endpoint.
-    #
-    # + config - SOAP configuraion
-    public function init(SoapConfiguration config);
+    public function __init(SoapConfiguration soapConfig) {
+        self.soapConnector = new(soapConfig.clientConfig);
+    }
 
-    # Get initialized SOAP connector.
+    # Sends request and expects a response.
     #
-    # + return - The SOAP connector
-    public function getCallerActions() returns SoapConnector;
+    # + path - Resource path
+    # + request - Request to be sent
+    # + return - If success, returns the response object, else returns `SoapError` object
+    public remote function sendReceive(string path, SoapRequest request) returns SoapResponse|error {
+        return self.soapConnector->sendReceive(path, request);
+    }
+
+    # Send Robust requests.Sends the request and possibly receives an error.
+    #
+    # + path - Resource path
+    # + request - Request to be sent
+    # + return - If success, returns `nil`, else returns `SoapError` object
+    public remote function sendRobust(string path, SoapRequest request) returns error? {
+        return self.soapConnector->sendRobust(path, request);
+    }
+
+    # Fire and forget requests. Sends the request without the possibility of any response from the service (even an error).
+    #
+    # + path - Resource path
+    # + request - Request to be sent
+    public remote function fireAndForget(string path, SoapRequest request) {
+        return self.soapConnector->fireAndForget(path, request);
+    }
 };
 
 public type SoapConfiguration record {
     http:ClientEndpointConfig clientConfig;
 };
-
-function Client::init(SoapConfiguration config) {
-    self.soapConnector.clientEP.init(config.clientConfig);
-}
-
-function Client::getCallerActions() returns SoapConnector {
-    return self.soapConnector;
-}

@@ -84,8 +84,8 @@ function getWSAddressingHeaders(SoapRequest request) returns xml {
             xml messageIDElement = xml `<wsa:MessageID>{{request.messageId}}</wsa:MessageID>`;
             headerElement += messageIDElement;
         } else {
-            error err = { message: "If ReplyTo element is present, wsa:MessageID MUST be present" };
-            throw err;
+            error err = error(SOAP_ERROR_CODE, { message: "If ReplyTo element is present, wsa:MessageID MUST be present" });
+            panic err;
         }
         xml replyToElement = xml `<wsa:ReplyTo><wsa:Address>{{request.replyTo}}</wsa:Address></wsa:ReplyTo>`;
         headerElement += replyToElement;
@@ -133,30 +133,31 @@ function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
 function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     xml headersRoot = xml `<soap:Header xmlns:soap="{{namespace}}"></soap:Header>`;
-    xml headerElement;
+    xml? headerElement = ();
     xml[] headers = request.headers;
-    if (lengthof headers != 0) {
+    if (headers.length() != 0) {
         int i = 1;
         xml headersXML = headers[0];
-        while (i < lengthof headers) {
+        while (i < headers.length()) {
             headersXML = headersXML + headers[i];
             i = i + 1;
         }
         headerElement = headersXML;
     }
 
-    if (request.to != EMPTY_STRING) {
-        headerElement += getWSAddressingHeaders(request);
-    }
+    if (headerElement is xml) {
+        if (request.to != EMPTY_STRING) {
+            headerElement += getWSAddressingHeaders(request);
+        }
 
-    if (request.username != EMPTY_STRING) {
-        headerElement += getWSSecreUsernameTokenHeaders(request);
-    }
+        if (request.username != EMPTY_STRING) {
+            headerElement += getWSSecreUsernameTokenHeaders(request);
+        }
 
-    if (!headerElement.isEmpty()) {
-        headersRoot.setChildren(headerElement);
+        if (!headerElement.isEmpty()) {
+            headersRoot.setChildren(headerElement);
+        }
     }
-
     return headersRoot;
 }
 
@@ -203,21 +204,26 @@ function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns 
 # + response - The request to be sent
 # + soapVersion - The SOAP version of the request
 # + return - The SOAP response created from the `http:Response`
-function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns (SoapResponse|error) {
-    SoapResponse soapResponse = {};
-    soapResponse.soapVersion = soapVersion;
+function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns SoapResponse|error {
     xml payload = check response.getXmlPayload();
     xml soapHeaders = payload["Header"].*;
+    xml[] soapResponseHeaders = [];
+
     if (!soapHeaders.isEmpty()) {
         int i = 0;
         xml[] headersXML = [];
-        while (i < lengthof soapHeaders) {
+        while (i < soapHeaders.length()) {
             headersXML[i] = soapHeaders[i];
             i += 1;
         }
-        soapResponse.headers = headersXML;
+        soapResponseHeaders = headersXML;
     }
-    payload = check response.getXmlPayload();
-    soapResponse.payload = payload["Body"].*;
+    xml soapResponsePayload = payload["Body"].*;
+
+    SoapResponse soapResponse = {
+        headers: soapResponseHeaders,
+        payload: soapResponsePayload,
+        soapVersion: soapVersion
+    };
     return soapResponse;
 }
