@@ -44,9 +44,9 @@ soap:SoapRequest soapRequest = {
 };
 
 var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
-    if (response is soap:SoapResponse) {
-        io:println(response);
-    } else {
-        test:assertFail(msg = <string>response.detail().message);
-    }
+if (response is soap:SoapResponse) {
+    test:assertEquals(response.soapVersion, SOAP11);
+} else {
+    test:assertFail(msg = <string>response.detail().message);
+}
 ```

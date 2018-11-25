@@ -19,6 +19,7 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
 ### Usage Example
 
 ```ballerina
+import ballerina/io;
 import wso2/soap;
 
 function main(string... args) {
@@ -45,7 +46,7 @@ function main(string... args) {
     if (response is soap:SoapResponse) {
         io:println(response);
     } else {
-        test:assertFail(msg = <string>response.detail().message);
+        io:println(response.detail().message);
     }
 }
 ```
