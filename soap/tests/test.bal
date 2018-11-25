@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
 import ballerina/log;
 import ballerina/test;
 
@@ -43,7 +42,7 @@ function testSendReceive() {
 
     var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
     if (response is SoapResponse) {
-        io:println(response);
+        test:assertEquals(response.soapVersion, SOAP11);
     } else {
         test:assertFail(msg = <string>response.detail().message);
     }
