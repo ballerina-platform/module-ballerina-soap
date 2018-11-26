@@ -22,14 +22,8 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
 import ballerina/io;
 import wso2/soap;
 
-function main(string... args) {
-    soap:SoapConfiguration soapConfig = {
-        clientConfig: {
-            url: "http://localhost:9000"
-        }
-    };
-
-    soap:Client soapClient = new(soapConfig);
+public function main() {
+    soap:Client soapClient = new("http://localhost:9000");
 
     xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                         <m0:request>

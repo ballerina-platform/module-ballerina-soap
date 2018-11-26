@@ -23,8 +23,8 @@ public type Client client object {
 
     public SoapConnector soapConnector;
 
-    public function __init(SoapConfiguration soapConfig) {
-        self.soapConnector = new(soapConfig.clientConfig);
+    public function __init(string url, SoapConfiguration? soapConfig = ()) {
+        self.soapConnector = new(url, soapConfig.clientConfig);
     }
 
     # Sends request and expects a response.

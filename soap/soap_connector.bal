@@ -23,8 +23,8 @@ public type SoapConnector client object {
 
     public http:Client soapClient;
 
-    public function __init(http:ClientEndpointConfig config) {
-        self.soapClient = new(config);
+    public function __init(string url, http:ClientEndpointConfig? config) {
+        self.soapClient = new(url, config = config);
     }
 
     remote function sendReceive(string path, SoapRequest request) returns SoapResponse|error;

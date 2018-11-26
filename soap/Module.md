@@ -19,15 +19,9 @@ First, import the `wso2/soap` module into the Ballerina project.
 import wso2/soap;
 ```
 
-Instantiate the connector by giving backend URL details in the HTTP client config.
+Instantiate the connector by giving backend URL.
 ```ballerina
-soap:SoapConfiguration soapConfig = {
-    clientConfig: {
-        url: "http://localhost:9000"
-    }
-};
-
-soap:Client soapClient = new(soapConfig);
+soap:Client soapClient = new("http://localhost:9000");
 ```
 
 The `sendSoapRequest` function send a soap request to initiated backend url with the given `SoapRequest` object.

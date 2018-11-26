@@ -17,13 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 
-SoapConfiguration soapConfig = {
-    clientConfig: {
-        url: "http://localhost:9000"
-    }
-};
-
-Client soapClient = new(soapConfig);
+Client soapClient = new("http://localhost:9000");
 
 @test:Config
 function testSendReceive() {
