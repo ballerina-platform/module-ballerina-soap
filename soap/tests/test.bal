@@ -14,15 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
 import ballerina/log;
 import ballerina/test;
 
-endpoint Client soapClient {
-    clientConfig: {
-        url: "http://localhost:9000"
-    }
-};
+Client soapClient = new("http://localhost:9000");
 
 @test:Config
 function testSendReceive() {
@@ -39,9 +34,10 @@ function testSendReceive() {
         payload: body
     };
 
-    var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
-    match details {
-        SoapResponse soapResponse => io:println(soapResponse);
-        SoapError soapError => test:assertFail(msg = soapError.message);
+    var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+    if (response is SoapResponse) {
+        test:assertEquals(response.soapVersion, SOAP11);
+    } else {
+        test:assertFail(msg = <string>response.detail().message);
     }
 }

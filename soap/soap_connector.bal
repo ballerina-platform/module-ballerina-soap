@@ -18,63 +18,45 @@ import ballerina/http;
 
 # SOAP client connector.
 #
-# + clientEP - HTTP client endpoint
-public type SoapConnector object {
+# + soapClient - HTTP client endpoint
+public type SoapConnector client object {
 
-    public http:Client clientEP;
+    public http:Client soapClient;
 
-    # Sends request and expects a response.
-    #
-    # + path - Resource path
-    # + request - Request to be sent
-    # + return - If success, returns the response object, else returns `SoapError` object
-    public function sendReceive(string path, SoapRequest request) returns SoapResponse|SoapError;
+    public function __init(string url, http:ClientEndpointConfig? config) {
+        self.soapClient = new(url, config = config);
+    }
 
-    # Send Robust requests.Sends the request and possibly receives an error.
-    #
-    # + path - Resource path
-    # + request - Request to be sent
-    # + return - If success, returns `nil`, else returns `SoapError` object
-    public function sendRobust(string path, SoapRequest request) returns SoapError?;
+    remote function sendReceive(string path, SoapRequest request) returns SoapResponse|error;
 
-    # Fire and forget requests. Sends the request without the possibility of any response from the service (even an error).
-    #
-    # + path - Resource path
-    # + request - Request to be sent
-    public function fireAndForget(string path, SoapRequest request);
+    remote function sendRobust(string path, SoapRequest request) returns error?;
 
+    remote function fireAndForget(string path, SoapRequest request);
 };
 
-function SoapConnector::sendReceive(string path, SoapRequest request) returns SoapResponse|SoapError {
-    endpoint http:Client httpClient = self.clientEP;
+remote function SoapConnector.sendReceive(string path, SoapRequest request) returns SoapResponse|error {
+    http:Client httpClient = self.soapClient;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, req);
-    match response {
-        http:Response httpResponse => {
-            return createSOAPResponse(httpResponse, request.soapVersion);
-        }
-        error err => {
-            return err;
-        }
+    if (response is http:Response) {
+        return createSOAPResponse(response, request.soapVersion);
+    } else {
+        return response;
     }
 }
 
-function SoapConnector::sendRobust(string path, SoapRequest request) returns SoapError? {
-    endpoint http:Client httpClient = self.clientEP;
+remote function SoapConnector.sendRobust(string path, SoapRequest request) returns error? {
+    http:Client httpClient = self.soapClient;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, req);
-    match response {
-        http:Response httpResponse => {
-            return ();
-        }
-        error err => {
-            return err;
-        }
+    if (response is error) {
+        return response;
     }
+    return ();
 }
 
-function SoapConnector::fireAndForget(string path, SoapRequest request) {
-    endpoint http:Client httpClient = self.clientEP;
+remote function SoapConnector.fireAndForget(string path, SoapRequest request) {
+    http:Client httpClient = self.soapClient;
     http:Request req = fillSOAPEnvelope(request, request.soapVersion);
     var response = httpClient->post(path, req);
 }

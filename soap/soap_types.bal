@@ -14,19 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-public type SoapVersion "SOAP11"|"SOAP12";
+public type SoapVersion SOAP11|SOAP12;
 
-@final public SoapVersion SOAP11 = "SOAP11";
-@final public SoapVersion SOAP12 = "SOAP12";
+public const SOAP11 = "SOAP11";
+public const SOAP12 = "SOAP12";
 
 # Represents SOAP request.
 #
-# + headers - The array of SOAP headers for the SOAP envelop to send to the endpoint
-# + payload - The xml of SOAP payload for the SOAP envelop to send to the endpoint
 # + soapVersion - The version of SOAP
 # + soapAction - The value of SOAP Action to send to the endpoint
-# + ^"from" - The value for the source endpoint parameter used for WS-Addressing
-# + to - The value for the destination parameter used for WS-Addressing
+# + payload - The xml of SOAP payload for the SOAP envelop to send to the endpoint
+# + headers - The array of SOAP headers for the SOAP envelop to send to the endpoint
+# + requestFrom - The value for the source endpoint parameter used for WS-Addressing
+# + requestTo - The value for the destination parameter used for WS-Addressing
 # + wsaAction - The value for the action parameter used for WS-Addressing
 # + relatesTo - The value for the relationship parameter used for WS-Addressing. In the form of a (URI, QName) pair
 # + relationshipType - The value for the relationship type parameter used for WS-Addressing
@@ -39,39 +39,30 @@ public type SoapVersion "SOAP11"|"SOAP12";
 # + password - The value for the password parameter used for WS-Security Username Token
 # + passwordType - The value for the password type parameter used for WS-Security Username Token
 public type SoapRequest record {
-    xml[] headers;
-    xml payload;
     SoapVersion soapVersion = SOAP11;
     string soapAction;
-    string ^"from";
-    string to;
-    string wsaAction;
-    string relatesTo;
-    string relationshipType;
-    string replyTo;
-    string faultTo;
-    string messageId;
-    string username;
-    string password;
-    string passwordType;
+    xml payload?;
+    xml[] headers?;
+    string requestFrom?;
+    string requestTo?;
+    string wsaAction?;
+    string relatesTo?;
+    string relationshipType?;
+    string replyTo?;
+    string faultTo?;
+    string messageId?;
+    string username?;
+    string password?;
+    string passwordType?;
 };
 
 # Represents SOAP response.
 #
+# + soapVersion - The version of SOAP
 # + headers - The array of SOAP headers for the SOAP envelop receives from the endpoint
 # + payload - The xml of SOAP payload for the SOAP envelop receives from the endpoint
-# + soapVersion - The version of SOAP
 public type SoapResponse record {
-    xml[] headers;
-    xml payload;
     SoapVersion soapVersion = SOAP11;
-};
-
-# Represents SOAP error.
-#
-# + message - The value for the error message
-# + cause - The value for the cause
-public type SoapError record {
-    string message;
-    error? cause;
+    xml[] headers?;
+    xml payload?;
 };

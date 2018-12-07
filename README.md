@@ -10,7 +10,7 @@ SOAP message.
 
 | Ballerina Language Version  | SOAP Version   |
 |:---------------------------:|:--------------:|
-| 0.983.0                     | 1.1 & 1.2      |
+| 0.985.0                     | 1.1 & 1.2      |
 
 ## Getting Started
 
@@ -19,14 +19,11 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
 ### Usage Example
 
 ```ballerina
+import ballerina/io;
 import wso2/soap;
 
-function main (string... args) {
-    endpoint soap:Client soapClient {
-        clientConfig: {
-            url: "http://localhost:9000"
-        }
-    }
+public function main() {
+    soap:Client soapClient = new("http://localhost:9000");
 
     xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                         <m0:request>
@@ -39,10 +36,11 @@ function main (string... args) {
         payload: body
     };
 
-    var details = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
-    match details {
-        soap:SoapResponse soapResponse => io:println(soapResponse);
-        soap:SoapError soapError => io:println(soapError);
+    var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+    if (response is soap:SoapResponse) {
+        io:println(response);
+    } else {
+        io:println(response.detail().message);
     }
 }
 ```
