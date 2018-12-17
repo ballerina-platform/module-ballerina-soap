@@ -21,4 +21,4 @@ final string SOAP11_ENCODING_STYLE ="http://schemas.xmlsoap.org/soap/encoding/";
 final string SOAP12_ENCODING_STYLE ="http://www.w3.org/2003/05/soap-encoding";
 
 // Error Codes
-final string SOAP_ERROR_CODE = "(wso2/soap)SoapError";
+final string SOAP_ERROR_CODE = "{wso2/soap}SOAPError";
