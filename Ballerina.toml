@@ -1,7 +1,7 @@
 [project]
 license = "Apache-2.0"
 org-name = "wso2"
-version = "0.3.14"
+version = "0.3.15"
 authors = ["WSO2"]
 repository = "https://github.com/wso2-ballerina/module-soap"
 keywords = ["soap"]

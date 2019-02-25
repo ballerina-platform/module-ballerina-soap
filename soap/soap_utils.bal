@@ -133,7 +133,7 @@ function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
     xml headerElement = usernameElement + passwordElement;
     usernameTokenRoot.setChildren(headerElement);
     time:Time time = time:currentTime();
-    xml timestampElement = xml `<wsu:Timestamp><wsu:Created>{{time.toString()}}</wsu:Created></wsu:Timestamp>`;
+    xml timestampElement = xml `<wsu:Timestamp><wsu:Created>{{time:toString(time)}}</wsu:Created></wsu:Timestamp>`;
     usernameTokenRoot = usernameTokenRoot + timestampElement;
     securityRoot.setChildren(usernameTokenRoot);
     return securityRoot;
