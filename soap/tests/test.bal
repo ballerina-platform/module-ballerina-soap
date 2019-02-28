@@ -17,7 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 
-Client soapClient = new("http://localhost:9000");
+Client soapTestClient = new("http://localhost:9000");
 
 @test:Config
 function testSendReceive() {
@@ -34,7 +34,7 @@ function testSendReceive() {
         payload: body
     };
 
-    var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+    var response = soapTestClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
     if (response is SoapResponse) {
         test:assertEquals(response.soapVersion, SOAP11);
     } else {
