@@ -158,19 +158,22 @@ function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns 
         }
         headerElement = headersXML;
     }
-
-    if (headerElement is xml) {
-        if (request["requestTo"] is string) {
-            headerElement += getWSAddressingHeaders(request);
+    if (request["requestTo"] is string) {
+        if (headerElement is ()) {
+            headerElement = getWSAddressingHeaders(request);
+        } else {
+            headerElement = headerElement + getWSAddressingHeaders(request);
         }
-
-        if (request["username"] is string) {
-            headerElement += getWSSecreUsernameTokenHeaders(request);
+    }
+    if (request["username"] is string) {
+        if (headerElement is ()) {
+            headerElement = getWSSecreUsernameTokenHeaders(request);
+        } else {
+            headerElement = headerElement + getWSSecreUsernameTokenHeaders(request);
         }
-
-        if (!headerElement.isEmpty()) {
-            headersRoot.setChildren(headerElement);
-        }
+    }
+    if (headerElement is xml && !headerElement.isEmpty()) {
+        headersRoot.setChildren(headerElement);
     }
     return headersRoot;
 }
