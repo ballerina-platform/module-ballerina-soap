@@ -23,7 +23,7 @@ import ballerina/io;
 import wso2/soap;
 
 public function main() {
-    soap:Client soapClient = new("http://localhost:9000");
+    soap:Soap11Client soapClient = new("http://localhost:9000");
 
     xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                         <m0:request>
@@ -31,12 +31,7 @@ public function main() {
                         </m0:request>
                     </m0:getQuote>`;
 
-    soap:SoapRequest soapRequest = {
-        soapAction: "urn:getQuote",
-        payload: body
-    };
-
-    var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+    var response = soapClient->sendReceive("/services/SimpleStockQuoteService", "urn:mediate", body);
     if (response is soap:SoapResponse) {
         io:println(response);
     } else {
