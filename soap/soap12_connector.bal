@@ -18,7 +18,7 @@ import ballerina/http;
 
 # SOAP 1.2 client connector.
 #
-# + soap12Client - HTTP client endpoint
+# + soap12Client - HTTP client endpoint for SOAP 1.2 client
 public type Soap12Connector client object {
 
     public http:Client soap12Client;
