@@ -123,12 +123,11 @@ function getWSSecreUsernameTokenHeaders(Options options) returns xml {
 
     string username = options.usernameToken["username"] ?: "";
     string password = options.usernameToken["password"] ?: "";
-    string nonce;
 
     xml securityRoot = xml `<wsse:Security></wsse:Security>`;
     xml usernameTokenRoot = xml `<wsse:UsernameToken> </wsse:UsernameToken>`;
     xml usernameElement = xml `<wsse:Username>{{username}}</wsse:Username>`;
-    xml passwordElement = xml `<wsse:Password>{{password}}</wsse:Password>`;
+    xml passwordElement;
 
     time:Time time = time:currentTime();
     xml timestampElement = xml `<wsu:Timestamp><wsu:Created>{{time:toString(time)}}</wsu:Created></wsu:Timestamp>`;
@@ -137,11 +136,9 @@ function getWSSecreUsernameTokenHeaders(Options options) returns xml {
     if (passwordType is ()) {
         passwordType = "PasswordText";
     }
-    string pT = <string> passwordType;
-    if (pT.equalsIgnoreCase("PasswordText")) {
-        passwordElement = xml `<wsse:Password Type="{{PWD_TEXT}}">{{password}}</wsse:Password>`;
-    } else if (pT.equalsIgnoreCase("PasswordDigest")) {
-        nonce = system:uuid();
+    string pwdType = <string> passwordType;
+    if (pwdType.equalsIgnoreCase("PasswordDigest")) {
+        string nonce = system:uuid();
         string encodedNonce = encoding:encodeBase64(nonce.toByteArray("UTF-8"));
         string createdTime = time:toString(time);
         password = createDigestPassword(nonce, password, createdTime);
@@ -149,6 +146,8 @@ function getWSSecreUsernameTokenHeaders(Options options) returns xml {
         xml nonceElement = xml `<wsse:Nonce EncodingType="{{BASE64ENCODED}}">{{encodedNonce}}</wsse:Nonce>`;
         xml createdTimeElement = xml `<wsu:Created>{{createdTime}}</wsu:Created>`;
         passwordElement = passwordDigest + nonceElement + createdTimeElement;
+    } else {
+        passwordElement = xml `<wsse:Password Type="{{PWD_TEXT}}">{{password}}</wsse:Password>`;
     }
 
     xml headerElement = usernameElement + passwordElement;
@@ -182,14 +181,14 @@ function createSoapHeader(Options? options = (), SoapVersion soapVersion) return
             if (headerElement is ()) {
                 headerElement = getWSAddressingHeaders(options);
             } else {
-                headerElement = < xml > headerElement + getWSAddressingHeaders(options);
+                headerElement = headerElement + getWSAddressingHeaders(options);
             }
         }
         if (options["usernameToken"]["username"] is string) {
             if (headerElement is ()) {
                 headerElement = getWSSecreUsernameTokenHeaders(options);
             } else {
-                headerElement = <xml> headerElement + getWSSecreUsernameTokenHeaders(options);
+                headerElement = headerElement + getWSSecreUsernameTokenHeaders(options);
             }
         }
         if (headerElement is xml && !headerElement.isEmpty()) {
@@ -269,6 +268,12 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
     return soapResponse;
 }
 
+# Creates the password used in password digest usernameToken WS-Security.
+#
+# + nonce - The nonce string
+# + password - The password in plain text
+# + createdTime - The created timestamp
+# + return - The digest password in string format
 function createDigestPassword(string nonce, string password, string createdTime) returns string {
     string concatenatedDigest = nonce+createdTime+password;
     byte[] SHA1hashedDigest = crypto:hashSha1(concatenatedDigest.toByteArray("UTF-8"));
