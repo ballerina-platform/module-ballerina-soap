@@ -32,7 +32,7 @@ public type Soap12Client client object {
     # + path - Resource path
     # + soapAction - SOAP action
     # + body - SOAP payload
-    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters.
+    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     # + return - If success, returns the response object, else returns `SoapError` object
     public remote function sendReceive(string path, string? soapAction = (), xml body, Options? options = ())
             returns SoapResponse|error {
@@ -43,7 +43,7 @@ public type Soap12Client client object {
     #
     # + path - Resource path
     # + soapAction - SOAP action
-    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters.
+    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     # + return - If success, returns `nil`, else returns `SoapError` object
     public remote function sendRobust(string path, string? soapAction = (), xml body, Options? options = ())
             returns error? {
@@ -55,7 +55,7 @@ public type Soap12Client client object {
     #
     # + path - Resource path
     # + soapAction - SOAP action
-    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters.
+    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     public remote function fireAndForget(string path, string? soapAction = (), xml body, Options? options = ()) {
         return self.soapConnector->fireAndForget(path, soapAction = soapAction, body, options = options);
     }

@@ -51,8 +51,8 @@ soap:Options soapOptions = {
 
 var response = soap11Client->sendReceive("/services/SimpleStockQuoteService", "urn:getQuote", body, options = soapOptions);
 if (response is soap:SoapResponse) {
-    test:assertEquals(response.soapVersion, SOAP11);
+    io:println(response);
 } else {
-    test:assertFail(msg = <string>response.detail().message);
+    io:println(response.detail().message);
 }
 ```

@@ -54,7 +54,7 @@ function createSoapEnvelop(SoapVersion soapVersion) returns xml {
     return xml `<soap:Envelope
                      xmlns:soap="{{namespace}}"
                      soap:encodingStyle="{{encodingStyle}}">
-                     </soap:Envelope>`;
+                </soap:Envelope>`;
 }
 
 # Provides the WS addressing header.
