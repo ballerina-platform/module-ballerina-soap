@@ -19,12 +19,19 @@ First, import the `wso2/soap` module into the Ballerina project.
 import wso2/soap;
 ```
 
-Instantiate the connector by giving backend URL.
+Instantiate a connector by giving backend URL.
 ```ballerina
-soap:Client soapClient = new("http://localhost:9000");
+soap:Soap11Client soap11Client = new("http://localhost:9000");
+```  
+or
+```ballerina
+soap:Soap12Client soap12Client = new("http://localhost:9000");
 ```
 
-The `sendSoapRequest` function send a soap request to initiated backend url with the given `SoapRequest` object.
+The `sendReceive` function sends a SOAP request to initiated backend url. For SOAP 1.1 requests, you can invoke the sendReceive function by passing the `body` and the `soapAction`.
+For SOAP 1.2 requests, you can invoke it by passing only the body. 
+
+If you want to add WS-Security, WS-Addressing or other headers, you can configure `Options` record accordingly and pass it to the function. 
 ```ballerina
 xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                     <m0:request>
@@ -32,12 +39,17 @@ xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                     </m0:request>
                 </m0:getQuote>`;
 
-soap:SoapRequest soapRequest = {
-    soapAction: "urn:getQuote",
-    payload: body
+soap:UsernameToken usernameToken = {
+    username: "admin",
+    password: "admin",
+    passwordType: "PasswordDigest"
 };
 
-var response = soapClient->sendReceive("/services/SimpleStockQuoteService", soapRequest);
+soap:Options soapOptions = {
+    usernameToken: usernameToken
+};
+
+var response = soap11Client->sendReceive("/services/SimpleStockQuoteService", "urn:getQuote", body, options = soapOptions);
 if (response is soap:SoapResponse) {
     test:assertEquals(response.soapVersion, SOAP11);
 } else {

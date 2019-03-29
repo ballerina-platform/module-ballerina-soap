@@ -16,9 +16,9 @@
 
 import ballerina/http;
 
-# Object for SOAP client endpoint.
+# Object for SOAP 1.2 client endpoint.
 #
-# + soapConnector - Reference to `SoapConnector` type
+# + soapConnector - Reference to `Soap12Connector` type
 public type Soap12Client client object {
 
     public Soap12Connector soapConnector;
@@ -27,7 +27,7 @@ public type Soap12Client client object {
         self.soapConnector = new(url, soapConfig.clientConfig);
     }
 
-    # Sends SOAP12 request and expects a response.
+    # Sends SOAP 1.2 request and expects a response.
     #
     # + path - Resource path
     # + soapAction - SOAP action
@@ -39,7 +39,7 @@ public type Soap12Client client object {
         return self.soapConnector->sendReceive(path, soapAction = soapAction, body, options = options);
     }
 
-    # Send Robust SOAP12 requests.Sends the request and possibly receives an error.
+    # Send Robust SOAP 1.2 requests.Sends the request and possibly receives an error.
     #
     # + path - Resource path
     # + soapAction - SOAP action
@@ -50,7 +50,8 @@ public type Soap12Client client object {
         return self.soapConnector->sendRobust(path, soapAction = soapAction, body, options = options);
     }
 
-    # Fire and forget requests. Sends the request without the possibility of any response from the service(even an error).
+    # Fire and forget requests. Sends the request without the possibility of any response from the
+    # service(even an error).
     #
     # + path - Resource path
     # + soapAction - SOAP action
