@@ -29,7 +29,7 @@ function testSendReceive() {
                         </m0:request>
                     </m0:getQuote>`;
 
-    var response = soapTestClient->sendReceive("/services/SimpleStockQuoteService", "urn:getQuote", body);
+    var response = soapClient->sendReceive("/services/SimpleStockQuoteService", "urn:getQuote", body);
     if (response is SoapResponse) {
         test:assertEquals(response.soapVersion, SOAP11);
     } else {
