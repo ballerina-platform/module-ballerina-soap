@@ -234,7 +234,17 @@ function fillSOAPEnvelope(string? soapAction = (), xml body, Options? options = 
             req.addHeader("SOAPAction", soapAction);
         }
     } else {
-        req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
+        if (soapAction is string) {
+            map<string> stringMap = {};
+            stringMap["action"] = "\"" + soapAction + "\"";
+            var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
+            if (mediaType is mime:MediaType) {
+                mediaType.parameters = stringMap;
+                req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
+            }
+        } else {
+            req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
+        }
     }
     return req;
 }
