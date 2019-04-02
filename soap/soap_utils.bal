@@ -236,7 +236,6 @@ function fillSOAPEnvelope(string? soapAction = (), xml body, Options? options = 
     } else {
         req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
     }
-    io:println(soapEnv);
     return req;
 }
 
