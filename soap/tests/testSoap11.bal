@@ -17,11 +17,11 @@
 import ballerina/log;
 import ballerina/test;
 
-Soap11Client soapClient = new("http://localhost:9000");
+Soap11Client soap11Client = new("http://localhost:9000");
 
 @test:Config
 function testSendReceive() {
-    log:printInfo("soapClient -> sendReceive()");
+    log:printInfo("soap11Client -> sendReceive()");
 
     xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                         <m0:request>
@@ -29,7 +29,7 @@ function testSendReceive() {
                         </m0:request>
                     </m0:getQuote>`;
 
-    var response = soapClient->sendReceive("/services/SimpleStockQuoteService", "urn:getQuote", body);
+    var response = soap11Client->sendReceive("/services/SimpleStockQuoteService", "urn:getQuote", body);
     if (response is SoapResponse) {
         test:assertEquals(response.soapVersion, SOAP11);
     } else {

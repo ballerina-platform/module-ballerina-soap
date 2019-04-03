@@ -21,7 +21,7 @@ Soap12Client soap12Client = new("http://localhost:9000");
 
 @test:Config
 function testSendReceiveSoap12() {
-    log:printInfo("soapClient -> sendReceive()");
+    log:printInfo("soap12Client -> sendReceive()");
 
     xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                         <m0:request>

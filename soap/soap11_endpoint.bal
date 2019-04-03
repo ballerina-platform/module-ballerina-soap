@@ -18,13 +18,13 @@ import ballerina/http;
 
 # Object for SOAP 1.1 client endpoint.
 #
-# + soapConnector - Reference to `Soap11Connector` type
+# + soap11Client - Http client created to send SOAP 1.1 requests.
 public type Soap11Client client object {
 
-    public Soap11Connector soapConnector;
+    private http:Client soap11Client;
 
     public function __init(string url, SoapConfiguration? soapConfig = ()) {
-        self.soapConnector = new(url, soapConfig.clientConfig);
+        self.soap11Client = new(url, config = soapConfig.clientConfig);
     }
 
     # Sends SOAP 1.1 request and expects a response.
@@ -33,19 +33,21 @@ public type Soap11Client client object {
     # + soapAction - SOAP action
     # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If success, returns the response object, else returns `SoapError` object
+    # + return - If a success, returns the response object, else returns `SoapError` object
     public remote function sendReceive(string path, string soapAction, xml body, Options? options = ())
             returns SoapResponse|error {
-        return self.soapConnector->sendReceive(path, soapAction, body, options = options);
+        http:Client httpClient = self.soap11Client;
+        return sendReceive(path, soapAction = soapAction, body, options = options, httpClient, SOAP11);
     }
 
     # Send Robust SOAP 1.1 requests.Sends the request and possibly receives an error.
     #
     # + path - Resource path
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If success, returns `nil`, else returns `SoapError` object
+    # + return - If a success, returns `nil`, else returns `SoapError` object
     public remote function sendRobust(string path, string soapAction, xml body, Options? options = ()) returns error? {
-            return self.soapConnector->sendRobust(path, soapAction, body, options = options);
+        http:Client httpClient = self.soap11Client;
+        return sendRobust(path, soapAction = soapAction, body, options = options, httpClient, SOAP11);
     }
 
     # Fire and forget requests. Sends the request without the possibility of any response from the
@@ -54,6 +56,7 @@ public type Soap11Client client object {
     # + path - Resource path
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     public remote function fireAndForget(string path, string soapAction, xml body, Options? options = ()) {
-            return self.soapConnector->fireAndForget(path, soapAction, body, options = options);
+        http:Client httpClient = self.soap11Client;
+        return fireAndForget(path, soapAction = soapAction, body, options = options, httpClient, SOAP11);
     }
 };

@@ -73,7 +73,7 @@ function getWSAddressingHeaders(Options options) returns xml {
         headerElement += xml `<wsa:Action>${wsaAction}</wsa:Action>`;
     }
 
-    var relatesTo = options["relatesTo"];
+    var relatesTo = options.wsAddressing["relatesTo"];
     if (relatesTo is string) {
         xml relatesToElement = xml `<wsa:RelatesTo>${relatesTo}</wsa:RelatesTo>`;
         var relationshipType = options.wsAddressing["relationshipType"];
@@ -91,7 +91,7 @@ function getWSAddressingHeaders(Options options) returns xml {
 
     var replyTo = options.wsAddressing["replyTo"];
     if (replyTo is string) {
-        var messageId = options["messageId"];
+        var messageId = options.wsAddressing["messageId"];
         if (messageId is string) {
             xml messageIDElement = xml `<wsa:MessageID>${messageId}</wsa:MessageID>`;
             headerElement += messageIDElement;
@@ -177,7 +177,7 @@ function createSoapHeader(Options? options = (), SoapVersion soapVersion) return
             }
             headerElement = headersXML;
         }
-        if (options["requestTo"] is string) {
+        if (options.wsAddressing["requestTo"] is string) {
             if (headerElement is ()) {
                 headerElement = getWSAddressingHeaders(options);
             } else {

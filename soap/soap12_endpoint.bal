@@ -18,13 +18,13 @@ import ballerina/http;
 
 # Object for SOAP 1.2 client endpoint.
 #
-# + soapConnector - Reference to `Soap12Connector` type
+# + soap12Client - Http client created to send SOAP 1.2 requests.
 public type Soap12Client client object {
 
-    public Soap12Connector soapConnector;
+    private http:Client soap12Client;
 
     public function __init(string url, SoapConfiguration? soapConfig = ()) {
-        self.soapConnector = new(url, soapConfig.clientConfig);
+        self.soap12Client = new(url, config = soapConfig.clientConfig);
     }
 
     # Sends SOAP 1.2 request and expects a response.
@@ -33,10 +33,11 @@ public type Soap12Client client object {
     # + soapAction - SOAP action
     # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If success, returns the response object, else returns `SoapError` object
+    # + return - If a success, returns the response object, else returns `SoapError` object
     public remote function sendReceive(string path, string? soapAction = (), xml body, Options? options = ())
-            returns SoapResponse|error {
-        return self.soapConnector->sendReceive(path, soapAction = soapAction, body, options = options);
+        returns SoapResponse|error {
+        http:Client httpClient = self.soap12Client;
+        return sendReceive(path, soapAction = soapAction, body, options = options, httpClient, SOAP12);
     }
 
     # Send Robust SOAP 1.2 requests.Sends the request and possibly receives an error.
@@ -44,10 +45,11 @@ public type Soap12Client client object {
     # + path - Resource path
     # + soapAction - SOAP action
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If success, returns `nil`, else returns `SoapError` object
+    # + return - If a success, returns `nil`, else returns `SoapError` object
     public remote function sendRobust(string path, string? soapAction = (), xml body, Options? options = ())
             returns error? {
-        return self.soapConnector->sendRobust(path, soapAction = soapAction, body, options = options);
+        http:Client httpClient = self.soap12Client;
+        return sendRobust(path, soapAction = soapAction, body, options = options, httpClient, SOAP12);
     }
 
     # Fire and forget requests. Sends the request without the possibility of any response from the
@@ -57,7 +59,7 @@ public type Soap12Client client object {
     # + soapAction - SOAP action
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     public remote function fireAndForget(string path, string? soapAction = (), xml body, Options? options = ()) {
-        return self.soapConnector->fireAndForget(path, soapAction = soapAction, body, options = options);
+        http:Client httpClient = self.soap12Client;
+        return fireAndForget(path, soapAction = soapAction, body, options = options, httpClient, SOAP12);
     }
 };
-
