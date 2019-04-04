@@ -117,7 +117,7 @@ function getWSAddressingHeaders(Options options) returns xml {
 #
 # + options - Soap options to be sent
 # + return - XML with the WS secure username token headers
-function getWSSecreUsernameTokenHeaders(Options options) returns xml {
+function getWSSecureUsernameTokenHeaders(Options options) returns xml {
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" as wsse;
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" as wsu;
 
@@ -186,9 +186,9 @@ function createSoapHeader(Options? options = (), SoapVersion soapVersion) return
         }
         if (options["usernameToken"]["username"] is string) {
             if (headerElement is ()) {
-                headerElement = getWSSecreUsernameTokenHeaders(options);
+                headerElement = getWSSecureUsernameTokenHeaders(options);
             } else {
-                headerElement = headerElement + getWSSecreUsernameTokenHeaders(options);
+                headerElement = headerElement + getWSSecureUsernameTokenHeaders(options);
             }
         }
         if (headerElement is xml && !headerElement.isEmpty()) {
@@ -285,7 +285,7 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
 # + createdTime - The created timestamp
 # + return - The digest password in string format
 function createDigestPassword(string nonce, string password, string createdTime) returns string {
-    string concatenatedDigest = nonce+createdTime+password;
+    string concatenatedDigest = nonce + createdTime + password;
     byte[] SHA1hashedDigest = crypto:hashSha1(concatenatedDigest.toByteArray("UTF-8"));
     string base64EncodedDigest = encoding:encodeBase64(SHA1hashedDigest);
     return base64EncodedDigest;

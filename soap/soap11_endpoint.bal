@@ -36,8 +36,7 @@ public type Soap11Client client object {
     # + return - If a success, returns the response object, else returns `SoapError` object
     public remote function sendReceive(string path, string soapAction, xml body, Options? options = ())
             returns SoapResponse|error {
-        http:Client httpClient = self.soap11Client;
-        return sendReceive(path, soapAction = soapAction, body, options = options, httpClient, SOAP11);
+        return sendReceive(path, soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
     }
 
     # Send Robust SOAP 1.1 requests.Sends the request and possibly receives an error.
@@ -46,8 +45,7 @@ public type Soap11Client client object {
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     # + return - If a success, returns `nil`, else returns `SoapError` object
     public remote function sendRobust(string path, string soapAction, xml body, Options? options = ()) returns error? {
-        http:Client httpClient = self.soap11Client;
-        return sendRobust(path, soapAction = soapAction, body, options = options, httpClient, SOAP11);
+        return sendRobust(path, soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
     }
 
     # Fire and forget requests. Sends the request without the possibility of any response from the
@@ -56,7 +54,6 @@ public type Soap11Client client object {
     # + path - Resource path
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     public remote function fireAndForget(string path, string soapAction, xml body, Options? options = ()) {
-        http:Client httpClient = self.soap11Client;
-        return fireAndForget(path, soapAction = soapAction, body, options = options, httpClient, SOAP11);
+        return fireAndForget(path, soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
     }
 };
