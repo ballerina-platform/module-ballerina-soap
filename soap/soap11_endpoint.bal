@@ -54,6 +54,6 @@ public type Soap11Client client object {
     # + path - Resource path
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     public remote function fireAndForget(string path, string soapAction, xml body, Options? options = ()) {
-        return fireAndForget(path, soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
+        fireAndForget(path, soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
     }
 };
