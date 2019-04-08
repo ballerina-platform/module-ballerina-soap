@@ -14,9 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/crypto;
+import ballerina/encoding;
 import ballerina/http;
 import ballerina/io;
 import ballerina/mime;
+import ballerina/system;
 import ballerina/time;
 
 # Provides the namespace for the given SOAP version.
@@ -49,61 +52,61 @@ function createSoapEnvelop(SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     string encodingStyle = getEncodingStyle(soapVersion);
     return xml `<soap:Envelope
-                     xmlns:soap="{{namespace}}"
-                     soap:encodingStyle="{{encodingStyle}}">
-                     </soap:Envelope>`;
+                     xmlns:soap="${namespace}"
+                     soap:encodingStyle="${encodingStyle}">
+                </soap:Envelope>`;
 }
 
 # Provides the WS addressing header.
 #
-# + request - The request to be sent
+# + options - Soap options to be sent
 # + return - XML with the WS addressing header
-function getWSAddressingHeaders(SoapRequest request) returns xml {
+function getWSAddressingHeaders(Options options) returns xml {
     xmlns "https://www.w3.org/2005/08/addressing" as wsa;
 
     // This `requestTo` parameter is already validated as a `xml` before calling this method.
-    string requestTo = request["requestTo"] ?: "";
-    var wsaAction = request["wsaAction"];
+    string requestTo = options.wsAddressing["requestTo"] ?: "";
+    var wsaAction = options.wsAddressing["wsaAction"];
 
-    xml headerElement = xml `<wsa:To>{{requestTo}}</wsa:To>`;
+    xml headerElement = xml `<wsa:To>${requestTo}</wsa:To>`;
     if (wsaAction is string) {
-        headerElement += xml `<wsa:Action>{{wsaAction}}</wsa:Action>`;
+        headerElement += xml `<wsa:Action>${wsaAction}</wsa:Action>`;
     }
 
-    var relatesTo = request["relatesTo"];
+    var relatesTo = options.wsAddressing["relatesTo"];
     if (relatesTo is string) {
-        xml relatesToElement = xml `<wsa:RelatesTo>{{relatesTo}}</wsa:RelatesTo>`;
-        var relationshipType = request["relationshipType"];
+        xml relatesToElement = xml `<wsa:RelatesTo>${relatesTo}</wsa:RelatesTo>`;
+        var relationshipType = options.wsAddressing["relationshipType"];
         if (relationshipType is string) {
             relatesToElement@["RelationshipType"] = relationshipType;
         }
         headerElement += relatesToElement;
     }
 
-    var requestFrom = request["requestFrom"];
+    var requestFrom = options.wsAddressing["requestFrom"];
     if (requestFrom is string) {
-        xml fromElement = xml `<wsa:From>{{requestFrom}}</wsa:From>`;
+        xml fromElement = xml `<wsa:From>${requestFrom}</wsa:From>`;
         headerElement += fromElement;
     }
 
-    var replyTo = request["replyTo"];
+    var replyTo = options.wsAddressing["replyTo"];
     if (replyTo is string) {
-        var messageId = request["messageId"];
+        var messageId = options.wsAddressing["messageId"];
         if (messageId is string) {
-            xml messageIDElement = xml `<wsa:MessageID>{{messageId}}</wsa:MessageID>`;
+            xml messageIDElement = xml `<wsa:MessageID>${messageId}</wsa:MessageID>`;
             headerElement += messageIDElement;
         } else {
             error err = error(SOAP_ERROR_CODE,
                 { message: "If ReplyTo element is present, wsa:MessageID MUST be present" });
             panic err;
         }
-        xml replyToElement = xml `<wsa:ReplyTo><wsa:Address>{{replyTo}}</wsa:Address></wsa:ReplyTo>`;
+        xml replyToElement = xml `<wsa:ReplyTo><wsa:Address>${replyTo}</wsa:Address></wsa:ReplyTo>`;
         headerElement += replyToElement;
     }
 
-    var faultTo = request["faultTo"];
+    var faultTo = options.wsAddressing["faultTo"];
     if (faultTo is string) {
-        xml faultToElement = xml `<wsa:FaultTo>{{faultTo}}</wsa:FaultTo>`;
+        xml faultToElement = xml `<wsa:FaultTo>${faultTo}</wsa:FaultTo>`;
         headerElement += faultToElement;
     }
 
@@ -112,28 +115,43 @@ function getWSAddressingHeaders(SoapRequest request) returns xml {
 
 # Provides the WS secure username token headers.
 #
-# + request - The request to be sent
+# + options - Soap options to be sent
 # + return - XML with the WS secure username token headers
-function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
+function getWSSecureUsernameTokenHeaders(Options options) returns xml {
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" as wsse;
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" as wsu;
 
-    string username = request["username"] ?: "";
-    string password = request["password"] ?: "";
+    string username = options.usernameToken["username"] ?: "";
+    string password = options.usernameToken["password"] ?: "";
+
     xml securityRoot = xml `<wsse:Security></wsse:Security>`;
     xml usernameTokenRoot = xml `<wsse:UsernameToken> </wsse:UsernameToken>`;
-    xml usernameElement = xml `<wsse:Username>{{username}}</wsse:Username>`;
-    xml passwordElement = xml `<wsse:Password>{{password}}</wsse:Password>`;
+    xml usernameElement = xml `<wsse:Username>${username}</wsse:Username>`;
+    xml passwordElement;
 
-    var passwordType = request["passwordType"];
-    if (passwordType is string) {
-        passwordElement@["Type"] = passwordType;
+    time:Time time = time:currentTime();
+    xml timestampElement = xml `<wsu:Timestamp><wsu:Created>${time:toString(time)}</wsu:Created></wsu:Timestamp>`;
+
+    var passwordType = options.usernameToken["passwordType"];
+    if (passwordType is ()) {
+        passwordType = "PasswordText";
+    }
+    string pwdType = <string> passwordType;
+    if (pwdType.equalsIgnoreCase("PasswordDigest")) {
+        string nonce = system:uuid();
+        string encodedNonce = encoding:encodeBase64(nonce.toByteArray("UTF-8"));
+        string createdTime = time:toString(time);
+        password = createDigestPassword(nonce, password, createdTime);
+        xml passwordDigest = xml `<wsse:Password Type="${PWD_DIGEST}">${password}</wsse:Password>`;
+        xml nonceElement = xml `<wsse:Nonce EncodingType="${BASE64ENCODED}">${encodedNonce}</wsse:Nonce>`;
+        xml createdTimeElement = xml `<wsu:Created>${createdTime}</wsu:Created>`;
+        passwordElement = passwordDigest + nonceElement + createdTimeElement;
+    } else {
+        passwordElement = xml `<wsse:Password Type="${PWD_TEXT}">${password}</wsse:Password>`;
     }
 
     xml headerElement = usernameElement + passwordElement;
     usernameTokenRoot.setChildren(headerElement);
-    time:Time time = time:currentTime();
-    xml timestampElement = xml `<wsu:Timestamp><wsu:Created>{{time:toString(time)}}</wsu:Created></wsu:Timestamp>`;
     usernameTokenRoot = usernameTokenRoot + timestampElement;
     securityRoot.setChildren(usernameTokenRoot);
     return securityRoot;
@@ -141,34 +159,39 @@ function getWSSecreUsernameTokenHeaders(SoapRequest request) returns xml {
 
 # Provides the SOAP headers in the request as XML.
 #
-# + request - The request to be sent
+# + options - Soap options to be sent
 # + soapVersion - The SOAP version of the request
 # + return - XML with the empty SOAP header
-function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns xml {
+function createSoapHeader(Options? options = (), SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
-    xml headersRoot = xml `<soap:Header xmlns:soap="{{namespace}}"></soap:Header>`;
+    xml headersRoot = xml `<soap:Header xmlns:soap="${namespace}"></soap:Header>`;
     xml? headerElement = ();
-    xml[] headers = request["headers"] ?: [];
-    if (headers.length() != 0) {
-        int i = 1;
-        xml headersXML = headers[0];
-        while (i < headers.length()) {
-            headersXML = headersXML + headers[i];
-            i = i + 1;
+    if (options is Options) {
+        xml[] headers = options["headers"] ?: [];
+        if (headers.length() != 0) {
+            int i = 1;
+            xml headersXML = headers[0];
+            while (i < headers.length()) {
+                headersXML = headersXML + headers[i];
+                i = i + 1;
+            }
+            headerElement = headersXML;
         }
-        headerElement = headersXML;
-    }
-
-    if (headerElement is xml) {
-        if (request["requestTo"] is string) {
-            headerElement += getWSAddressingHeaders(request);
+        if (options["wsAddressing"]["requestTo"] is string) {
+            if (headerElement is ()) {
+                headerElement = getWSAddressingHeaders(options);
+            } else {
+                headerElement = headerElement + getWSAddressingHeaders(options);
+            }
         }
-
-        if (request["username"] is string) {
-            headerElement += getWSSecreUsernameTokenHeaders(request);
+        if (options["usernameToken"]["username"] is string) {
+            if (headerElement is ()) {
+                headerElement = getWSSecureUsernameTokenHeaders(options);
+            } else {
+                headerElement = headerElement + getWSSecureUsernameTokenHeaders(options);
+            }
         }
-
-        if (!headerElement.isEmpty()) {
+        if (headerElement is xml && !headerElement.isEmpty()) {
             headersRoot.setChildren(headerElement);
         }
     }
@@ -179,26 +202,27 @@ function createSoapHeader(SoapRequest request, SoapVersion soapVersion) returns 
 #
 # + payload - The payload to be sent
 # + soapVersion - The SOAP version of the request
-# + return - XML with the empty SOAP body
+# + return - XML with the SOAP body
 function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
-    xml bodyRoot = xml `<soap:Body xmlns:soap="{{namespace}}"></soap:Body>`;
+    xml bodyRoot = xml `<soap:Body xmlns:soap="${namespace}"></soap:Body>`;
     bodyRoot.setChildren(payload);
     return bodyRoot;
 }
 
 # Prepare a SOAP envelope with the XML to be sent.
 #
-# + request - The request to be sent
+# + soapAction - SOAP action
+# + body - SOAP request body
+# + options - The Soap options to be sent
 # + soapVersion - The SOAP version of the request
 # + return - The SOAP Request as `http:Request` with the SOAP envelope
-function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns http:Request {
-    xml soapPayload = createSoapHeader(request, soapVersion);
-    var requestPayload = request["payload"];
-    if (requestPayload is xml) {
-        xml body = createSoapBody(requestPayload, soapVersion);
-        soapPayload += body;
-    }
+function fillSOAPEnvelope(string? soapAction = (), xml body, Options? options = (), SoapVersion soapVersion)
+        returns http:Request {
+    xml soapPayload = createSoapHeader(options = options, soapVersion);
+    var requestPayload = body;
+    xml bodyPayload = createSoapBody(requestPayload, soapVersion);
+    soapPayload += bodyPayload;
 
     xml soapEnv = createSoapEnvelop(soapVersion);
     soapEnv.setChildren(soapPayload);
@@ -206,10 +230,23 @@ function fillSOAPEnvelope(SoapRequest request, SoapVersion soapVersion) returns 
     req.setXmlPayload(soapEnv);
     if (soapVersion == SOAP11) {
         req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
-        req.addHeader("SOAPAction", request.soapAction);
+        if (soapAction is string) {
+            req.addHeader("SOAPAction", soapAction);
+        }
     } else {
-        req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
+        if (soapAction is string) {
+            map<string> stringMap = {};
+            stringMap["action"] = "\"" + soapAction + "\"";
+            var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
+            if (mediaType is mime:MediaType) {
+                mediaType.parameters = stringMap;
+                req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
+            }
+        } else {
+            req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
+        }
     }
+    io:println(soapEnv);
     return req;
 }
 
@@ -241,3 +278,46 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
     };
     return soapResponse;
 }
+
+# Creates the password used in password digest usernameToken WS-Security.
+#
+# + nonce - The nonce string
+# + password - The password in plain text
+# + createdTime - The created timestamp
+# + return - The digest password in string format
+function createDigestPassword(string nonce, string password, string createdTime) returns string {
+    string concatenatedDigest = nonce + createdTime + password;
+    byte[] SHA1hashedDigest = crypto:hashSha1(concatenatedDigest.toByteArray("UTF-8"));
+    string base64EncodedDigest = encoding:encodeBase64(SHA1hashedDigest);
+    return base64EncodedDigest;
+}
+
+function sendReceive(string path, string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+        SoapVersion soapVersion) returns SoapResponse|error {
+    http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, soapVersion);
+    var response = httpClient->post(path, req);
+    if (response is http:Response) {
+        return createSOAPResponse(response, soapVersion);
+    } else {
+        return response;
+    }
+}
+
+function sendRobust(string path, string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+        SoapVersion soapVersion) returns error? {
+    http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, soapVersion);
+    var response = httpClient->post(path, req);
+    if (response is error) {
+        return response;
+    }
+}
+
+function fireAndForget(string path, string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+        SoapVersion soapVersion) {
+    http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, SOAP11);
+    var response = httpClient->post(path, req);
+}
+
+public type SoapConfiguration record {
+    http:ClientEndpointConfig clientConfig;
+};

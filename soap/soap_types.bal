@@ -19,12 +19,34 @@ public type SoapVersion SOAP11|SOAP12;
 public const SOAP11 = "SOAP11";
 public const SOAP12 = "SOAP12";
 
+public const PASSWORD_DIGEST = "PasswordDigest";
+public const PASSWORD_TEXT = "PasswordText";
+public type PasswordType PASSWORD_DIGEST|PASSWORD_TEXT;
+
 # Represents SOAP request.
 #
-# + soapVersion - The version of SOAP
-# + soapAction - The value of SOAP Action to send to the endpoint
-# + payload - The xml of SOAP payload for the SOAP envelop to send to the endpoint
 # + headers - The array of SOAP headers for the SOAP envelop to send to the endpoint
+# + wsAddressing - Soap WS-Addressing related options.
+# + usernameToken - Soap WS-Username token related options.
+public type Options record {|
+    xml[] headers?;
+    WsAddressing wsAddressing?;
+    UsernameToken usernameToken?;
+|};
+
+# Represents UsernameToken WS-Security.
+#
+# + username - The value for the username parameter used for WS-Security Username Token
+# + password - The value for the password parameter used for WS-Security Username Token
+# + passwordType - The value for the password type parameter used for WS-Security Username Token
+public type UsernameToken record {|
+    string username;
+    string password;
+    PasswordType passwordType = PASSWORD_TEXT;
+|};
+
+# Represents WsAddressing related properties.
+#
 # + requestFrom - The value for the source endpoint parameter used for WS-Addressing
 # + requestTo - The value for the destination parameter used for WS-Addressing
 # + wsaAction - The value for the action parameter used for WS-Addressing
@@ -35,14 +57,7 @@ public const SOAP12 = "SOAP12";
 # + faultTo - The value for the fault endpoint parameter used for WS-Addressing. If this element is present, messageId
 #             must be present
 # + messageId - The value for the messageId parameter used for WS-Addressing
-# + username - The value for the username parameter used for WS-Security Username Token
-# + password - The value for the password parameter used for WS-Security Username Token
-# + passwordType - The value for the password type parameter used for WS-Security Username Token
-public type SoapRequest record {
-    SoapVersion soapVersion = SOAP11;
-    string soapAction;
-    xml payload?;
-    xml[] headers?;
+public type WsAddressing record {|
     string requestFrom?;
     string requestTo?;
     string wsaAction?;
@@ -51,18 +66,15 @@ public type SoapRequest record {
     string replyTo?;
     string faultTo?;
     string messageId?;
-    string username?;
-    string password?;
-    string passwordType?;
-};
+|};
 
 # Represents SOAP response.
 #
 # + soapVersion - The version of SOAP
 # + headers - The array of SOAP headers for the SOAP envelop receives from the endpoint
 # + payload - The xml of SOAP payload for the SOAP envelop receives from the endpoint
-public type SoapResponse record {
+public type SoapResponse record {|
     SoapVersion soapVersion = SOAP11;
     xml[] headers?;
     xml payload?;
-};
+|};
