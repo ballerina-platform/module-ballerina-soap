@@ -177,7 +177,7 @@ function createSoapHeader(Options? options = (), SoapVersion soapVersion) return
             }
             headerElement = headersXML;
         }
-        if (options.wsAddressing["requestTo"] is string) {
+        if (options["wsAddressing"]["requestTo"] is string) {
             if (headerElement is ()) {
                 headerElement = getWSAddressingHeaders(options);
             } else {
@@ -246,6 +246,7 @@ function fillSOAPEnvelope(string? soapAction = (), xml body, Options? options = 
             req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
         }
     }
+    io:println(soapEnv);
     return req;
 }
 

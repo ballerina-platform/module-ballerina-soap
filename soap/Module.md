@@ -42,7 +42,7 @@ xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
 soap:UsernameToken usernameToken = {
     username: "admin",
     password: "admin",
-    passwordType: "PasswordDigest"
+    passwordType: PASSWORD_DIGEST
 };
 
 soap:Options soapOptions = {

@@ -19,6 +19,10 @@ public type SoapVersion SOAP11|SOAP12;
 public const SOAP11 = "SOAP11";
 public const SOAP12 = "SOAP12";
 
+public const PASSWORD_DIGEST = "PasswordDigest";
+public const PASSWORD_TEXT = "PasswordText";
+public type PasswordType PASSWORD_DIGEST|PASSWORD_TEXT;
+
 # Represents SOAP request.
 #
 # + headers - The array of SOAP headers for the SOAP envelop to send to the endpoint
@@ -38,7 +42,7 @@ public type Options record {|
 public type UsernameToken record {|
     string username;
     string password;
-    string passwordType?;
+    PasswordType passwordType = PASSWORD_TEXT;
 |};
 
 # Represents WsAddressing related properties.
