@@ -17,7 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 
-Soap12Client soap12Client = new("http://localhost:9000");
+Soap12Client soap12Client = new("http://localhost:9000/services/SimpleStockQuoteService");
 
 @test:Config
 function testSendReceiveSoap12() {
@@ -29,7 +29,7 @@ function testSendReceiveSoap12() {
                         </m0:request>
                     </m0:getQuote>`;
 
-    var response = soap12Client->sendReceive("/services/SimpleStockQuoteService", soapAction = "urn:getQuote", body);
+    var response = soap12Client->sendReceive(soapAction = "urn:getQuote", body);
     if (response is SoapResponse) {
         test:assertEquals(response.soapVersion, SOAP12);
     } else {

@@ -246,7 +246,12 @@ function fillSOAPEnvelope(string? soapAction = (), xml body, Options? options = 
             req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
         }
     }
-    io:println(soapEnv);
+    map<string>? httpHeaders = options["httpHeaders"];
+    if (httpHeaders is map<string>) {
+        foreach var (headerName, headerValue) in httpHeaders {
+            req.setHeader(headerName, headerValue);
+        }
+    }
     return req;
 }
 
@@ -274,7 +279,8 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
     SoapResponse soapResponse = {
         headers: soapResponseHeaders,
         payload: soapResponsePayload,
-        soapVersion: soapVersion
+        soapVersion: soapVersion,
+        httpResponse: response
     };
     return soapResponse;
 }
@@ -292,7 +298,9 @@ function createDigestPassword(string nonce, string password, string createdTime)
     return base64EncodedDigest;
 }
 
-function sendReceive(string path, string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+string path = "/";
+
+function sendReceive(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
         SoapVersion soapVersion) returns SoapResponse|error {
     http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, soapVersion);
     var response = httpClient->post(path, req);
@@ -303,7 +311,7 @@ function sendReceive(string path, string? soapAction = (), xml body, Options? op
     }
 }
 
-function sendRobust(string path, string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+function sendRobust(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
         SoapVersion soapVersion) returns error? {
     http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, soapVersion);
     var response = httpClient->post(path, req);
@@ -312,12 +320,12 @@ function sendRobust(string path, string? soapAction = (), xml body, Options? opt
     }
 }
 
-function fireAndForget(string path, string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+function sendAndForget(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
         SoapVersion soapVersion) {
     http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, SOAP11);
     var response = httpClient->post(path, req);
 }
 
-public type SoapConfiguration record {
+public type SoapClientEndpointConfig record {
     http:ClientEndpointConfig clientConfig;
 };
