@@ -320,7 +320,7 @@ function sendRobust(string? soapAction = (), xml body, Options? options = (), ht
     }
 }
 
-function sendAndForget(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+function sendOnly(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
         SoapVersion soapVersion) {
     http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, SOAP11);
     var response = httpClient->post(path, req);

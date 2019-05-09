@@ -50,7 +50,7 @@ public type Soap11Client client object {
     # service(even an error).
     #
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    public remote function sendAndForget(string soapAction, xml body, Options? options = ()) {
-        sendAndForget(soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
+    public remote function sendOnly(string soapAction, xml body, Options? options = ()) {
+        sendOnly(soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
     }
 };
