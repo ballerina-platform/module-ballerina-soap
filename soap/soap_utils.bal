@@ -325,7 +325,3 @@ function sendOnly(string? soapAction = (), xml body, Options? options = (), http
     http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, SOAP11);
     var response = httpClient->post(path, req);
 }
-
-public type SoapClientEndpointConfig record {
-    http:ClientEndpointConfig clientConfig;
-};

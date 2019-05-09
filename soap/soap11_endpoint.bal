@@ -23,8 +23,8 @@ public type Soap11Client client object {
 
     private http:Client soap11Client;
 
-    public function __init(string url, SoapClientEndpointConfig? config = ()) {
-        self.soap11Client = new(url, config = config.clientConfig);
+    public function __init(string url, http:ClientEndpointConfig? config = ()) {
+        self.soap11Client = new(url, config = config);
     }
 
     # Sends SOAP 1.1 request and expects a response.
