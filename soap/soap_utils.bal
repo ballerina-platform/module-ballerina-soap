@@ -298,7 +298,7 @@ function createDigestPassword(string nonce, string password, string createdTime)
     return base64EncodedDigest;
 }
 
-string path = "/";
+string path = "";
 
 function sendReceive(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
         SoapVersion soapVersion) returns SoapResponse|error {
