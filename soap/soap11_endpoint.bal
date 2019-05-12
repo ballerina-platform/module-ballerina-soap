@@ -18,7 +18,7 @@ import ballerina/http;
 
 # Object for SOAP 1.1 client endpoint.
 #
-# + soap11Client - Http client created to send SOAP 1.1 requests.
+# + soap11Client - HTTP client created to send SOAP 1.1 requests.
 public type Soap11Client client object {
 
     private http:Client soap11Client;
@@ -32,7 +32,7 @@ public type Soap11Client client object {
     # + soapAction - SOAP action
     # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If a success, returns the response object, else returns `SoapError` object
+    # + return - If a success, returns the response object, else returns an error
     public remote function sendReceive(string soapAction, xml body, Options? options = ())
             returns SoapResponse|error {
         return sendReceive(soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
@@ -40,8 +40,10 @@ public type Soap11Client client object {
 
     # Send Robust SOAP 1.1 requests.Sends the request and possibly receives an error.
     #
+    # + soapAction - SOAP action
+    # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If a success, returns `nil`, else returns `SoapError` object
+    # + return - If a success, returns `nil`, else returns an error
     public remote function sendRobust(string soapAction, xml body, Options? options = ()) returns error? {
         return sendRobust(soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
     }
@@ -49,6 +51,8 @@ public type Soap11Client client object {
     # Fire and forget requests. Sends the request without the possibility of any response from the
     # service(even an error).
     #
+    # + soapAction - SOAP action
+    # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     public remote function sendOnly(string soapAction, xml body, Options? options = ()) {
         sendOnly(soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);
