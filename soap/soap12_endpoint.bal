@@ -23,40 +23,39 @@ public type Soap12Client client object {
 
     private http:Client soap12Client;
 
-    public function __init(string url, SoapConfiguration? soapConfig = ()) {
-        self.soap12Client = new(url, config = soapConfig.clientConfig);
+    public function __init(string url, http:ClientEndpointConfig? config = ()) {
+        self.soap12Client = new(url, config = config);
     }
 
     # Sends SOAP 1.2 request and expects a response.
     #
-    # + path - Resource path
     # + soapAction - SOAP action
     # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If a success, returns the response object, else returns `SoapError` object
-    public remote function sendReceive(string path, string? soapAction = (), xml body, Options? options = ())
+    # + return - If a success, returns the response object, else returns an error
+    public remote function sendReceive(string? soapAction = (), xml body, Options? options = ())
         returns SoapResponse|error {
-        return sendReceive(path, soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
+        return sendReceive(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
 
     # Send Robust SOAP 1.2 requests.Sends the request and possibly receives an error.
     #
-    # + path - Resource path
     # + soapAction - SOAP action
+    # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If a success, returns `nil`, else returns `SoapError` object
-    public remote function sendRobust(string path, string? soapAction = (), xml body, Options? options = ())
+    # + return - If a success, returns `nil`, else returns an error
+    public remote function sendRobust(string? soapAction = (), xml body, Options? options = ())
             returns error? {
-        return sendRobust(path, soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
+        return sendRobust(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
 
     # Fire and forget requests. Sends the request without the possibility of any response from the
     # service(even an error).
     #
-    # + path - Resource path
     # + soapAction - SOAP action
+    # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    public remote function fireAndForget(string path, string? soapAction = (), xml body, Options? options = ()) {
-        fireAndForget(path, soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
+    public remote function sendOnly(string? soapAction = (), xml body, Options? options = ()) {
+        sendOnly(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
 };

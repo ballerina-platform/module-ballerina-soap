@@ -26,12 +26,14 @@ public type PasswordType PASSWORD_DIGEST|PASSWORD_TEXT;
 # Represents SOAP request.
 #
 # + headers - The array of SOAP headers for the SOAP envelop to send to the endpoint
-# + wsAddressing - Soap WS-Addressing related options.
-# + usernameToken - Soap WS-Username token related options.
+# + wsAddressing - Soap WS-Addressing related options
+# + usernameToken - Soap WS-Username token related options
+# + httpHeaders - Headers to be included in the HTTP request
 public type Options record {|
     xml[] headers?;
     WsAddressing wsAddressing?;
     UsernameToken usernameToken?;
+    map<string> httpHeaders?;
 |};
 
 # Represents UsernameToken WS-Security.
@@ -73,8 +75,10 @@ public type WsAddressing record {|
 # + soapVersion - The version of SOAP
 # + headers - The array of SOAP headers for the SOAP envelop receives from the endpoint
 # + payload - The xml of SOAP payload for the SOAP envelop receives from the endpoint
+# + httpResponse - The HTTP response
 public type SoapResponse record {|
     SoapVersion soapVersion = SOAP11;
     xml[] headers?;
     xml payload?;
+    http:Response httpResponse;
 |};
