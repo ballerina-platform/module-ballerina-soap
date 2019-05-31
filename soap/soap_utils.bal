@@ -217,17 +217,21 @@ function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
 # + options - The Soap options to be sent
 # + soapVersion - The SOAP version of the request
 # + return - The SOAP Request as `http:Request` with the SOAP envelope
-function fillSOAPEnvelope(string? soapAction = (), xml body, Options? options = (), SoapVersion soapVersion)
+function fillSOAPEnvelope(string? soapAction = (), xml|mime:Entity[] body, Options? options = (), SoapVersion soapVersion)
         returns http:Request {
     xml soapPayload = createSoapHeader(options = options, soapVersion);
-    var requestPayload = body;
-    xml bodyPayload = createSoapBody(requestPayload, soapVersion);
-    soapPayload += bodyPayload;
-
-    xml soapEnv = createSoapEnvelop(soapVersion);
-    soapEnv.setChildren(soapPayload);
     http:Request req = new;
-    req.setXmlPayload(soapEnv);
+    var requestPayload = body;
+    if (requestPayload is xml) {
+        xml bodyPayload = createSoapBody(requestPayload, soapVersion);
+        soapPayload += bodyPayload;
+
+        xml soapEnv = createSoapEnvelop(soapVersion);
+        soapEnv.setChildren(soapPayload);
+        req.setXmlPayload(soapEnv);
+    } else {
+        req.setBodyParts(requestPayload);
+    }
     if (soapVersion == SOAP11) {
         req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
         if (soapAction is string) {
@@ -300,7 +304,7 @@ function createDigestPassword(string nonce, string password, string createdTime)
 
 string path = "";
 
-function sendReceive(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+function sendReceive(string? soapAction = (), xml|mime:Entity[] body, Options? options = (), http:Client httpClient,
         SoapVersion soapVersion) returns SoapResponse|error {
     http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, soapVersion);
     var response = httpClient->post(path, req);
@@ -311,7 +315,7 @@ function sendReceive(string? soapAction = (), xml body, Options? options = (), h
     }
 }
 
-function sendRobust(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+function sendRobust(string? soapAction = (), xml|mime:Entity[] body, Options? options = (), http:Client httpClient,
         SoapVersion soapVersion) returns error? {
     http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, soapVersion);
     var response = httpClient->post(path, req);
@@ -320,7 +324,7 @@ function sendRobust(string? soapAction = (), xml body, Options? options = (), ht
     }
 }
 
-function sendOnly(string? soapAction = (), xml body, Options? options = (), http:Client httpClient,
+function sendOnly(string? soapAction = (), xml|mime:Entity[] body, Options? options = (), http:Client httpClient,
         SoapVersion soapVersion) {
     http:Request req = fillSOAPEnvelope(options = options, soapAction = soapAction, body, SOAP11);
     var response = httpClient->post(path, req);

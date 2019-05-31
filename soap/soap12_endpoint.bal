@@ -33,7 +33,7 @@ public type Soap12Client client object {
     # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     # + return - If a success, returns the response object, else returns an error
-    public remote function sendReceive(string? soapAction = (), xml body, Options? options = ())
+    public remote function sendReceive(string? soapAction = (), xml|mime:Entity[] body, Options? options = ())
         returns SoapResponse|error {
         return sendReceive(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
@@ -44,7 +44,7 @@ public type Soap12Client client object {
     # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     # + return - If a success, returns `nil`, else returns an error
-    public remote function sendRobust(string? soapAction = (), xml body, Options? options = ())
+    public remote function sendRobust(string? soapAction = (), xml|mime:Entity[] body, Options? options = ())
             returns error? {
         return sendRobust(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
@@ -55,7 +55,7 @@ public type Soap12Client client object {
     # + soapAction - SOAP action
     # + body - SOAP payload
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    public remote function sendOnly(string? soapAction = (), xml body, Options? options = ()) {
+    public remote function sendOnly(string? soapAction = (), xml|mime:Entity[] body, Options? options = ()) {
         sendOnly(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
 };
