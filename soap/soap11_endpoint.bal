@@ -30,7 +30,7 @@ public type Soap11Client client object {
     # Sends SOAP 1.1 request and expects a response.
     #
     # + soapAction - SOAP action
-    # + body - SOAP payload
+    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     # + return - If a success, returns the response object, else returns an error
     public remote function sendReceive(string soapAction, xml|mime:Entity[] body, Options? options = ())
@@ -41,7 +41,7 @@ public type Soap11Client client object {
     # Send Robust SOAP 1.1 requests.Sends the request and possibly receives an error.
     #
     # + soapAction - SOAP action
-    # + body - SOAP payload
+    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     # + return - If a success, returns `nil`, else returns an error
     public remote function sendRobust(string soapAction, xml|mime:Entity[] body, Options? options = ()) returns error? {
@@ -52,7 +52,7 @@ public type Soap11Client client object {
     # service(even an error).
     #
     # + soapAction - SOAP action
-    # + body - SOAP payload
+    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
     # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
     public remote function sendOnly(string soapAction, xml|mime:Entity[] body, Options? options = ()) {
         sendOnly(soapAction = soapAction, body, options = options, self.soap11Client, SOAP11);

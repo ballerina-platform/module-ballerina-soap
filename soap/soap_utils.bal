@@ -213,7 +213,7 @@ function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
 # Prepare a SOAP envelope with the XML to be sent.
 #
 # + soapAction - SOAP action
-# + body - SOAP request body
+# + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
 # + options - The Soap options to be sent
 # + soapVersion - The SOAP version of the request
 # + return - The SOAP Request as `http:Request` with the SOAP envelope
