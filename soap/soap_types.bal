@@ -23,11 +23,11 @@ public const PASSWORD_DIGEST = "PasswordDigest";
 public const PASSWORD_TEXT = "PasswordText";
 public type PasswordType PASSWORD_DIGEST|PASSWORD_TEXT;
 
-# Represents SOAP request.
+# Represents the SOAP request.
 #
-# + headers - The array of SOAP headers for the SOAP envelop to send to the endpoint
-# + wsAddressing - Soap WS-Addressing related options
-# + usernameToken - Soap WS-Username token related options
+# + headers - The array of SOAP headers that will be sent to the endpoint via the SOAP envelope 
+# + wsAddressing - SOAP WS-Addressing related options
+# + usernameToken - SOAP WS-Username token related options
 # + httpHeaders - Headers to be included in the HTTP request
 public type Options record {|
     xml[] headers?;
@@ -38,9 +38,9 @@ public type Options record {|
 
 # Represents UsernameToken WS-Security.
 #
-# + username - The value for the username parameter used for WS-Security Username Token
-# + password - The value for the password parameter used for WS-Security Username Token
-# + passwordType - The value for the password type parameter used for WS-Security Username Token
+# + username - The value of the username parameter used for the WS-Security Username Token
+# + password - The value of the password parameter used for the WS-Security Username Token
+# + passwordType - The value of the password type parameter used for the WS-Security Username Token
 public type UsernameToken record {|
     string username;
     string password;
@@ -49,16 +49,16 @@ public type UsernameToken record {|
 
 # Represents WsAddressing related properties.
 #
-# + requestFrom - The value for the source endpoint parameter used for WS-Addressing
-# + requestTo - The value for the destination parameter used for WS-Addressing
-# + wsaAction - The value for the action parameter used for WS-Addressing
-# + relatesTo - The value for the relationship parameter used for WS-Addressing. In the form of a (URI, QName) pair
-# + relationshipType - The value for the relationship type parameter used for WS-Addressing
-# + replyTo - The value for the reply endpoint parameter used for WS-Addressing. This element must be present if a reply
+# + requestFrom - The value of the source endpoint parameter used for WS-Addressing
+# + requestTo - The value of the destination parameter used for WS-Addressing
+# + wsaAction - The value of the action parameter used for WS-Addressing
+# + relatesTo - The value of the relationship parameter used for WS-Addressing (i.e., in the form of a (URI, QName) pair)
+# + relationshipType - The value of the relationship type parameter used for WS-Addressing
+# + replyTo - The value of the reply endpoint parameter used for WS-Addressing. This element must be present if a reply
 #             is expected. If this element is present, messageId must be present
-# + faultTo - The value for the fault endpoint parameter used for WS-Addressing. If this element is present, messageId
+# + faultTo - The value of the fault endpoint parameter used for WS-Addressing. If this element is present, the messageId
 #             must be present
-# + messageId - The value for the messageId parameter used for WS-Addressing
+# + messageId - The value of the messageId parameter used for WS-Addressing
 public type WsAddressing record {|
     string requestFrom?;
     string requestTo?;
@@ -70,11 +70,11 @@ public type WsAddressing record {|
     string messageId?;
 |};
 
-# Represents SOAP response.
+# Represents the SOAP response.
 #
 # + soapVersion - The version of SOAP
-# + headers - The array of SOAP headers for the SOAP envelop receives from the endpoint
-# + payload - The xml of SOAP payload for the SOAP envelop receives from the endpoint
+# + headers - The array of SOAP headers, which the SOAP envelope receives from the endpoint
+# + payload - The XML of the SOAP payload, which the SOAP envelope receives from the endpoint
 # + httpResponse - The HTTP response
 public type SoapResponse record {|
     SoapVersion soapVersion = SOAP11;

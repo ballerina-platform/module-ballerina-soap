@@ -16,9 +16,9 @@
 
 import ballerina/http;
 
-# Object for SOAP 1.2 client endpoint.
+# Object for the SOAP 1.2 client endpoint.
 #
-# + soap12Client - Http client created to send SOAP 1.2 requests.
+# + soap12Client - The HTTP client created to send SOAP 1.2 requests.
 public type Soap12Client client object {
 
     private http:Client soap12Client;
@@ -30,31 +30,31 @@ public type Soap12Client client object {
     # Sends SOAP 1.2 request and expects a response.
     #
     # + soapAction - SOAP action
-    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
-    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If a success, returns the response object, else returns an error
+    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
+    # + return - If successful, returns the response object. Else, returns an error.
     public remote function sendReceive(string? soapAction = (), xml|mime:Entity[] body, Options? options = ())
         returns SoapResponse|error {
         return sendReceive(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
 
-    # Send Robust SOAP 1.2 requests.Sends the request and possibly receives an error.
+    # Sends robust SOAP 1.2 requests and possibly receives an error.
     #
     # + soapAction - SOAP action
-    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
-    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
-    # + return - If a success, returns `nil`, else returns an error
+    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
+    # + return - If successful, returns `nil`. Else, returns an error.
     public remote function sendRobust(string? soapAction = (), xml|mime:Entity[] body, Options? options = ())
             returns error? {
         return sendRobust(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
 
     # Fire and forget requests. Sends the request without the possibility of any response from the
-    # service(even an error).
+    # service (even an error).
     #
     # + soapAction - SOAP action
-    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
-    # + options - SOAP options. Ex: Headers, Ws-addressing parameters, usernameToken parameters
+    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
     public remote function sendOnly(string? soapAction = (), xml|mime:Entity[] body, Options? options = ()) {
         sendOnly(soapAction = soapAction, body, options = options, self.soap12Client, SOAP12);
     }
