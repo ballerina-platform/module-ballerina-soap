@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// SOAP related constants
+// SOAP-related constants
 final string SOAP11_NAMESPACE ="http://schemas.xmlsoap.org/soap/envelope/";
 final string SOAP12_NAMESPACE ="http://www.w3.org/2003/05/soap-envelope";
 final string SOAP11_ENCODING_STYLE ="http://schemas.xmlsoap.org/soap/encoding/";
@@ -23,5 +23,5 @@ final string PWD_TEXT = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss
 final string PWD_DIGEST = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest";
 final string BASE64ENCODED = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary";
 
-// Error Codes
+// Error codes
 final string SOAP_ERROR_CODE = "{wso2/soap}SOAPError";

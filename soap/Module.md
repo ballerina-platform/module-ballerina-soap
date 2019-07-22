@@ -1,9 +1,9 @@
-Connects to SOAP backend from Ballerina. 
+Connects from Ballerina to the SOAP backend. 
 
 # Module Overview
 
-The SOAP connector allows you to send an ordinary XML request to a soap backend by specifying the necessary details to
-construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers and the body in a
+The SOAP connector allows you to send an ordinary XML request to a SOAP backend by specifying the necessary details to
+construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers, and the body in a
 SOAP message.
 
 ## Compatibility
@@ -19,7 +19,7 @@ First, import the `wso2/soap` module into the Ballerina project.
 import wso2/soap;
 ```
 
-Instantiate a connector by giving backend URL.
+Instantiate a connector by giving the backend URL.
 ```ballerina
 soap:Soap11Client soap11Client = new("http://localhost:9000");
 ```  
@@ -28,10 +28,9 @@ or
 soap:Soap12Client soap12Client = new("http://localhost:9000");
 ```
 
-The `sendReceive` function sends a SOAP request to initiated backend url. For SOAP 1.1 requests, you can invoke the sendReceive function by passing the `body` and the `soapAction`.
-For SOAP 1.2 requests, you can invoke it by passing only the body. 
+The `sendReceive` function sends a SOAP request to the initiated backend URL. For SOAP 1.1 requests, you can invoke the sendReceive function by passing the `body` and the `soapAction`. For SOAP 1.2 requests, you can invoke it by passing only the body. 
 
-If you want to add WS-Security, WS-Addressing or other headers, you can configure `Options` record accordingly and pass it to the function. 
+If you want to add WS-Security, WS-Addressing or other headers, you can configure the`Options` record accordingly and pass it to the function. 
 ```ballerina
 xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
                     <m0:request>

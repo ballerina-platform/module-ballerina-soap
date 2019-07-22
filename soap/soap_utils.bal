@@ -57,14 +57,14 @@ function createSoapEnvelop(SoapVersion soapVersion) returns xml {
                 </soap:Envelope>`;
 }
 
-# Provides the WS addressing header.
+# Provides the WS-Addressing header.
 #
-# + options - Soap options to be sent
-# + return - XML with the WS addressing header
+# + options - SOAP options to be sent
+# + return - XML with the WS-addressing header
 function getWSAddressingHeaders(Options options) returns xml {
     xmlns "https://www.w3.org/2005/08/addressing" as wsa;
 
-    // This `requestTo` parameter is already validated as a `xml` before calling this method.
+    // This `requestTo` parameter is already validated as an `xml` before calling this method.
     string requestTo = options.wsAddressing["requestTo"] ?: "";
     var wsaAction = options.wsAddressing["wsaAction"];
 
@@ -113,10 +113,10 @@ function getWSAddressingHeaders(Options options) returns xml {
     return headerElement;
 }
 
-# Provides the WS secure username token headers.
+# Provides the WS-secure username token headers.
 #
-# + options - Soap options to be sent
-# + return - XML with the WS secure username token headers
+# + options - SOAP options to be sent
+# + return - XML with the WS-secure username token headers
 function getWSSecureUsernameTokenHeaders(Options options) returns xml {
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" as wsse;
     xmlns "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" as wsu;
@@ -159,7 +159,7 @@ function getWSSecureUsernameTokenHeaders(Options options) returns xml {
 
 # Provides the SOAP headers in the request as XML.
 #
-# + options - Soap options to be sent
+# + options - SOAP options to be sent
 # + soapVersion - The SOAP version of the request
 # + return - XML with the empty SOAP header
 function createSoapHeader(Options? options = (), SoapVersion soapVersion) returns xml {
@@ -210,13 +210,13 @@ function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
     return bodyRoot;
 }
 
-# Prepare a SOAP envelope with the XML to be sent.
+# Prepares a SOAP envelope with the XML to be sent.
 #
 # + soapAction - SOAP action
 # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
-# + options - The Soap options to be sent
+# + options - The SOAP options to be sent
 # + soapVersion - The SOAP version of the request
-# + return - The SOAP Request as `http:Request` with the SOAP envelope
+# + return - The SOAP Request sent as `http:Request` with the SOAP envelope
 function fillSOAPEnvelope(string? soapAction = (), xml|mime:Entity[] body, Options? options = (), SoapVersion soapVersion)
         returns http:Request {
     xml soapPayload = createSoapHeader(options = options, soapVersion);
@@ -263,7 +263,7 @@ function fillSOAPEnvelope(string? soapAction = (), xml|mime:Entity[] body, Optio
 #
 # + response - The request to be sent
 # + soapVersion - The SOAP version of the request
-# + return - The SOAP response created from the `http:Response` or `error` object when reading the payload
+# + return - The SOAP response created from the `http:Response` or the `error` object when reading the payload
 function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns SoapResponse|error {
     xml payload = check response.getXmlPayload();
     xml soapHeaders = payload["Header"].*;
