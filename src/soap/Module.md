@@ -9,7 +9,7 @@ SOAP message.
 ## Compatibility
 |                          |    Version     |
 |:------------------------:|:--------------:|
-| Ballerina Language       | 0.991.0        |
+| Ballerina Language       | 1.0.0        |
 | SOAP Version             | 1.1 & 1.2      |
 
 ## Sample

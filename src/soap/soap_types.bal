@@ -13,15 +13,16 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+import ballerina/http;
 
-public type SoapVersion SOAP11|SOAP12;
+public type SoapVersion SOAP11 | SOAP12;
 
 public const SOAP11 = "SOAP11";
 public const SOAP12 = "SOAP12";
 
 public const PASSWORD_DIGEST = "PasswordDigest";
 public const PASSWORD_TEXT = "PasswordText";
-public type PasswordType PASSWORD_DIGEST|PASSWORD_TEXT;
+public type PasswordType PASSWORD_DIGEST | PASSWORD_TEXT;
 
 # Represents the SOAP request.
 #
