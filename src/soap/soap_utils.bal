@@ -50,7 +50,7 @@ function getEncodingStyle(SoapVersion soapVersion) returns string {
 function createSoapEnvelop(SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     string encodingStyle = getEncodingStyle(soapVersion);
-    if (soapVersion == SOAP11_NAMESPACE) {
+    if (soapVersion == SOAP11) {
         return xml `<soap:Envelope
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
         soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -175,7 +175,7 @@ function getWSSecureUsernameTokenHeaders(Options options) returns xml {
 function createSoapHeader(SoapVersion soapVersion, Options? options = ()) returns xml {
     string namespace = getNamespace(soapVersion);
     xml headersRoot;
-    if (soapVersion == SOAP11_NAMESPACE) {
+    if (soapVersion == SOAP11) {
         headersRoot = xml `<soap:Header xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"></soap:Header>`;
     } else {
         headersRoot = xml `<soap:Header xmlns:soap="http://www.w3.org/2003/05/soap-envelope"></soap:Header>`;
@@ -221,7 +221,7 @@ function createSoapHeader(SoapVersion soapVersion, Options? options = ()) return
 function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
     xml bodyRoot;
-    if (soapVersion == SOAP11_NAMESPACE) {
+    if (soapVersion == SOAP11) {
         bodyRoot = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"></soap:Body>`;
     } else {
         bodyRoot = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"></soap:Body>`;

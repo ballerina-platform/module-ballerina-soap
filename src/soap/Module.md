@@ -21,11 +21,11 @@ import wso2/soap;
 
 Instantiate a connector by giving the backend URL.
 ```ballerina
-soap:Soap11Client soap11Client = new("http://localhost:9000");
+soap:Soap11Client soap11Client = new("http://localhost:9000/services/SimpleStockQuoteService");
 ```  
 or
 ```ballerina
-soap:Soap12Client soap12Client = new("http://localhost:9000");
+soap:Soap12Client soap12Client = new("http://localhost:9000/services/SimpleStockQuoteService");
 ```
 
 The `sendReceive` function sends a SOAP request to the initiated backend URL. For SOAP 1.1 requests, you can invoke the sendReceive function by passing the `body` and the `soapAction`. For SOAP 1.2 requests, you can invoke it by passing only the body. 
@@ -41,17 +41,16 @@ xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
 soap:UsernameToken usernameToken = {
     username: "admin",
     password: "admin",
-    passwordType: PASSWORD_DIGEST
+    passwordType: "PasswordDigest"
 };
 
 soap:Options soapOptions = {
     usernameToken: usernameToken
 };
-
-var response = soap11Client->sendReceive("/services/SimpleStockQuoteService", "urn:getQuote", body, options = soapOptions);
-if (response is soap:SoapResponse) {
-    io:println(response);
-} else {
-    io:println(response.detail().message);
-}
+    var response = soapClient->sendReceive("urn:mediate", body, soapOptions);
+    if (response is soap:SoapResponse) {
+        io:println(response);
+    } else {
+        io:println(response.detail()?.message);
+    }
 ```
