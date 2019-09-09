@@ -27,3 +27,7 @@ hs_err_pid*
 
 # Build directory
 target/
+
+# OS generated files
+.DS_Store
+.DS_Store?

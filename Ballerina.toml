@@ -1,5 +1,5 @@
 [project]
-license = "Apache-2.0"
+license = ["Apache-2.0"]
 org-name = "wso2"
 version = "0.3.17"
 authors = ["WSO2"]
