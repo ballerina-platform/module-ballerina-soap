@@ -34,7 +34,7 @@ public type Soap11Client client object {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
     # + return - If successful, returns the response object. Else, returns an error
-    public remote function sendReceive(string soapAction, xml | mime:Entity[] body, Options? options = ())
+    public remote function sendReceive(xml | mime:Entity[] body, string soapAction, Options? options = ())
     returns @tainted SoapResponse | error {
         return sendReceive(SOAP11, body, self.soap11Client, soapAction = soapAction, options = options);
     }
