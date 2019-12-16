@@ -2,8 +2,8 @@
 
 # SOAP Connector
 
-The SOAP connector allows you to send an ordinary XML request to a soap backend by specifying the necessary details to
-construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers and the body in a
+The SOAP connector allows you to send an ordinary XML request to a SOAP backend by specifying the necessary details to
+construct a SOAP envelope. It abstracts out the details of the creation of a SOAP envelope, headers, and the body in a
 SOAP message.
 
 ## Compatibility
@@ -40,10 +40,10 @@ public function main() {
 }
 ```
 
-You may run this example using the following steps:
+You can run this example using the following steps:
 
 1. First [run the axis2 server](https://docs.wso2.com/display/EI620/Setting+Up+the+ESB+Samples#SettingUptheESBSamples-StartingtheAxis2server).
-2. Save the example in a ballerina file (eg.: `soapExample.bal`)
+2. Save the example in a Ballerina file (e.g., `soapExample.bal`)
 3. Run the file using the command `ballerina run soapExample.bal`
 4. You will get a response similar to the following
 
