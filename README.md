@@ -8,9 +8,9 @@ SOAP message.
 
 ## Compatibility
 
-| Ballerina Language Version  | SOAP Version   |
+| Ballerina Language Versions | SOAP Versions  |
 |:---------------------------:|:--------------:|
-| 1.0.1                       | 1.1 & 1.2      |
+| 1.0.x, 1.1.x                | 1.1 & 1.2      |
 
 ## Getting Started
 
