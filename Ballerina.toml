@@ -2,6 +2,5 @@
 license = ["Apache-2.0"]
 org-name = "ballerina"
 version = "0.9.0"
-authors = ["WSO2"]
 repository = "https://github.com/ballerina-platform/module-soap"
 keywords = ["soap"]
