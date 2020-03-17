@@ -9,14 +9,14 @@ SOAP message.
 ## Compatibility
 |                          |    Versions    |
 |:------------------------:|:--------------:|
-| Ballerina Language       | 1.0.x, 1.1.x   |
+| Ballerina Language       | 1.2.x          |
 | SOAP Version             | 1.1 & 1.2      |
 
 ## Sample
 
-First, import the `wso2/soap` module into the Ballerina project.
+First, import the `ballerina/soap` module into the Ballerina project.
 ```ballerina
-import wso2/soap;
+import ballerina/soap;
 ```
 
 Instantiate a connector by giving the backend URL.

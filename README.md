@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wso2-ballerina/module-soap.svg?branch=master)](https://travis-ci.org/wso2-ballerina/module-soap)
+[![Build Status](https://travis-ci.org/ballerina-platform/module-soap.svg?branch=master)](https://travis-ci.org/ballerina-platform/module-soap)
 
 # SOAP Connector
 
@@ -10,7 +10,7 @@ SOAP message.
 
 | Ballerina Language Versions | SOAP Versions  |
 |:---------------------------:|:--------------:|
-| 1.0.x, 1.1.x                | 1.1 & 1.2      |
+| 1.2.x                       | 1.1 & 1.2      |
 
 ## Getting Started
 
@@ -20,7 +20,7 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
 
 ```ballerina
 import ballerina/io;
-import wso2/soap;
+import ballerina/soap;
 
 public function main() {
     soap:Soap11Client soapClient = new("http://localhost:9000/services/SimpleStockQuoteService");
