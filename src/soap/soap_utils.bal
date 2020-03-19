@@ -290,8 +290,14 @@ returns http:Request {
 # + return - The SOAP response created from the `http:Response` or the `error` object when reading the payload
 function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns @tainted SoapResponse | error {
     xml payload = check response.getXmlPayload();
-    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
-    xml soapHeaders = payload/<Header>/*;
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
+    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
+    xml soapHeaders;
+    if (soapVersion == SOAP11) {
+        soapHeaders = payload/<soap11:Header>/*;
+    } else {
+        soapHeaders = payload/<soap12:Header>/*;
+    }
     xml[] soapResponseHeaders = [];
 
     if ((soapHeaders/*).length() !=0) {
@@ -303,7 +309,12 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
         }
         soapResponseHeaders = headersXML;
     }
-    xml soapResponsePayload = payload/<soap:Body>;
+    xml soapResponsePayload;
+    if (soapVersion == SOAP11) {
+        soapResponsePayload = payload/<soap11:Body>;
+    } else {
+        soapResponsePayload = payload/<soap12:Body>;
+    }
     SoapResponse soapResponse = {
         headers: soapResponseHeaders,
         payload: soapResponsePayload,

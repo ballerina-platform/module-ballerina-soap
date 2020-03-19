@@ -16,5 +16,6 @@ script:
   - wget https://product-dist.ballerina.io/downloads/1.2.0/ballerina-linux-installer-x64-1.2.0.deb
   - sudo dpkg -i ballerina-linux-installer-x64-1.2.0.deb
   - sudo apt-get install -f
+  - export JAVA_OPTS="-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
   - ballerina --version
   - ballerina build -c --skip-tests soap
