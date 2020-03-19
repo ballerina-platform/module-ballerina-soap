@@ -16,12 +16,11 @@
 
 import ballerina/crypto;
 import ballerina/http;
+import ballerina/lang.'xml as xmllib;
 import ballerina/log;
 import ballerina/mime;
 import ballerina/system;
 import ballerina/time;
-import ballerina/io;
-import ballerina/lang.'xml as xmllib;
 
 # Provides the namespace for the given SOAP version.
 #
@@ -82,14 +81,10 @@ function getWSAddressingHeaders(Options options) returns xml {
     }
 
     var relatesTo = options?.wsAddressing["relatesTo"];
-    io:println("*****************************************");
-    io:println(relatesTo);
     if (relatesTo is string) {
-        io:println("-----------------" + relatesTo + "---------------------");
         xmllib:Element relatesToElement = <xmllib:Element> xml `<wsa:RelatesTo>${relatesTo}</wsa:RelatesTo>`;
         var relationshipType = options?.wsAddressing["relationshipType"];
         if (relationshipType is string) {
-            io:println("-----------------" + relationshipType + "---------------------");
             map<string> relatesAttr = relatesToElement.getAttributes();
             relatesAttr[wsa:RelatesTo] = relationshipType;
         } else {
@@ -257,7 +252,6 @@ returns http:Request {
 
         xmllib:Element soapEnv = createSoapEnvelop(soapVersion);
         soapEnv.setChildren(soapPayload);
-        io:println(soapEnv);
         req.setXmlPayload(soapEnv);
     } else {
         req.setBodyParts(requestPayload);
@@ -296,6 +290,7 @@ returns http:Request {
 # + return - The SOAP response created from the `http:Response` or the `error` object when reading the payload
 function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns @tainted SoapResponse | error {
     xml payload = check response.getXmlPayload();
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
     xml soapHeaders = payload/<Header>/*;
     xml[] soapResponseHeaders = [];
 
@@ -308,8 +303,7 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
         }
         soapResponseHeaders = headersXML;
     }
-    xml soapResponsePayload = payload/<Body>/*;
-
+    xml soapResponsePayload = payload/<soap:Body>;
     SoapResponse soapResponse = {
         headers: soapResponseHeaders,
         payload: soapResponsePayload,
