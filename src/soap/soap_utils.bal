@@ -16,6 +16,7 @@
 
 import ballerina/crypto;
 import ballerina/http;
+import ballerina/lang.'xml as xmllib;
 import ballerina/log;
 import ballerina/mime;
 import ballerina/system;
@@ -47,16 +48,16 @@ function getEncodingStyle(SoapVersion soapVersion) returns string {
 #
 # + soapVersion - The SOAP version of the request
 # + return - XML with the empty SOAP envelope
-function createSoapEnvelop(SoapVersion soapVersion) returns xml {
+function createSoapEnvelop(SoapVersion soapVersion) returns xmllib:Element {
     string namespace = getNamespace(soapVersion);
     string encodingStyle = getEncodingStyle(soapVersion);
     if (soapVersion == SOAP11) {
-        return xml `<soap:Envelope
+        return <xmllib:Element> xml `<soap:Envelope
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
         soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
                 </soap:Envelope>`;
     } else {
-        return xml `<soap:Envelope
+        return <xmllib:Element> xml `<soap:Envelope
         xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
         soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
                 </soap:Envelope>`;
@@ -81,14 +82,16 @@ function getWSAddressingHeaders(Options options) returns xml {
 
     var relatesTo = options?.wsAddressing["relatesTo"];
     if (relatesTo is string) {
-        xml relatesToElement = xml `<wsa:RelatesTo>${relatesTo}</wsa:RelatesTo>`;
+        xmllib:Element relatesToElement = <xmllib:Element> xml `<wsa:RelatesTo>${relatesTo}</wsa:RelatesTo>`;
         var relationshipType = options?.wsAddressing["relationshipType"];
         if (relationshipType is string) {
-            relatesToElement@["RelationshipType"] = relationshipType;
+            map<string> relatesAttr = relatesToElement.getAttributes();
+            relatesAttr[wsa:RelatesTo] = relationshipType;
         } else {
             log:printDebug("relationshipType is not of type string");
         }
-        headerElement += relatesToElement;
+        xml relatesToXml = relatesToElement;
+        headerElement += relatesToXml;
     }
 
     var requestFrom = options?.wsAddressing["requestFrom"];
@@ -134,8 +137,8 @@ function getWSSecureUsernameTokenHeaders(Options options) returns xml {
     string username = options?.usernameToken["username"] ?: "";
     string password = options?.usernameToken["password"] ?: "";
 
-    xml securityRoot = xml `<wsse:Security></wsse:Security>`;
-    xml usernameTokenRoot = xml `<wsse:UsernameToken> </wsse:UsernameToken>`;
+    xmllib:Element securityRoot = <xmllib:Element> xml `<wsse:Security></wsse:Security>`;
+    xmllib:Element usernameTokenRoot = <xmllib:Element> xml `<wsse:UsernameToken> </wsse:UsernameToken>`;
     xml usernameElement = xml `<wsse:Username>${username}</wsse:Username>`;
     xml passwordElement;
 
@@ -162,7 +165,8 @@ function getWSSecureUsernameTokenHeaders(Options options) returns xml {
 
     xml headerElement = usernameElement + passwordElement;
     usernameTokenRoot.setChildren(headerElement);
-    usernameTokenRoot = usernameTokenRoot + timestampElement;
+    xml userTokenXml = usernameTokenRoot;
+    userTokenXml = userTokenXml + timestampElement;
     securityRoot.setChildren(usernameTokenRoot);
     return securityRoot;
 }
@@ -174,11 +178,11 @@ function getWSSecureUsernameTokenHeaders(Options options) returns xml {
 # + return - XML with the empty SOAP header
 function createSoapHeader(SoapVersion soapVersion, Options? options = ()) returns xml {
     string namespace = getNamespace(soapVersion);
-    xml headersRoot;
+    xmllib:Element headersRoot;
     if (soapVersion == SOAP11) {
-        headersRoot = xml `<soap:Header xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"></soap:Header>`;
+        headersRoot = <xmllib:Element> xml `<soap:Header xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"></soap:Header>`;
     } else {
-        headersRoot = xml `<soap:Header xmlns:soap="http://www.w3.org/2003/05/soap-envelope"></soap:Header>`;
+        headersRoot = <xmllib:Element> xml `<soap:Header xmlns:soap="http://www.w3.org/2003/05/soap-envelope"></soap:Header>`;
     }
     xml? headerElement = ();
     if (options is Options) {
@@ -206,7 +210,7 @@ function createSoapHeader(SoapVersion soapVersion, Options? options = ()) return
                 headerElement = headerElement + getWSSecureUsernameTokenHeaders(options);
             }
         }
-        if (headerElement is xml && !headerElement.isEmpty()) {
+        if (headerElement is xml && (headerElement/*).length() != 0) {
             headersRoot.setChildren(headerElement);
         }
     }
@@ -220,11 +224,11 @@ function createSoapHeader(SoapVersion soapVersion, Options? options = ()) return
 # + return - XML with the SOAP body
 function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
     string namespace = getNamespace(soapVersion);
-    xml bodyRoot;
+    xmllib:Element bodyRoot;
     if (soapVersion == SOAP11) {
-        bodyRoot = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"></soap:Body>`;
+        bodyRoot = <xmllib:Element> xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"></soap:Body>`;
     } else {
-        bodyRoot = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"></soap:Body>`;
+        bodyRoot = <xmllib:Element> xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"></soap:Body>`;
     }
     bodyRoot.setChildren(payload);
     return bodyRoot;
@@ -246,7 +250,7 @@ returns http:Request {
         xml bodyPayload = createSoapBody(requestPayload, soapVersion);
         soapPayload += bodyPayload;
 
-        xml soapEnv = createSoapEnvelop(soapVersion);
+        xmllib:Element soapEnv = createSoapEnvelop(soapVersion);
         soapEnv.setChildren(soapPayload);
         req.setXmlPayload(soapEnv);
     } else {
@@ -286,10 +290,17 @@ returns http:Request {
 # + return - The SOAP response created from the `http:Response` or the `error` object when reading the payload
 function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns @tainted SoapResponse | error {
     xml payload = check response.getXmlPayload();
-    xml soapHeaders = payload["Header"].*;
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
+    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
+    xml soapHeaders;
+    if (soapVersion == SOAP11) {
+        soapHeaders = payload/<soap11:Header>/*;
+    } else {
+        soapHeaders = payload/<soap12:Header>/*;
+    }
     xml[] soapResponseHeaders = [];
 
-    if (!soapHeaders.isEmpty()) {
+    if ((soapHeaders/*).length() !=0) {
         int i = 0;
         xml[] headersXML = [];
         while (i < soapHeaders.length()) {
@@ -298,8 +309,12 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
         }
         soapResponseHeaders = headersXML;
     }
-    xml soapResponsePayload = payload["Body"].*;
-
+    xml soapResponsePayload;
+    if (soapVersion == SOAP11) {
+        soapResponsePayload = payload/<soap11:Body>;
+    } else {
+        soapResponsePayload = payload/<soap12:Body>;
+    }
     SoapResponse soapResponse = {
         headers: soapResponseHeaders,
         payload: soapResponsePayload,

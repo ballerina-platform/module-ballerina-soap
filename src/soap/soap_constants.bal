@@ -24,4 +24,4 @@ final string PWD_DIGEST = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-w
 final string BASE64ENCODED = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary";
 
 // Error codes
-final string SOAP_ERROR_CODE = "{wso2/soap}SOAPError";
+final string SOAP_ERROR_CODE = "{ballerina/soap}SOAPError";
