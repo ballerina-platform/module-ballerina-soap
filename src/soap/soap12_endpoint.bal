@@ -34,8 +34,8 @@ public type Soap12Client client object {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
     # + return - If successful, returns the response object. Else, returns an error.
-    public remote function sendReceive(xml | mime:Entity[] body, string? soapAction = (), Options? options = ())
-    returns @tainted SoapResponse | error {
+    public remote function sendReceive(xml|mime:Entity[] body, public string? soapAction = (), public Options? options = ())
+    returns @tainted SoapResponse|error {
         return sendReceive(SOAP12, body, self.soap12Client, soapAction = soapAction, options = options);
     }
 
@@ -45,7 +45,7 @@ public type Soap12Client client object {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
     # + return - If successful, returns `nil`. Else, returns an error.
-    public remote function sendRobust(xml | mime:Entity[] body, string? soapAction = (), Options? options = ())
+    public remote function sendRobust(xml|mime:Entity[] body, public string? soapAction = (), public Options? options = ())
     returns error? {
         return sendRobust(SOAP12, body, self.soap12Client, soapAction = soapAction, options = options);
     }
@@ -56,7 +56,7 @@ public type Soap12Client client object {
     # + soapAction - SOAP action
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
-    public remote function sendOnly(xml | mime:Entity[] body, string? soapAction = (), Options? options = ()) {
+    public remote function sendOnly(xml|mime:Entity[] body, public string? soapAction = (), public Options? options = ()) {
         sendOnly(SOAP12, body, self.soap12Client, soapAction = soapAction, options = options);
     }
 };

@@ -47,7 +47,7 @@ soap:UsernameToken usernameToken = {
 soap:Options soapOptions = {
     usernameToken: usernameToken
 };
-    var response = soapClient->sendReceive("urn:mediate", body, soapOptions);
+    var response = soapClient->sendReceive(body, "urn:mediate", soapOptions);
     if (response is soap:SoapResponse) {
         io:println(response);
     } else {

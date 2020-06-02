@@ -30,32 +30,33 @@ public type Soap11Client client object {
 
     # Sends SOAP 1.1 request and expects a response.
     #
-    # + soapAction - SOAP action
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + soapAction - SOAP action
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
     # + return - If successful, returns the response object. Else, returns an error
-    public remote function sendReceive(xml | mime:Entity[] body, string soapAction, Options? options = ())
-    returns @tainted SoapResponse | error {
+    public remote function sendReceive(xml|mime:Entity[] body, string soapAction, public Options? options = ())
+                                        returns @tainted SoapResponse|error {
         return sendReceive(SOAP11, body, self.soap11Client, soapAction = soapAction, options = options);
     }
 
     # Sends Robust SOAP 1.1 requests and possibly receives an error.
     #
-    # + soapAction - SOAP action
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + soapAction - SOAP action
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
     # + return - If successful, returns `nil`. Else, returns an error.
-    public remote function sendRobust(string soapAction, xml | mime:Entity[] body, Options? options = ()) returns error? {
+    public remote function sendRobust(xml|mime:Entity[] body, string soapAction, public Options? options = ()) 
+                                      returns error? {
         return sendRobust(SOAP11, body, self.soap11Client, soapAction = soapAction, options = options);
     }
 
     # Fire and forget requests. Sends the request without the possibility of any response from the
     # service (even an error).
     #
-    # + soapAction - SOAP action
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + soapAction - SOAP action
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
-    public remote function sendOnly(string soapAction, xml | mime:Entity[] body, Options? options = ()) {
+    public remote function sendOnly(xml|mime:Entity[] body, string soapAction, public Options? options = ()) {
         sendOnly(SOAP11, body, self.soap11Client, soapAction = soapAction, options = options);
     }
 };

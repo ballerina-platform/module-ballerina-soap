@@ -31,7 +31,7 @@ public function main() {
                         </m0:request>
                     </m0:getQuote>`;
 
-    var response = soapClient->sendReceive("urn:mediate", body);
+    var response = soapClient->sendReceive(body, "urn:mediate");
     if (response is soap:SoapResponse) {
         io:println(response);
     } else {
