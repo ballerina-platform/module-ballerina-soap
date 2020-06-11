@@ -339,7 +339,8 @@ function createDigestPassword(string nonce, string password, string createdTime)
 
 string path = "";
 
-function sendReceive(SoapVersion soapVersion, xml | mime:Entity[] body, http:Client httpClient, string? soapAction = (), Options? options = ()) returns @tainted SoapResponse | error {
+function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (), 
+                     Options? options = ()) returns @tainted SoapResponse|error {
     http:Request req = fillSOAPEnvelope(soapVersion, body, options = options, soapAction = soapAction);
     var response = httpClient->post(path, req);
     if (response is http:Response) {
@@ -349,7 +350,8 @@ function sendReceive(SoapVersion soapVersion, xml | mime:Entity[] body, http:Cli
     }
 }
 
-function sendRobust(SoapVersion soapVersion, xml | mime:Entity[] body, http:Client httpClient, string? soapAction = (), Options? options = ()) returns error? {
+function sendRobust(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
+                    Options? options = ()) returns error? {
     http:Request req = fillSOAPEnvelope(soapVersion, body, options = options, soapAction = soapAction);
     var response = httpClient->post(path, req);
     if (response is error) {
@@ -357,7 +359,8 @@ function sendRobust(SoapVersion soapVersion, xml | mime:Entity[] body, http:Clie
     }
 }
 
-function sendOnly(SoapVersion soapVersion, xml | mime:Entity[] body, http:Client httpClient, string? soapAction = (), Options? options = ()) {
+function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
+                  Options? options = ()) {
     http:Request req = fillSOAPEnvelope(SOAP11, body, options = options, soapAction = soapAction);
     var response = httpClient->post(path, req);
 }
