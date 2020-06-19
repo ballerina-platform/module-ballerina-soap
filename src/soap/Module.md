@@ -7,10 +7,10 @@ construct a SOAP envelope. It abstracts out the details of the creation of a SOA
 SOAP message.
 
 ## Compatibility
-|                          |    Versions    |
-|:------------------------:|:--------------:|
-| Ballerina Language       | 1.2.x          |
-| SOAP Version             | 1.1 & 1.2      |
+|                          |      Versions      |
+|:------------------------:|:------------------:|
+| Ballerina Language       | Swan Lake Preview1 |
+| SOAP Version             | 1.1 & 1.2          |
 
 ## Sample
 

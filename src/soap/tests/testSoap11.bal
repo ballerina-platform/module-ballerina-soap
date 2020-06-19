@@ -33,6 +33,6 @@ function testSendReceive() {
     if (response is SoapResponse) {
         test:assertEquals(response.soapVersion, SOAP11);
     } else {
-        test:assertFail(msg = <string>response.detail()?.message);
+        test:assertFail(msg = response.message());
     }
 }
