@@ -35,7 +35,7 @@ public function main() {
     if (response is soap:SoapResponse) {
         io:println(response);
     } else {
-         io:println(response.detail()?.message);
+         io:println(response..message());
     }
 }
 ```

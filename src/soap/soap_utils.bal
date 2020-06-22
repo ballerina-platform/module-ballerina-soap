@@ -77,7 +77,7 @@ function getWSAddressingHeaders(Options options) returns xml {
 
     xml headerElement = xml `<wsa:To>${requestTo}</wsa:To>`;
     if (wsaAction is string) {
-        headerElement += xml `<wsa:Action>${wsaAction}</wsa:Action>`;
+        headerElement = headerElement + xml `<wsa:Action>${wsaAction}</wsa:Action>`;
     }
 
     var relatesTo = options?.wsAddressing["relatesTo"];
@@ -91,13 +91,13 @@ function getWSAddressingHeaders(Options options) returns xml {
             log:printDebug("relationshipType is not of type string");
         }
         xml relatesToXml = relatesToElement;
-        headerElement += relatesToXml;
+        headerElement = headerElement + relatesToXml;
     }
 
     var requestFrom = options?.wsAddressing["requestFrom"];
     if (requestFrom is string) {
         xml fromElement = xml `<wsa:From>${requestFrom}</wsa:From>`;
-        headerElement += fromElement;
+        headerElement = headerElement + fromElement;
     }
 
     var replyTo = options?.wsAddressing["replyTo"];
@@ -105,20 +105,20 @@ function getWSAddressingHeaders(Options options) returns xml {
         var messageId = options?.wsAddressing["messageId"];
         if (messageId is string) {
             xml messageIDElement = xml `<wsa:MessageID>${messageId}</wsa:MessageID>`;
-            headerElement += messageIDElement;
+            headerElement = headerElement + messageIDElement;
         } else {
             error err = error(SOAP_ERROR_CODE,
             message = "If ReplyTo element is present, wsa:MessageID MUST be present");
             panic err;
         }
         xml replyToElement = xml `<wsa:ReplyTo><wsa:Address>${replyTo}</wsa:Address></wsa:ReplyTo>`;
-        headerElement += replyToElement;
+        headerElement = headerElement + replyToElement;
     }
 
     var faultTo = options?.wsAddressing["faultTo"];
     if (faultTo is string) {
         xml faultToElement = xml `<wsa:FaultTo>${faultTo}</wsa:FaultTo>`;
-        headerElement += faultToElement;
+        headerElement = headerElement + faultToElement;
     } else {
         log:printDebug("faultTo is not of type string");
     }
@@ -248,7 +248,7 @@ returns http:Request {
     var requestPayload = body;
     if (requestPayload is xml) {
         xml bodyPayload = createSoapBody(requestPayload, soapVersion);
-        soapPayload += bodyPayload;
+        soapPayload = soapPayload + bodyPayload;
 
         xmllib:Element soapEnv = createSoapEnvelop(soapVersion);
         soapEnv.setChildren(soapPayload);

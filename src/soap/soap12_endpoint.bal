@@ -24,7 +24,7 @@ public type Soap12Client client object {
 
     private http:Client soap12Client;
 
-    public function __init(string url, http:ClientConfiguration? config = ()) {
+    public function init(string url, http:ClientConfiguration? config = ()) {
         self.soap12Client = new (url, config = config);
     }
 
