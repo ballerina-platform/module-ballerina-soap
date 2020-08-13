@@ -8,9 +8,10 @@ SOAP message.
 
 ## Compatibility
 
-| Ballerina Language Versions | SOAP Versions  |
-|:---------------------------:|:--------------:|
-| 1.2.x                       | 1.1 & 1.2      |
+|                          |      Versions      |
+|:------------------------:|:------------------:|
+| Ballerina Language       | Swan Lake Preview1 |
+| SOAP Version             | 1.1 & 1.2          |
 
 ## Getting Started
 
@@ -21,50 +22,63 @@ Refer the [Getting Started](https://ballerina.io/learn/getting-started/) guide t
 ```ballerina
 import ballerina/io;
 import ballerina/soap;
+  
+public function main () {
 
-public function main() {
-    soap:Soap11Client soapClient = new("http://localhost:9000/services/SimpleStockQuoteService");
+    soap:Soap12Client soapClient = new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
 
-    xml body = xml `<m0:getQuote xmlns:m0="http://services.samples">
-                        <m0:request>
-                            <m0:symbol>WSO2</m0:symbol>
-                        </m0:request>
-                    </m0:getQuote>`;
+    xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query"> 
+         <quer:PhoneNumber>18006785432</quer:PhoneNumber>
+         <quer:LicenseKey>0</quer:LicenseKey>
+      </quer:CheckPhoneNumber>`;
 
-    var response = soapClient->sendReceive(body, "urn:mediate");
+    var response = soapClient->sendReceive(body);
     if (response is soap:SoapResponse) {
-        io:println(response);
+        io:println(response["payload"]);
     } else {
-         io:println(response..message());
+        io:println(response.message());
     }
 }
 ```
 
-You can run this example using the following steps:
+Follow the steps below to run this example.
 
-1. First [run the axis2 server](https://docs.wso2.com/display/EI620/Setting+Up+the+ESB+Samples#SettingUptheESBSamples-StartingtheAxis2server).
-2. Save the example in a Ballerina file (e.g., `soapExample.bal`)
-3. Run the file using the command `ballerina run soapExample.bal`
-4. You will get a response similar to the following
+1. Save the example in a Ballerina file (e.g., `soapExample.bal`).
+2. Execute the `ballerina run soapExample.bal` command to run the file.
+You will get a response similar to the following.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<ns:getQuoteResponse xmlns:ns="http://services.samples">
-   <ns:return xmlns:ax21="http://services.samples/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ax21:GetQuoteResponse">
-      <ax21:change>3.8023739781944386</ax21:change>
-      <ax21:earnings>-9.58706726808414</ax21:earnings>
-      <ax21:high>90.1204744818775</ax21:high>
-      <ax21:last>87.00770771274415</ax21:last>
-      <ax21:lastTradeTimestamp>Wed Jan 10 10:17:04 IST 2018</ax21:lastTradeTimestamp>
-      <ax21:low>89.96298980939689</ax21:low>
-      <ax21:marketCap>5.349140522956562E7</ax21:marketCap>
-      <ax21:name>WSO2 Company</ax21:name>
-      <ax21:open>-85.85962074870565</ax21:open>
-      <ax21:peRatio>-19.963567651822213</ax21:peRatio>
-      <ax21:percentageChange>3.867313309537189</ax21:percentageChange>
-      <ax21:prevClose>98.32081535306169</ax21:prevClose>
-      <ax21:symbol>WSO2</ax21:symbol>
-      <ax21:volume>16449</ax21:volume>
-   </ns:return>
-</ns:getQuoteResponse>
+<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+   <CheckPhoneNumberResponse xmlns="http://ws.cdyne.com/PhoneVerify/query">
+      <CheckPhoneNumberResult>
+         <Company>Toll Free</Company>
+         <Valid>true</Valid>
+         <Use>Assigned to a code holder for normal use.</Use>
+         <State>TF</State>
+         <RC />
+         <OCN />
+         <OriginalNumber>18006785432</OriginalNumber>
+         <CleanNumber>8006785432</CleanNumber>
+         <SwitchName />
+         <SwitchType />
+         <Country>United States</Country>
+         <CLLI />
+         <PrefixType>Landline</PrefixType>
+         <LATA />
+         <sms>Landline</sms>
+         <Email />
+         <AssignDate>Unknown</AssignDate>
+         <TelecomCity />
+         <TelecomCounty />
+         <TelecomState>TF</TelecomState>
+         <TelecomZip />
+         <TimeZone />
+         <Lat />
+         <Long />
+         <Wireless>false</Wireless>
+         <LRN />
+      </CheckPhoneNumberResult>
+   </CheckPhoneNumberResponse>
+</soap:Body>
 ```
