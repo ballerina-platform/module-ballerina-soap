@@ -79,11 +79,11 @@ public function main () {
 }
 ```
 
-You can run this example using the following steps:
+Follow the steps below to run this example.
 
-1. Save the example in a Ballerina file (e.g., `soapExample.bal`)
-2. Run the file using the command `ballerina run soapExample.bal`
-3. You will get a response similar to the following
+1. Save the example in a Ballerina file (e.g., `soapExample.bal`).
+2. Execute the `ballerina run soapExample.bal` command to run the file.
+You will get a response similar to the following.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
