@@ -18,14 +18,16 @@ import ballerina/http;
 import ballerina/mime;
 
 # Object for the SOAP 1.1 client endpoint.
-#
-# + soap11Client - The HTTP client created to send SOAP 1.1 requests.
-public type Soap11Client client object {
+public client class Soap11Client {
 
-    private http:Client soap11Client;
+    http:Client soap11Client;
 
-    public function init(string url, http:ClientConfiguration? config = ()) {
-        self.soap11Client = new (url, config = config);
+    public function init(string url, http:ClientConfiguration? config = ()) returns error? {
+        if (config is http:ClientConfiguration) {
+            self.soap11Client = check new (url, config = config);
+        } else {
+            self.soap11Client = check new (url);
+        }
     }
 
     # Sends SOAP 1.1 request and expects a response.
@@ -34,7 +36,7 @@ public type Soap11Client client object {
     # + soapAction - SOAP action
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
     # + return - If successful, returns the response object. Else, returns an error
-    public remote function sendReceive(xml|mime:Entity[] body, string soapAction, public Options? options = ())
+    remote function sendReceive(xml|mime:Entity[] body, string soapAction, Options? options = ())
                                         returns @tainted SoapResponse|error {
         return sendReceive(SOAP11, body, self.soap11Client, soapAction = soapAction, options = options);
     }
@@ -45,7 +47,7 @@ public type Soap11Client client object {
     # + soapAction - SOAP action
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
     # + return - If successful, returns `nil`. Else, returns an error.
-    public remote function sendRobust(xml|mime:Entity[] body, string soapAction, public Options? options = ()) 
+    remote function sendRobust(xml|mime:Entity[] body, string soapAction, Options? options = ()) 
                                       returns error? {
         return sendRobust(SOAP11, body, self.soap11Client, soapAction = soapAction, options = options);
     }
@@ -56,7 +58,8 @@ public type Soap11Client client object {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + soapAction - SOAP action
     # + options - SOAP options. E.g., headers, WS-addressing parameters, usernameToken parameters
-    public remote function sendOnly(xml|mime:Entity[] body, string soapAction, public Options? options = ()) {
-        sendOnly(SOAP11, body, self.soap11Client, soapAction = soapAction, options = options);
+    # + return - If successful, returns `nil`. Else, returns an error.
+    remote function sendOnly(xml|mime:Entity[] body, string soapAction, Options? options = ()) returns error? {
+        var _ = check sendOnly(SOAP11, body, self.soap11Client, soapAction = soapAction, options = options);
     }
 };

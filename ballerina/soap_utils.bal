@@ -19,7 +19,7 @@ import ballerina/http;
 import ballerina/lang.'xml as xmllib;
 import ballerina/log;
 import ballerina/mime;
-import ballerina/system;
+import ballerina/uuid;
 import ballerina/time;
 
 # Provides the namespace for the given SOAP version.
@@ -49,8 +49,8 @@ function getEncodingStyle(SoapVersion soapVersion) returns string {
 # + soapVersion - The SOAP version of the request
 # + return - XML with the empty SOAP envelope
 function createSoapEnvelop(SoapVersion soapVersion) returns xmllib:Element {
-    string namespace = getNamespace(soapVersion);
-    string encodingStyle = getEncodingStyle(soapVersion);
+    string _ = getNamespace(soapVersion);
+    string _ = getEncodingStyle(soapVersion);
     if (soapVersion == SOAP11) {
         return <xmllib:Element> xml `<soap:Envelope
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
@@ -142,8 +142,8 @@ function getWSSecureUsernameTokenHeaders(Options options) returns xml {
     xml usernameElement = xml `<wsse:Username>${username}</wsse:Username>`;
     xml passwordElement;
 
-    time:Time time = time:currentTime();
-    xml timestampElement = xml `<wsu:Timestamp><wsu:Created>${time:toString(time)}</wsu:Created></wsu:Timestamp>`;
+    time:Utc time = time:utcNow();
+    xml timestampElement = xml `<wsu:Timestamp><wsu:Created>${time.toString()}</wsu:Created></wsu:Timestamp>`;
 
     var passwordType = options?.usernameToken["passwordType"];
     if (passwordType is ()) {
@@ -151,9 +151,9 @@ function getWSSecureUsernameTokenHeaders(Options options) returns xml {
     }
     string pwdType = <string>passwordType;
     if (equalsIgnoreCase("PasswordDigest", pwdType)) {
-        string nonce = system:uuid();
+        string nonce = uuid:createType4AsString();
         string encodedNonce = nonce.toBytes().toBase64();
-        string createdTime = time:toString(time);
+        string createdTime = time.toString();
         password = createDigestPassword(nonce, password, createdTime);
         xml passwordDigest = xml `<wsse:Password Type="${PWD_DIGEST}">${password}</wsse:Password>`;
         xml nonceElement = xml `<wsse:Nonce EncodingType="${BASE64ENCODED}">${encodedNonce}</wsse:Nonce>`;
@@ -177,7 +177,7 @@ function getWSSecureUsernameTokenHeaders(Options options) returns xml {
 # + soapVersion - The SOAP version of the request
 # + return - XML with the empty SOAP header
 function createSoapHeader(SoapVersion soapVersion, Options? options = ()) returns xml {
-    string namespace = getNamespace(soapVersion);
+    string _ = getNamespace(soapVersion);
     xmllib:Element headersRoot;
     if (soapVersion == SOAP11) {
         headersRoot = <xmllib:Element> xml `<soap:Header xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"></soap:Header>`;
@@ -223,7 +223,7 @@ function createSoapHeader(SoapVersion soapVersion, Options? options = ()) return
 # + soapVersion - The SOAP version of the request
 # + return - XML with the SOAP body
 function createSoapBody(xml payload, SoapVersion soapVersion) returns xml {
-    string namespace = getNamespace(soapVersion);
+    string _ = getNamespace(soapVersion);
     xmllib:Element bodyRoot;
     if (soapVersion == SOAP11) {
         bodyRoot = <xmllib:Element> xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"></soap:Body>`;
@@ -342,27 +342,20 @@ string path = "";
 function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (), 
                      Options? options = ()) returns @tainted SoapResponse|error {
     http:Request req = fillSOAPEnvelope(soapVersion, body, options = options, soapAction = soapAction);
-    var response = httpClient->post(path, req);
-    if (response is http:Response) {
-        return createSOAPResponse(response, soapVersion);
-    } else {
-        return response;
-    }
+    http:Response response = check httpClient->post(path, req);
+    return createSOAPResponse(response, soapVersion);
 }
 
 function sendRobust(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
                     Options? options = ()) returns error? {
     http:Request req = fillSOAPEnvelope(soapVersion, body, options = options, soapAction = soapAction);
-    var response = httpClient->post(path, req);
-    if (response is error) {
-        return response;
-    }
+    http:Response _ = check httpClient->post(path, req);
 }
 
 function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-                  Options? options = ()) {
+                  Options? options = ()) returns error? {
     http:Request req = fillSOAPEnvelope(SOAP11, body, options = options, soapAction = soapAction);
-    var response = httpClient->post(path, req);
+    http:Response _ = check httpClient->post(path, req);
 }
 
 # Returns the value equality of two strings despite of case.

@@ -17,7 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 
-Soap12Client soap12Client = new ("http://localhost:9000/services/SimpleStockQuoteService");
+Soap12Client soap12Client = check new ("http://localhost:9000/services/SimpleStockQuoteService");
 
 @test:Config {}
 function testSendReceiveSoap12() {
