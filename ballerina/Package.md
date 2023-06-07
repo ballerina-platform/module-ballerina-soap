@@ -1,8 +1,8 @@
 ## Package overview
 
-This package provides APIs to convert a YAML configuration file to json, and vice-versa.
+This module provides APIs to send an ordinary XML request to a SOAP backend by specifying the necessary details to construct a SOAP envelope.
 
-Since the parser is following LL(1) grammar, it follows a non-recursive predictive parsing algorithm which operates in a linear time complexity.
+Soap module abstracts out the details of the creation of a SOAP envelope, headers, and the body in a SOAP message.
 
 ## Report issues
 
