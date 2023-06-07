@@ -87,6 +87,7 @@ subprojects {
         ballerinaStdLibs "io.ballerina.stdlib:task-ballerina:${project.stdlibTaskVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:os-ballerina:${project.stdlibOsVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:url-ballerina:${project.stdlibUrlVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:io-ballerina:${project.stdlibIoVersion}"
     }
 }
 
