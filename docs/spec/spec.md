@@ -24,7 +24,7 @@ The conforming implementation of the specification is released and included in t
 ## 1. Overview
 This specification elaborates on the functions available in the Soap library.
 
-Soap module abstracts out the details of the creation of a SOAP envelope, headers, and the body in a SOAP message.
+The soap module abstracts out the details of the creation of a SOAP envelope, headers, and the body in a SOAP message.
 
 ## 2. Compatibility
 
