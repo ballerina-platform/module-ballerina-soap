@@ -17,9 +17,10 @@
 import ballerina/log;
 import ballerina/test;
 
-Soap11Client soap11Client = new ("http://localhost:9000/services/SimpleStockQuoteService");
+Soap11Client soap11Client = check new ("http://localhost:9000/services/SimpleStockQuoteService");
 
-@test:Config {}
+// Incomplete test since the service (SimpleStockQuoteService) is not implemented.
+@test:Config {enable: false}
 function testSendReceive() {
     log:printInfo("soap11Client -> sendReceive()");
 
