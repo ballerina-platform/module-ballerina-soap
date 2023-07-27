@@ -324,6 +324,42 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
     return soapResponse;
 }
 
+function createSoapResponse(http:Response response, SoapVersion soapVersion) returns xml | error {
+    xml payload = check response.getXmlPayload();
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
+    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
+    xml soapHeaders;
+    if (soapVersion == SOAP11) {
+        soapHeaders = payload/<soap11:Header>/*;
+    } else {
+        soapHeaders = payload/<soap12:Header>/*;
+    }
+    xml[] soapResponseHeaders = [];
+
+    if ((soapHeaders/*).length() !=0) {
+        int i = 0;
+        xml[] headersXML = [];
+        while (i < soapHeaders.length()) {
+            headersXML[i] = soapHeaders[i];
+            i += 1;
+        }
+        soapResponseHeaders = headersXML;
+    }
+    xml soapResponsePayload;
+    if (soapVersion == SOAP11) {
+        soapResponsePayload = payload/<soap11:Body>;
+    } else {
+        soapResponsePayload = payload/<soap12:Body>;
+    }
+    SoapResponse soapResponse = {
+        headers: soapResponseHeaders,
+        payload: soapResponsePayload,
+        soapVersion: soapVersion,
+        httpResponse: response
+    };
+    return soapResponsePayload;
+}
+
 # Creates the password used in password digest usernameToken WS-Security.
 #
 # + nonce - The nonce string
@@ -339,22 +375,14 @@ function createDigestPassword(string nonce, string password, string createdTime)
 
 string path = "";
 
-function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (), 
-                     Options? options = ()) returns @tainted SoapResponse|error {
-    http:Request req = fillSOAPEnvelope(soapVersion, body, options = options, soapAction = soapAction);
+function sendReceive(xml|mime:Entity[] body, http:Client httpClient) returns xml|error {
+    http:Request req = fillSOAPEnvelope(SOAP11, body);
     http:Response response = check httpClient->post(path, req);
-    return createSOAPResponse(response, soapVersion);
+    return createSoapResponse(response, SOAP11);
 }
 
-function sendRobust(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-                    Options? options = ()) returns error? {
-    http:Request req = fillSOAPEnvelope(soapVersion, body, options = options, soapAction = soapAction);
-    http:Response _ = check httpClient->post(path, req);
-}
-
-function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-                  Options? options = ()) returns error? {
-    http:Request req = fillSOAPEnvelope(SOAP11, body, options = options, soapAction = soapAction);
+function sendOnly(xml|mime:Entity[] body, http:Client httpClient) returns error? {
+    http:Request req = fillSOAPEnvelope(SOAP11, body);
     http:Response _ = check httpClient->post(path, req);
 }
 
