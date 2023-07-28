@@ -18,7 +18,7 @@ import ballerina/test;
 
 @test:Config {}
 function testSendReceive11() returns error? {
-    BasicClient soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
+    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
 
     xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
          <quer:PhoneNumber>18006785432</quer:PhoneNumber>
@@ -37,7 +37,7 @@ function testSendReceive11() returns error? {
 
 @test:Config {}
 function testSendReceive12() returns error? {
-    BasicClient soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", version = SOAP12);
+    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", version = SOAP12);
 
     xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
          <quer:PhoneNumber>18006785432</quer:PhoneNumber>
@@ -56,7 +56,7 @@ function testSendReceive12() returns error? {
 
 @test:Config {}
 function testSendOnly11() returns error? {
-    BasicClient soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
+    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
 
     xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
          <quer:PhoneNumber>18006785432</quer:PhoneNumber>
@@ -72,7 +72,7 @@ function testSendOnly11() returns error? {
 
 @test:Config {}
 function testSendOnly12() returns error? {
-    BasicClient soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", version = SOAP12);
+    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", version = SOAP12);
 
     xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
          <quer:PhoneNumber>18006785432</quer:PhoneNumber>

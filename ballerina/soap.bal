@@ -25,7 +25,7 @@ public const SOAP12 = "SOAP12";
 
 
 # Object for the basic SOAP client endpoint.
-public client class BasicClient {
+public client class Client {
 
     http:Client soapClient;
     SoapVersion version = SOAP11;
