@@ -288,7 +288,7 @@ returns http:Request {
 # + response - The request to be sent
 # + soapVersion - The SOAP version of the request
 # + return - The SOAP response created from the `http:Response` or the `error` object when reading the payload
-function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns @tainted SoapResponse | error {
+function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns xml | error {
     xml payload = check response.getXmlPayload();
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
@@ -315,13 +315,7 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
     } else {
         soapResponsePayload = payload/<soap12:Body>;
     }
-    SoapResponse soapResponse = {
-        headers: soapResponseHeaders,
-        payload: soapResponsePayload,
-        soapVersion: soapVersion,
-        httpResponse: response
-    };
-    return soapResponse;
+    return soapResponsePayload;
 }
 
 # Creates the password used in password digest usernameToken WS-Security.
@@ -339,9 +333,8 @@ function createDigestPassword(string nonce, string password, string createdTime)
 
 string path = "";
 
-function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (), 
-                     Options? options = ()) returns @tainted SoapResponse|error {
-    http:Request req = fillSOAPEnvelope(soapVersion, body, options = options, soapAction = soapAction);
+function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = ()) returns xml|error {
+    http:Request req = fillSOAPEnvelope(soapVersion, body, soapAction = soapAction);
     http:Response response = check httpClient->post(path, req);
     return createSOAPResponse(response, soapVersion);
 }
