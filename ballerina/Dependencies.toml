@@ -47,9 +47,6 @@ dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
 ]
-modules = [
-	{org = "ballerina", packageName = "crypto", moduleName = "crypto"}
-]
 
 [[package]]
 org = "ballerina"
@@ -217,9 +214,6 @@ dependencies = [
 	{org = "ballerina", name = "lang.value"},
 	{org = "ballerina", name = "observe"}
 ]
-modules = [
-	{org = "ballerina", packageName = "log", moduleName = "log"}
-]
 
 [[package]]
 org = "ballerina"
@@ -278,14 +272,10 @@ org = "ballerina"
 name = "soap"
 version = "0.1.0"
 dependencies = [
-	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "http"},
 	{org = "ballerina", name = "lang.xml"},
-	{org = "ballerina", name = "log"},
 	{org = "ballerina", name = "mime"},
-	{org = "ballerina", name = "test"},
-	{org = "ballerina", name = "time"},
-	{org = "ballerina", name = "uuid"}
+	{org = "ballerina", name = "test"}
 ]
 modules = [
 	{org = "ballerina", packageName = "soap", moduleName = "soap"}
@@ -319,9 +309,6 @@ version = "2.2.5"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
-modules = [
-	{org = "ballerina", packageName = "time", moduleName = "time"}
-]
 
 [[package]]
 org = "ballerina"
@@ -329,19 +316,5 @@ name = "url"
 version = "2.2.4"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
-]
-
-[[package]]
-org = "ballerina"
-name = "uuid"
-version = "1.5.1"
-dependencies = [
-	{org = "ballerina", name = "crypto"},
-	{org = "ballerina", name = "jballerina.java"},
-	{org = "ballerina", name = "lang.int"},
-	{org = "ballerina", name = "time"}
-]
-modules = [
-	{org = "ballerina", packageName = "uuid", moduleName = "uuid"}
 ]
 
