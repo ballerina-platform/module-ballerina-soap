@@ -20,8 +20,8 @@ import ballerina/mime;
 # Soap version.
 public type SoapVersion SOAP11 | SOAP12;
 
-const SOAP11 = "SOAP11";
-const SOAP12 = "SOAP12";
+public const SOAP11 = "SOAP11";
+public const SOAP12 = "SOAP12";
 
 
 # Object for the basic SOAP client endpoint.
