@@ -138,3 +138,18 @@ function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client h
     http:Request req = fillSoapEnvelope(SOAP11, body, soapAction = soapAction);
     http:Response _ = check httpClient->post(path, req);
 }
+
+function retrieveHttpClientConfig(ClientConfiguration config) returns http:ClientConfiguration {
+    return {
+        httpVersion: config.httpVersion,
+        http1Settings: config.http1Settings,
+        http2Settings: config.http2Settings,
+        timeout: config.timeout,
+        poolConfig: config?.poolConfig,
+        auth: config?.auth,
+        retryConfig: config?.retryConfig,
+        responseLimits: config.responseLimits,
+        secureSocket: config?.secureSocket,
+        circuitBreaker: config?.circuitBreaker
+    };
+}
