@@ -78,7 +78,6 @@ subprojects {
         ballerinaStdLibs "io.ballerina:observe-ballerina:${project.observeInternalVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:cache-ballerina:${project.stdlibCacheVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:file-ballerina:${project.stdlibFileVersion}"
-        ballerinaStdLibs "io.ballerina.stdlib:regex-ballerina:${project.stdlibRegexVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:constraint-ballerina:${project.stdlibConstraintVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:task-ballerina:${project.stdlibTaskVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:os-ballerina:${project.stdlibOsVersion}"
