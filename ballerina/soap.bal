@@ -17,7 +17,7 @@
 import ballerina/http;
 import ballerina/mime;
 
-# Soap version.
+# Defines the supported SOAP versions.
 public enum SoapVersion {
     SOAP11,
     SOAP12
