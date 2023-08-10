@@ -35,7 +35,6 @@ public type ClientConfiguration record {|
 
 # Object for the basic SOAP client endpoint.
 public isolated client class Client {
-
     private final http:Client soapClient;
     private final SoapVersion soapVersion;
 
@@ -50,6 +49,9 @@ public isolated client class Client {
     }
 
     # Sends SOAP request and expects a response.
+    # ```ballerina
+    # xml|mime:Entity[] response = check soapClient->sendReceive(body);
+    # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + return - If successful, returns the response. Else, returns an error
@@ -59,6 +61,9 @@ public isolated client class Client {
 
     # Fire and forget requests. Sends the request without the possibility of any response from the
     # service (even an error).
+    # ```ballerina
+    # var response = check soapClient->sendOnly(body);
+    # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + return - If successful, returns `nil`. Else, returns an error
