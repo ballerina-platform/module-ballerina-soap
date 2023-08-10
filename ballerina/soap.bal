@@ -27,7 +27,7 @@ public enum SoapVersion {
 
 # Soap client configurations.
 #
-# + soapVersion - Soap version
+# + soapVersion - SOAP version
 public type ClientConfiguration record {|
   *http:ClientConfiguration;
   SoapVersion soapVersion = SOAP11;
@@ -43,9 +43,13 @@ public isolated client class Client {
     # + url - URL endpoint
     # + config - Configurations for SOAP client
     # + return - `error` in case of errors or `()` otherwise
-    public function init(string url, *ClientConfiguration config) returns error? {
+    public function init(string url, *ClientConfiguration config) returns Error? {
         self.soapVersion = config.soapVersion;
-        self.soapClient = check new (url,retrieveHttpClientConfig(config));
+        do {
+	        self.soapClient = check new (url,retrieveHttpClientConfig(config));
+        } on fail var err {
+            return error Error("Failed to initialize soap client", err);
+        }
     }
 
     # Sends SOAP request and expects a response.
@@ -55,19 +59,19 @@ public isolated client class Client {
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + return - If successful, returns the response. Else, returns an error
-    remote function sendReceive(xml|mime:Entity[] body) returns xml|mime:Entity[]|error {
+    remote function sendReceive(xml|mime:Entity[] body) returns xml|mime:Entity[]|Error {
         return sendReceive(self.soapVersion, body, self.soapClient);
     }
 
-    # Fire and forget requests. Sends the request without the possibility of any response from the
+    # Fires and forgets requests. Sends the request without the possibility of any response from the
     # service (even an error).
     # ```ballerina
-    # var response = check soapClient->sendOnly(body);
+    # check soapClient->sendOnly(body);
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body) returns error? {
+    remote function sendOnly(xml|mime:Entity[] body) returns Error? {
         return sendOnly(self.soapVersion, body, self.soapClient);
     }
 }

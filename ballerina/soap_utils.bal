@@ -113,7 +113,7 @@ returns http:Request {
 # + response - The request to be sent
 # + soapVersion - The SOAP version of the request
 # + return - The SOAP response created from the `http:Response` or the `error` object when reading the payload
-function createSOAPResponse(http:Response response, SoapVersion soapVersion) returns xml | error {
+function createSoapResponse(http:Response response, SoapVersion soapVersion) returns xml | error {
     xml payload = check response.getXmlPayload();
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
@@ -129,14 +129,27 @@ function createSOAPResponse(http:Response response, SoapVersion soapVersion) ret
 
 string path = "";
 
-function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = ()) returns xml|error {
+function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = ()) returns xml|Error {
     http:Request req = fillSoapEnvelope(soapVersion, body, soapAction = soapAction);
-    http:Response response = check httpClient->post(path, req);
-    return createSOAPResponse(response, soapVersion);
+    http:Response response;
+    do {
+	    response = check httpClient->post(path, req);
+    } on fail var err {
+    	return error Error("Failed to receive soap response", err);
+    }
+    do {
+	    return check createSoapResponse(response, soapVersion);
+    } on fail var err {
+    	return error Error("Failed to create soap response", err);
+    }
 }
-function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = ()) returns error? {
+function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = ()) returns Error? {
     http:Request req = fillSoapEnvelope(SOAP11, body, soapAction = soapAction);
-    http:Response _ = check httpClient->post(path, req);
+    do {
+	    http:Response _ = check httpClient->post(path, req);
+    } on fail var err {
+    	return error Error("Failed to create soap response", err);
+    }
 }
 
 function retrieveHttpClientConfig(ClientConfiguration config) returns http:ClientConfiguration {
