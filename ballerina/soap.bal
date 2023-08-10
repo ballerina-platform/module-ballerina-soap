@@ -39,6 +39,11 @@ public isolated client class Client {
     private final http:Client soapClient;
     private final SoapVersion soapVersion;
 
+    # Gets invoked during object initialization.
+    #
+    # + url - URL endpoint
+    # + config - Configurations for SOAP client
+    # + return - `error` in case of errors or `()` otherwise
     public function init(string url, *ClientConfiguration config) returns error? {
         self.soapVersion = config.soapVersion;
         self.soapClient = check new (url,retrieveHttpClientConfig(config));
