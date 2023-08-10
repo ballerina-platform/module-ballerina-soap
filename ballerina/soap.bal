@@ -35,11 +35,9 @@ public type ClientConfiguration record {|
 public isolated client class Client {
 
     private final http:Client soapClient;
-    private final ClientConfiguration config;
-
+    private final SoapVersion soapVersion;
     public function init(string url, *ClientConfiguration config) returns error? {
-        self.config = config;
-        
+        self.soapVersion = config.soapVersion;
         self.soapClient = check new (url,retrieveHttpClientConfig(config));
     }
 
@@ -48,7 +46,8 @@ public isolated client class Client {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + return - If successful, returns the response. Else, returns an error
     remote function sendReceive(xml|mime:Entity[] body) returns xml|mime:Entity[]|error {
-        return sendReceive(self.config.soapVersion, body, self.soapClient);
+ 
+        return sendReceive(self.soapVersion, body, self.soapClient);
     }
 
     # Fire and forget requests. Sends the request without the possibility of any response from the
@@ -57,6 +56,6 @@ public isolated client class Client {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + return - If successful, returns `nil`. Else, returns an error
     remote function sendOnly(xml|mime:Entity[] body) returns error? {
-        return sendOnly(self.config.soapVersion, body, self.soapClient);
+        return sendOnly(self.soapVersion, body, self.soapClient);
     }
 }
