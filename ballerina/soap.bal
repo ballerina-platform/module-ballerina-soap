@@ -32,10 +32,10 @@ public type ClientConfiguration record {|
 |};
 
 # Object for the basic SOAP client endpoint.
-public client class Client {
+public isolated client class Client {
 
-    http:Client soapClient;
-    ClientConfiguration config;
+    private final http:Client soapClient;
+    private final ClientConfiguration config;
 
     public function init(string url, *ClientConfiguration config) returns error? {
         self.config = config;
