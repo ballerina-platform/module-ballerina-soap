@@ -19,7 +19,9 @@ import ballerina/mime;
 
 # Defines the supported SOAP versions.
 public enum SoapVersion {
+    # Represents SOAP 1.1 version
     SOAP11,
+    # Represents SOAP 1.2 version
     SOAP12
 }
 
@@ -36,6 +38,7 @@ public isolated client class Client {
 
     private final http:Client soapClient;
     private final SoapVersion soapVersion;
+
     public function init(string url, *ClientConfiguration config) returns error? {
         self.soapVersion = config.soapVersion;
         self.soapClient = check new (url,retrieveHttpClientConfig(config));
@@ -46,7 +49,6 @@ public isolated client class Client {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + return - If successful, returns the response. Else, returns an error
     remote function sendReceive(xml|mime:Entity[] body) returns xml|mime:Entity[]|error {
- 
         return sendReceive(self.soapVersion, body, self.soapClient);
     }
 

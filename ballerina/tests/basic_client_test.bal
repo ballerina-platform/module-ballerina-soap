@@ -26,14 +26,10 @@ function testSendReceive11() returns error? {
          <quer:LicenseKey>0</quer:LicenseKey>
       </quer:CheckPhoneNumber>`;
 
-    xml|mime:Entity[]|error response = check soapClient->sendReceive(body);
+    xml|mime:Entity[] response = check soapClient->sendReceive(body);
 
     xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><CheckPhoneNumberResponse xmlns="http://ws.cdyne.com/PhoneVerify/query"><CheckPhoneNumberResult><Company>Toll Free</Company><Valid>true</Valid><Use>Assigned to a code holder for normal use.</Use><State>TF</State><RC/><OCN/><OriginalNumber>18006785432</OriginalNumber><CleanNumber>8006785432</CleanNumber><SwitchName/><SwitchType/><Country>United States</Country><CLLI/><PrefixType>Landline</PrefixType><LATA/><sms>Landline</sms><Email/><AssignDate>Unknown</AssignDate><TelecomCity/><TelecomCounty/><TelecomState>TF</TelecomState><TelecomZip/><TimeZone/><Lat/><Long/><Wireless>false</Wireless><LRN/></CheckPhoneNumberResult></CheckPhoneNumberResponse></soap:Body>`;
-    if response is error {
-        test:assertFail(msg = response.message());
-    } else {
-        test:assertEquals(response, expected);
-    }
+    test:assertEquals(response, expected);
 }
 
 @test:Config {}
@@ -45,14 +41,10 @@ function testSendReceive12() returns error? {
          <quer:LicenseKey>0</quer:LicenseKey>
       </quer:CheckPhoneNumber>`;
 
-    xml|mime:Entity[]|error response = check soapClient->sendReceive(body);
+    xml|mime:Entity[] response = check soapClient->sendReceive(body);
 
     xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><CheckPhoneNumberResponse xmlns="http://ws.cdyne.com/PhoneVerify/query"><CheckPhoneNumberResult><Company>Toll Free</Company><Valid>true</Valid><Use>Assigned to a code holder for normal use.</Use><State>TF</State><RC/><OCN/><OriginalNumber>18006785432</OriginalNumber><CleanNumber>8006785432</CleanNumber><SwitchName/><SwitchType/><Country>United States</Country><CLLI/><PrefixType>Landline</PrefixType><LATA/><sms>Landline</sms><Email/><AssignDate>Unknown</AssignDate><TelecomCity/><TelecomCounty/><TelecomState>TF</TelecomState><TelecomZip/><TimeZone/><Lat/><Long/><Wireless>false</Wireless><LRN/></CheckPhoneNumberResult></CheckPhoneNumberResponse></soap:Body>`;
-    if response is error {
-        test:assertFail(msg = response.message());
-    } else {
-        test:assertEquals(response, expected);
-    }
+    test:assertEquals(response, expected);
 }
 
 @test:Config {}
@@ -64,11 +56,7 @@ function testSendOnly11() returns error? {
          <quer:LicenseKey>0</quer:LicenseKey>
       </quer:CheckPhoneNumber>`;
 
-    error? response = check soapClient->sendOnly(body);
-
-    if response is error {
-        test:assertFail(msg = response.message());
-    }
+    _ = check soapClient->sendOnly(body);
 }
 
 @test:Config {}
@@ -80,9 +68,5 @@ function testSendOnly12() returns error? {
          <quer:LicenseKey>0</quer:LicenseKey>
       </quer:CheckPhoneNumber>`;
 
-    error? response = check soapClient->sendOnly(body);
-
-    if response is error {
-        test:assertFail(msg = response.message());
-    }
+    _ = check soapClient->sendOnly(body);
 }
