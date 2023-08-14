@@ -63,14 +63,41 @@ page at http://checkstyle.sourceforge.net/config.html -->
         <property name="message" value='All TODOs should be named.  e.g. "TODO: (ENG-123) - Refactor when v2 is released."' />
     </module>
 
+    <!--
+
+        LENGTH and CODING CHECKS
+
+        -->
+
+    <module name="LineLength">
+        <!-- Checks if a line is too long. -->
+        <property name="max" value="120" default="120" />
+        <property name="severity" value="error" />
+
+        <!--
+              The default ignore pattern exempts the following elements:
+                - import statements
+                - long URLs inside comments
+            -->
+
+        <property name="ignorePattern" value="${com.puppycrawl.tools.checkstyle.checks.sizes.LineLength.ignorePattern}" default="^(package .*;\s*)|(import .*;\s*)|( *\* *https?://.*)$" />
+    </module>
+
     <!--<module name="JavadocPackage">-->
-        <!--&lt;!&ndash; Checks that each Java package has a Javadoc file used for commenting.-->
-          <!--Only allows a package-info.java, not package.html. &ndash;&gt;-->
-        <!--<property name="severity" value="warning"/>-->
+    <!--&lt;!&ndash; Checks that each Java package has a Javadoc file used for commenting.-->
+    <!--Only allows a package-info.java, not package.html. &ndash;&gt;-->
+    <!--<property name="severity" value="warning"/>-->
     <!--</module>-->
 
     <!-- All Java AST specific tests live under TreeWalker module. -->
     <module name="TreeWalker">
+
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="CHECKSTYLE OFF: (.+)" />
+            <property name="onCommentFormat" value="CHECKSTYLE ON" />
+            <property name="checkFormat" value="Javadoc.*" />
+            <property name="messageFormat" value="$1" />
+        </module>
 
         <!--
 
@@ -89,11 +116,14 @@ page at http://checkstyle.sourceforge.net/config.html -->
         </module>
 
         <module name="ImportOrder">
-            <property name="groups" value="*,java,javax"/>
-            <property name="ordered" value="true"/>
+            <!-- Checks for out of order import statements. -->
+            <property name="severity" value="error" />
+            <property name="ordered" value="true" />
+            <property name="groups" value="*,java,javax" />
+            <!-- This ensures that static imports go to the end. -->
+            <property name="option" value="bottom" />
+            <property name="tokens" value="STATIC_IMPORT, IMPORT" />
             <property name="separated" value="true"/>
-            <property name="option" value="bottom"/>
-            <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
 
         <module name="IllegalImport">
@@ -124,18 +154,12 @@ page at http://checkstyle.sourceforge.net/config.html -->
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
         <module name="JavadocMethod">
-            <property name="scope" value="protected" />
             <property name="severity" value="error" />
-            <property name="allowMissingJavadoc" value="true" />
             <property name="allowMissingParamTags" value="true" />
             <property name="allowMissingReturnTag" value="true" />
-            <property name="allowMissingThrowsTags" value="true" />
-            <property name="allowThrowsTagsForSubclasses" value="true" />
-            <property name="allowUndeclaredRTE" value="true" />
         </module>
 
         <module name="JavadocType">
-            <property name="scope" value="protected" />
             <property name="severity" value="error" />
         </module>
 
@@ -177,8 +201,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
             <property name="applyToPackage" value="true" />
             <property name="applyToPrivate" value="false" />
             <property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|FLAG_.*)$" />
-            <message key="name.invalidPattern"
-                value="Variable ''{0}'' should be in ALL_CAPS (if it is a constant) or be private (otherwise)." />
+            <message key="name.invalidPattern" value="Variable ''{0}'' should be in ALL_CAPS (if it is a constant) or be private (otherwise)." />
             <property name="severity" value="error" />
         </module>
 
@@ -230,28 +253,6 @@ page at http://checkstyle.sourceforge.net/config.html -->
             <property name="severity" value="error" />
         </module>
 
-
-        <!--
-
-        LENGTH and CODING CHECKS
-
-        -->
-
-        <module name="LineLength">
-            <!-- Checks if a line is too long. -->
-            <property name="max" value="120" default="120" />
-            <property name="severity" value="error" />
-
-            <!--
-              The default ignore pattern exempts the following elements:
-                - import statements
-                - long URLs inside comments
-            -->
-
-            <property name="ignorePattern" value="${com.puppycrawl.tools.checkstyle.checks.sizes.LineLength.ignorePattern}"
-                default="^(package .*;\s*)|(import .*;\s*)|( *\* *https?://.*)$" />
-        </module>
-
         <module name="LeftCurly">
             <!-- Checks for placement of the left curly brace ('{'). -->
             <property name="severity" value="error" />
@@ -295,8 +296,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
             on the last non-blank line preceding the fallen-into case contains 'fall through' (or
             some other variants which we don't publicized to promote consistency).
             -->
-            <property name="reliefPattern"
-                value="fall through|Fall through|fallthru|Fallthru|falls through|Falls through|fallthrough|Fallthrough|No break|NO break|no break|continue on" />
+            <property name="reliefPattern" value="fall through|Fall through|fallthru|Fallthru|falls through|Falls through|fallthrough|Fallthrough|No break|NO break|no break|continue on" />
             <property name="severity" value="error" />
         </module>
 
@@ -328,8 +328,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
                  This includes most binary operators and keywords followed
                  by regular or curly braces.
             -->
-            <property name="tokens"
-                value="ASSIGN, BAND, BAND_ASSIGN, BOR,
+            <property name="tokens" value="ASSIGN, BAND, BAND_ASSIGN, BOR,
         BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN,
         EQUAL, GE, GT, LAND, LCURLY, LE, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE,
         LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_RETURN,
@@ -394,14 +393,10 @@ page at http://checkstyle.sourceforge.net/config.html -->
             <property name="format" value="e\.printStackTrace\(\)" />
             <property name="illegalPattern" value="true" />
         </module>
-
-        <module name="SuppressionCommentFilter">
-            <property name="offCommentFormat" value="CHECKSTYLE OFF: (.+)"/>
-            <property name="onCommentFormat" value="CHECKSTYLE ON"/>
-            <property name="checkFormat" value="Javadoc.*"/>
-            <property name="messageFormat" value="$1"/>
-        </module>
-
     </module>
+
+    <!--module name="SuppressionFilter">
+        <property name="file" value="suppressions.xml"/>
+    </module-->
 
 </module>
