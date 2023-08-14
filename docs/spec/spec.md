@@ -42,7 +42,7 @@ The SOAP client can be used to connect to a SOAP service and retrieve data.
 
 #### 2.1.1 Initializing the Client
 
-The soap:Client init method requires a valid URL and optional configuration to initialize the client.
+The `soap:Client` `init` method requires a valid URL and optional configuration to initialize the client.
 
 #### 2.1.2 SendReceive
 
