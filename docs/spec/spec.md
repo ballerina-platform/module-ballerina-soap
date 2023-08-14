@@ -30,7 +30,7 @@ The soap module abstracts out the details of the creation of a SOAP envelope, he
 
 |                          |      Versions      |
 |:------------------------:|:------------------:|
-| Ballerina Language       | 2201.6.0           |
+| Ballerina Language       | 2201.7.0           |
 | SOAP Version             | 0.1                |
 
 ## 3. Usage Example
@@ -38,22 +38,19 @@ The soap module abstracts out the details of the creation of a SOAP envelope, he
 ```ballerina
 import ballerina/io;
 import ballerina/soap;
+import ballerina/mime;
   
-public function main () {
+public function main () returns error? {
 
-    soap:Soap12Client soapClient = new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
+    soap:Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
 
     xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query"> 
          <quer:PhoneNumber>18006785432</quer:PhoneNumber>
          <quer:LicenseKey>0</quer:LicenseKey>
       </quer:CheckPhoneNumber>`;
 
-    var response = soapClient->sendReceive(body);
-    if (response is soap:SoapResponse) {
-        io:println(response["payload"]);
-    } else {
-        io:println(response.message());
-    }
+    xml|mime:Entity[] response = check soapClient->sendReceive(body);
+    io:println(response);
 }
 ```
 
