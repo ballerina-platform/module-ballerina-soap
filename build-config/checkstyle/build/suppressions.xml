@@ -42,6 +42,4 @@
     <!-- do not check swagger generated files -->
     <suppress checks=".*" files=".*/src/gen/java/.*" />
 
-    <suppress checks=".*" files=".*/src/main/resources/.*" />
-
 </suppressions>
