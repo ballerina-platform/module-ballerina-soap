@@ -23,6 +23,7 @@ The conforming implementation of the specification is released and included in t
        * 2.1.1 [Initializing the Client](#211-initializing-the-client)
        * 2.1.2 [SendReceive](#211-sendreceive)
        * 2.1.3 [SendOnly](#213-sendonly)
+3. [Supported SOAP Versions](#3-supported-soap-versions)
 
 ## 1. Overview
 This specification elaborates on the functions available in the Soap library.
@@ -91,4 +92,4 @@ public function main () returns error? {
 ## 3. Supported SOAP Versions
 
 The soap module supports SOAP 1.1 and 1.2 versions. By default, the soap client is configured to work with SOAP 1.1. Users can overwrite this to support SOAP 1.2 by passing `soapVersion`
-parameter during client initilization.
+parameter during client initialization.
