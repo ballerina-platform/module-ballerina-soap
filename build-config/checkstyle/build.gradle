@@ -19,12 +19,12 @@ plugins {
     id "de.undercouch.download"
 }
 
-apply plugin: 'java-library'
+apply plugin: 'java'
 
 task downloadCheckstyleRuleFiles(type: Download) {
     src([
-            'https://raw.githubusercontent.com/wso2/code-quality-tools/v1.4/checkstyle/jdk-17/checkstyle.xml',
-            'https://raw.githubusercontent.com/wso2/code-quality-tools/v1.4/checkstyle/jdk-17/suppressions.xml'
+            'https://raw.githubusercontent.com/wso2/code-quality-tools/v1.3/checkstyle/checkstyle.xml',
+            'https://raw.githubusercontent.com/wso2/code-quality-tools/v1.3/checkstyle/suppressions.xml'
     ])
     overwrite false
     onlyIfNewer true
