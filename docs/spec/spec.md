@@ -87,3 +87,8 @@ public function main () returns error? {
     _ = check soapClient->sendOnly(body);
 }
 ```
+
+## 3. Supported SOAP Versions
+
+The soap module supports SOAP 1.1 and 1.2 versions. By default, the soap client is configured to work with SOAP 1.1. Users can overwrite this to support SOAP 1.2 by passing `soapVersion`
+parameter during client initilization.
