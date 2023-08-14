@@ -93,3 +93,12 @@ public function main () returns error? {
 
 The soap module supports SOAP 1.1 and 1.2 versions. By default, the soap client is configured to work with SOAP 1.1. Users can overwrite this to support SOAP 1.2 by passing `soapVersion`
 parameter during client initialization.
+
+```ballerina
+import ballerina/soap;
+  
+public function main () returns error? {
+
+    soap:Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", soapVersion = SOAP12);
+}
+```
