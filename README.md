@@ -2,12 +2,12 @@ Ballerina SOAP Library
 ===================
 
 [![Build](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/build-timestamped-master.yml)
-[![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-soap/branch/main/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-soap)
+[![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-soap/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-soap)
 [![Trivy](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/trivy-scan.yml)
 [![GraalVM Check](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/build-with-bal-test-graalvm.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/build-with-bal-test-graalvm.yml)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-soap.svg)](https://github.com/ballerina-platform/module-ballerina-soap/commits/main)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-soap.svg)](https://github.com/ballerina-platform/module-ballerina-soap/commits/master)
 [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/soap.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fyaml)
-[![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-soap/branch/main/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-soap)
+[![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-soap/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-soap)
 
 This library provides APIs to send an ordinary XML request to a SOAP backend by specifying the necessary details to construct a SOAP envelope.
 
