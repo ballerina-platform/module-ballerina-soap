@@ -1,10 +1,10 @@
 [package]
 org = "ballerina"
 name = "soap"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Ballerina"]
 keywords = ["soap"]
 repository = "https://github.com/ballerina-platform/module-ballerina-soap"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.5.0"
+distribution = "2201.8.0"
