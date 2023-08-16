@@ -48,6 +48,21 @@ function testSendReceive12() returns error? {
 }
 
 @test:Config {}
+function testSendReceive12WithAction() returns error? {
+    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", soapVersion = SOAP12);
+
+    xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
+         <quer:PhoneNumber>18006785432</quer:PhoneNumber>
+         <quer:LicenseKey>0</quer:LicenseKey>
+      </quer:CheckPhoneNumber>`;
+
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, action = "http://ws.cdyne.com/PhoneVerify/query");
+
+    xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><CheckPhoneNumberResponse xmlns="http://ws.cdyne.com/PhoneVerify/query"><CheckPhoneNumberResult><Company>Toll Free</Company><Valid>true</Valid><Use>Assigned to a code holder for normal use.</Use><State>TF</State><RC/><OCN/><OriginalNumber>18006785432</OriginalNumber><CleanNumber>8006785432</CleanNumber><SwitchName/><SwitchType/><Country>United States</Country><CLLI/><PrefixType>Landline</PrefixType><LATA/><sms>Landline</sms><Email/><AssignDate>Unknown</AssignDate><TelecomCity/><TelecomCounty/><TelecomState>TF</TelecomState><TelecomZip/><TimeZone/><Lat/><Long/><Wireless>false</Wireless><LRN/></CheckPhoneNumberResult></CheckPhoneNumberResponse></soap:Body>`;
+    test:assertEquals(response, expected);
+}
+
+@test:Config {}
 function testSendOnly11() returns error? {
     Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
 
@@ -69,4 +84,16 @@ function testSendOnly12() returns error? {
       </quer:CheckPhoneNumber>`;
 
     _ = check soapClient->sendOnly(body);
+}
+
+@test:Config {}
+function testSendOnly12WithAction() returns error? {
+    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", soapVersion = SOAP12);
+
+    xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
+         <quer:PhoneNumber>18006785432</quer:PhoneNumber>
+         <quer:LicenseKey>0</quer:LicenseKey>
+      </quer:CheckPhoneNumber>`;
+
+    _ = check soapClient->sendOnly(body, action = "http://ws.cdyne.com/PhoneVerify/query");
 }
