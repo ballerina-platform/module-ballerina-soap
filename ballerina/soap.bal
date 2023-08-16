@@ -74,6 +74,6 @@ public isolated client class Client {
     # + action - SOAP action as a `string`
     # + return - If successful, returns `nil`. Else, returns an error
     remote function sendOnly(xml|mime:Entity[] body, string? action = ()) returns Error? {
-        return sendOnly(self.soapVersion, body, self.soapClient);
+        return sendOnly(self.soapVersion, body, self.soapClient, action);
     }
 }
