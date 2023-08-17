@@ -19,12 +19,18 @@ import ballerina/mime;
 
 @test:Config {}
 function testSendReceive11() returns error? {
-    Client soapClient = check new("http://www.dneonline.com/calculator.asmx?WSDL");
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    xml body = xml `<quer:Add xmlns:quer="http://tempuri.org/">
-         <quer:intA>2</quer:intA>
-         <quer:intB>3</quer:intB>
-      </quer:Add>`;
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
 
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
 
@@ -34,12 +40,18 @@ function testSendReceive11() returns error? {
 
 @test:Config {}
 function testSendReceive12() returns error? {
-    Client soapClient = check new("http://www.dneonline.com/calculator.asmx?WSDL", soapVersion = SOAP12);
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL", soapVersion = SOAP12);
 
-    xml body = xml `<quer:Add xmlns:quer="http://tempuri.org/">
-         <quer:intA>2</quer:intA>
-         <quer:intB>3</quer:intB>
-      </quer:Add>`;
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
 
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
 
@@ -49,24 +61,36 @@ function testSendReceive12() returns error? {
 
 @test:Config {}
 function testSendOnly11() returns error? {
-    Client soapClient = check new("http://www.dneonline.com/calculator.asmx?WSDL");
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    xml body = xml `<quer:Add xmlns:quer="http://tempuri.org/">
-         <quer:intA>2</quer:intA>
-         <quer:intB>3</quer:intB>
-      </quer:Add>`;
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
 
     _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
 }
 
 @test:Config {}
 function testSendOnly12() returns error? {
-    Client soapClient = check new("http://www.dneonline.com/calculator.asmx?WSDL", soapVersion = SOAP12);
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL", soapVersion = SOAP12);
 
-    xml body = xml `<quer:Add xmlns:quer="http://tempuri.org/">
-         <quer:intA>2</quer:intA>
-         <quer:intB>3</quer:intB>
-      </quer:Add>`;
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
 
     _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
 }
