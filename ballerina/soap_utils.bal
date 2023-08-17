@@ -17,13 +17,13 @@
 import ballerina/http;
 import ballerina/mime;
 
-# Prepares a SOAP envelope with the XML to be sent.
+# Creates a SOAP Request as an `http:Request`
 #
 # + soapAction - SOAP action
 # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with soap attachments
 # + soapVersion - The SOAP version of the request
-# + return - The SOAP Request sent as `http:Request` with the SOAP envelope
-function fillSoapEnvelope(SoapVersion soapVersion, xml|mime:Entity[] body, string soapAction)
+# + return - The SOAP Request sent as `http:Request`
+function createHttpRequest(SoapVersion soapVersion, xml|mime:Entity[] body, string soapAction)
 returns http:Request {
     http:Request req = new;
     if body is xml {
@@ -62,7 +62,7 @@ function createSoapResponse(http:Response response, SoapVersion soapVersion) ret
 string path = "";
 
 function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string soapAction) returns xml|Error {
-    http:Request req = fillSoapEnvelope(soapVersion, body, soapAction);
+    http:Request req = createHttpRequest(soapVersion, body, soapAction);
     http:Response response;
     do {
         response = check httpClient->post(path, req);
@@ -77,7 +77,7 @@ function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Clien
 }
 
 function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string soapAction) returns Error? {
-    http:Request req = fillSoapEnvelope(SOAP11, body, soapAction);
+    http:Request req = createHttpRequest(SOAP11, body, soapAction);
     do {
         http:Response _ = check httpClient->post(path, req);
     } on fail var err {
