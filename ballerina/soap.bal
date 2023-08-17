@@ -60,7 +60,7 @@ public isolated client class Client {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + action - SOAP action as a `string`
     # + return - If successful, returns the response. Else, returns an error
-    remote function sendReceive(xml|mime:Entity[] body, string? action = ()) returns xml|mime:Entity[]|Error {
+    remote function sendReceive(xml|mime:Entity[] body, string action) returns xml|mime:Entity[]|Error {
         return sendReceive(self.soapVersion, body, self.soapClient, action);
     }
 
@@ -73,7 +73,7 @@ public isolated client class Client {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + action - SOAP action as a `string`
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body, string? action = ()) returns Error? {
+    remote function sendOnly(xml|mime:Entity[] body, string action) returns Error? {
         return sendOnly(self.soapVersion, body, self.soapClient, action);
     }
 }
