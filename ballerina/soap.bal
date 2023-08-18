@@ -29,8 +29,8 @@ public enum SoapVersion {
 #
 # + soapVersion - SOAP version
 public type ClientConfiguration record {|
-  *http:ClientConfiguration;
-  SoapVersion soapVersion = SOAP11;
+    *http:ClientConfiguration;
+    SoapVersion soapVersion = SOAP11;
 |};
 
 # Object for the basic SOAP client endpoint.
@@ -46,7 +46,7 @@ public isolated client class Client {
     public function init(string url, *ClientConfiguration config) returns Error? {
         self.soapVersion = config.soapVersion;
         do {
-	        self.soapClient = check new (url,retrieveHttpClientConfig(config));
+            self.soapClient = check new (url, retrieveHttpClientConfig(config));
         } on fail var err {
             return error Error("Failed to initialize soap client", err);
         }
