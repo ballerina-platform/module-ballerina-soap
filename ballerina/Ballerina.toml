@@ -1,7 +1,7 @@
 [package]
 org = "ballerina"
 name = "soap"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Ballerina"]
 keywords = ["soap"]
 repository = "https://github.com/ballerina-platform/module-ballerina-soap"
