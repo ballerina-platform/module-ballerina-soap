@@ -29,8 +29,8 @@ public enum SoapVersion {
 #
 # + soapVersion - SOAP version
 public type ClientConfiguration record {|
-  *http:ClientConfiguration;
-  SoapVersion soapVersion = SOAP11;
+    *http:ClientConfiguration;
+    SoapVersion soapVersion = SOAP11;
 |};
 
 # Object for the basic SOAP client endpoint.
@@ -46,7 +46,7 @@ public isolated client class Client {
     public function init(string url, *ClientConfiguration config) returns Error? {
         self.soapVersion = config.soapVersion;
         do {
-	        self.soapClient = check new (url,retrieveHttpClientConfig(config));
+            self.soapClient = check new (url, retrieveHttpClientConfig(config));
         } on fail var err {
             return error Error("Failed to initialize soap client", err);
         }
@@ -54,24 +54,28 @@ public isolated client class Client {
 
     # Sends SOAP request and expects a response.
     # ```ballerina
-    # xml|mime:Entity[] response = check soapClient->sendReceive(body);
+    # xml|mime:Entity[] response = check soapClient->sendReceive(body, action);
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + action - SOAP action as a `string`
+    # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns the response. Else, returns an error
-    remote function sendReceive(xml|mime:Entity[] body) returns xml|mime:Entity[]|Error {
-        return sendReceive(self.soapVersion, body, self.soapClient);
+    remote function sendReceive(xml|mime:Entity[] body, string action, map<string|string[]> headers = {}) returns xml|mime:Entity[]|Error {
+        return sendReceive(self.soapVersion, body, self.soapClient, action, headers);
     }
 
     # Fires and forgets requests. Sends the request without the possibility of any response from the
     # service (even an error).
     # ```ballerina
-    # check soapClient->sendOnly(body);
+    # check soapClient->sendOnly(body, action);
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + action - SOAP action as a `string`
+    # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body) returns Error? {
-        return sendOnly(self.soapVersion, body, self.soapClient);
+    remote function sendOnly(xml|mime:Entity[] body, string action, map<string|string[]> headers = {}) returns Error? {
+        return sendOnly(self.soapVersion, body, self.soapClient, action, headers);
     }
 }
