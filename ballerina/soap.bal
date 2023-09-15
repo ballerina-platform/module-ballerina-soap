@@ -54,28 +54,28 @@ public isolated client class Client {
 
     # Sends SOAP request and expects a response.
     # ```ballerina
-    # xml|mime:Entity[] response = check soapClient->sendReceive(body, action);
+    # xml|mime:Entity[] response = check soapClient->sendReceive(body);
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns the response. Else, returns an error
-    remote function sendReceive(xml|mime:Entity[] body, string action, map<string|string[]> headers = {}) returns xml|mime:Entity[]|Error {
+    remote function sendReceive(xml|mime:Entity[] body, string? action = (), map<string|string[]> headers = {})returns xml|mime:Entity[]|Error {
         return sendReceive(self.soapVersion, body, self.soapClient, action, headers);
     }
 
     # Fires and forgets requests. Sends the request without the possibility of any response from the
     # service (even an error).
     # ```ballerina
-    # check soapClient->sendOnly(body, action);
+    # check soapClient->sendOnly(body);
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body, string action, map<string|string[]> headers = {}) returns Error? {
+    remote function sendOnly(xml|mime:Entity[] body, string? action = (), map<string|string[]> headers = {}) returns Error? {
         return sendOnly(self.soapVersion, body, self.soapClient, action, headers);
     }
 }

@@ -24,7 +24,7 @@ import ballerina/mime;
 # + soapVersion - The SOAP version of the request
 # + headers - SOAP headers as a `map<string|string[]>`
 # + return - The SOAP Request sent as `http:Request`
-function createHttpRequest(SoapVersion soapVersion, xml|mime:Entity[] body, string soapAction, map<string|string[]> headers = {})
+function createHttpRequest(SoapVersion soapVersion, xml|mime:Entity[] body, string? soapAction, map<string|string[]> headers = {})
 returns http:Request {
     http:Request req = new;
     if body is xml {
@@ -34,14 +34,20 @@ returns http:Request {
     }
     if soapVersion == SOAP11 {
         req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
-        req.addHeader("SOAPAction", soapAction);
+        if soapAction is string {
+            req.addHeader("SOAPAction", soapAction);
+        }
     } else {
-        map<string> stringMap = {};
-        stringMap["action"] = "\"" + soapAction + "\"";
-        var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
-        if mediaType is mime:MediaType {
-            mediaType.parameters = stringMap;
-            req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
+        if soapAction is string {
+            map<string> stringMap = {};
+            stringMap["action"] = "\"" + soapAction + "\"";
+            var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
+            if mediaType is mime:MediaType {
+                mediaType.parameters = stringMap;
+                req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
+            }
+        } else {
+            req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
         }
     }
     foreach string key in headers.keys() {
@@ -66,7 +72,7 @@ function createSoapResponse(http:Response response, SoapVersion soapVersion) ret
 
 string path = "";
 
-function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string soapAction, map<string|string[]> headers = {}) returns xml|Error {
+function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (), map<string|string[]> headers = {}) returns xml|Error {
     http:Request req = createHttpRequest(soapVersion, body, soapAction, headers);
     http:Response response;
     do {
@@ -81,7 +87,7 @@ function sendReceive(SoapVersion soapVersion, xml|mime:Entity[] body, http:Clien
     }
 }
 
-function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string soapAction, map<string|string[]> headers = {}) returns Error? {
+function sendOnly(SoapVersion soapVersion, xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (), map<string|string[]> headers = {}) returns Error? {
     http:Request req = createHttpRequest(SOAP11, body, soapAction, headers);
     do {
         http:Response _ = check httpClient->post(path, req);
