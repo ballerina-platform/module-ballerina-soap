@@ -19,54 +19,120 @@ import ballerina/mime;
 
 @test:Config {}
 function testSendReceive11() returns error? {
-    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
-         <quer:PhoneNumber>18006785432</quer:PhoneNumber>
-         <quer:LicenseKey>0</quer:LicenseKey>
-      </quer:CheckPhoneNumber>`;
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
 
-    xml|mime:Entity[] response = check soapClient->sendReceive(body);
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
 
-    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><CheckPhoneNumberResponse xmlns="http://ws.cdyne.com/PhoneVerify/query"><CheckPhoneNumberResult><Company>Toll Free</Company><Valid>true</Valid><Use>Assigned to a code holder for normal use.</Use><State>TF</State><RC/><OCN/><OriginalNumber>18006785432</OriginalNumber><CleanNumber>8006785432</CleanNumber><SwitchName/><SwitchType/><Country>United States</Country><CLLI/><PrefixType>Landline</PrefixType><LATA/><sms>Landline</sms><Email/><AssignDate>Unknown</AssignDate><TelecomCity/><TelecomCounty/><TelecomState>TF</TelecomState><TelecomZip/><TimeZone/><Lat/><Long/><Wireless>false</Wireless><LRN/></CheckPhoneNumberResult></CheckPhoneNumberResponse></soap:Body>`;
+    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
     test:assertEquals(response, expected);
 }
 
 @test:Config {}
 function testSendReceive12() returns error? {
-    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", soapVersion = SOAP12);
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL", soapVersion = SOAP12);
 
-    xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
-         <quer:PhoneNumber>18006785432</quer:PhoneNumber>
-         <quer:LicenseKey>0</quer:LicenseKey>
-      </quer:CheckPhoneNumber>`;
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
 
-    xml|mime:Entity[] response = check soapClient->sendReceive(body);
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
 
-    xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><CheckPhoneNumberResponse xmlns="http://ws.cdyne.com/PhoneVerify/query"><CheckPhoneNumberResult><Company>Toll Free</Company><Valid>true</Valid><Use>Assigned to a code holder for normal use.</Use><State>TF</State><RC/><OCN/><OriginalNumber>18006785432</OriginalNumber><CleanNumber>8006785432</CleanNumber><SwitchName/><SwitchType/><Country>United States</Country><CLLI/><PrefixType>Landline</PrefixType><LATA/><sms>Landline</sms><Email/><AssignDate>Unknown</AssignDate><TelecomCity/><TelecomCounty/><TelecomState>TF</TelecomState><TelecomZip/><TimeZone/><Lat/><Long/><Wireless>false</Wireless><LRN/></CheckPhoneNumberResult></CheckPhoneNumberResponse></soap:Body>`;
+    xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
     test:assertEquals(response, expected);
 }
 
 @test:Config {}
 function testSendOnly11() returns error? {
-    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl");
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
-         <quer:PhoneNumber>18006785432</quer:PhoneNumber>
-         <quer:LicenseKey>0</quer:LicenseKey>
-      </quer:CheckPhoneNumber>`;
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
 
-    _ = check soapClient->sendOnly(body);
+    _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
 }
 
 @test:Config {}
 function testSendOnly12() returns error? {
-    Client soapClient = check new("http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl", soapVersion = SOAP12);
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL", soapVersion = SOAP12);
 
-    xml body = xml `<quer:CheckPhoneNumber xmlns:quer="http://ws.cdyne.com/PhoneVerify/query">
-         <quer:PhoneNumber>18006785432</quer:PhoneNumber>
-         <quer:LicenseKey>0</quer:LicenseKey>
-      </quer:CheckPhoneNumber>`;
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
 
-    _ = check soapClient->sendOnly(body);
+    _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
+}
+
+@test:Config {}
+function testSendReceive11WithHeaders() returns error? {
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", {foo: ["bar1", "bar2"]});
+
+    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
+    test:assertEquals(response, expected);
+}
+
+@test:Config {}
+function testSendReceive12WithHeaders() returns error? {
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL", soapVersion = SOAP12);
+
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", {foo: ["bar1", "bar2"]});
+
+    xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
+    test:assertEquals(response, expected);
 }
