@@ -110,7 +110,8 @@ function testSendReceive11WithHeaders() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", {foo: ["bar1", "bar2"]});
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add",
+                                                               {foo: ["bar1", "bar2"]});
 
     xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
     test:assertEquals(response, expected);
@@ -131,7 +132,8 @@ function testSendReceive12WithHeaders() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", {foo: ["bar1", "bar2"]});
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add",
+                                                               {foo: ["bar1", "bar2"]});
 
     xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
     test:assertEquals(response, expected);

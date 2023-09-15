@@ -61,7 +61,8 @@ public isolated client class Client {
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns the response. Else, returns an error
-    remote function sendReceive(xml|mime:Entity[] body, string? action = (), map<string|string[]> headers = {})returns xml|mime:Entity[]|Error {
+    remote function sendReceive(xml|mime:Entity[] body, string? action = (),
+                                map<string|string[]> headers = {})returns xml|mime:Entity[]|Error {
         return sendReceive(self.soapVersion, body, self.soapClient, action, headers);
     }
 
@@ -75,7 +76,8 @@ public isolated client class Client {
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body, string? action = (), map<string|string[]> headers = {}) returns Error? {
+    remote function sendOnly(xml|mime:Entity[] body, string? action = (),
+                             map<string|string[]> headers = {}) returns Error? {
         return sendOnly(self.soapVersion, body, self.soapClient, action, headers);
     }
 }
