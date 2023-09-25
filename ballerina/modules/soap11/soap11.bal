@@ -17,26 +17,15 @@
 import ballerina/http;
 import ballerina/mime;
 
-# Defines the supported SOAP versions.
-public enum SoapVersion {
-    # Represents SOAP 1.1 version
-    SOAP11,
-    # Represents SOAP 1.2 version
-    SOAP12
-}
-
 # Soap client configurations.
 #
-# + soapVersion - SOAP version
 public type ClientConfiguration record {|
     *http:ClientConfiguration;
-    SoapVersion soapVersion = SOAP11;
 |};
 
 # Object for the basic SOAP client endpoint.
 public isolated client class Client {
     private final http:Client soapClient;
-    private final SoapVersion soapVersion;
 
     # Gets invoked during object initialization.
     #
@@ -44,7 +33,6 @@ public isolated client class Client {
     # + config - Configurations for SOAP client
     # + return - `error` in case of errors or `()` otherwise
     public function init(string url, *ClientConfiguration config) returns Error? {
-        self.soapVersion = config.soapVersion;
         do {
             self.soapClient = check new (url, retrieveHttpClientConfig(config));
         } on fail var err {
@@ -61,9 +49,9 @@ public isolated client class Client {
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns the response. Else, returns an error
-    remote function sendReceive(xml|mime:Entity[] body, string? action = (),
-                                map<string|string[]> headers = {})returns xml|mime:Entity[]|Error {
-        return sendReceive(self.soapVersion, body, self.soapClient, action, headers);
+    remote function sendReceive(xml|mime:Entity[] body, string action,
+                                map<string|string[]> headers = {}) returns xml|mime:Entity[]|Error {
+        return sendReceive(body, self.soapClient, action, headers);
     }
 
     # Fires and forgets requests. Sends the request without the possibility of any response from the
@@ -76,8 +64,8 @@ public isolated client class Client {
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body, string? action = (),
+    remote function sendOnly(xml|mime:Entity[] body, string action,
                              map<string|string[]> headers = {}) returns Error? {
-        return sendOnly(self.soapVersion, body, self.soapClient, action, headers);
+        return sendOnly(body, self.soapClient, action, headers);
     }
 }

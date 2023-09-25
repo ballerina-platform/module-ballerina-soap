@@ -3,6 +3,7 @@ org = "ballerina"
 name = "soap"
 version = "@toml.version@"
 authors = ["Ballerina"]
+export=["soap.soap11", "soap.soap11"]
 keywords = ["soap"]
 repository = "https://github.com/ballerina-platform/module-ballerina-soap"
 icon = "icon.png"
