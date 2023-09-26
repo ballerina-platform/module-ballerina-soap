@@ -1,7 +1,7 @@
 [package]
 org = "ballerina"
 name = "soap"
-version = "0.3.0"
+version = "0.2.0"
 authors = ["Ballerina"]
 export=["soap.soap11", "soap.soap12"]
 keywords = ["soap"]
