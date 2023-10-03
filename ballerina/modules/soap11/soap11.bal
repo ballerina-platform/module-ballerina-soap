@@ -24,6 +24,8 @@ xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 # Object for the basic SOAP client endpoint.
 public client class Client {
     private final http:Client soapClient;
+    private wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity;
+    private wssec:OutboundSecurityConfig? outboundSecurity;
 
     # Gets invoked during object initialization.
     #
@@ -57,7 +59,14 @@ public client class Client {
                 xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);
                 xml response = check common:sendReceive(applySecurityPoliciesResult, self.soapClient,
                                                         action, headers, false);
-        return sendReceive(body, self.soapClient, action, headers);
+                wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
+                do {
+                    if outboundSecurity !is () {
+                        return check common:applyOutboundConfig(outboundSecurity, response);
+                    }
+                } on fail var e {
+                    return error Error("Outbound security configurations do not match with the SOAP response. ", e.cause());
+                }
             }
             return check common:sendReceive(body, self.soapClient, action, headers, false);
         } on fail var e {
