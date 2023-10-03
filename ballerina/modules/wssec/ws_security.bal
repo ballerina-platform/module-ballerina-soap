@@ -25,4 +25,14 @@ class WsSecurity {
         returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
+
+    function applySignatureOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Signature signature, string? x509FilePath)
+        returns string|Error = @java:Method {
+        'class: "org.wssec.WsSecurity"
+    } external;
+
+    function applyEncryptionOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Encryption encryption)
+        returns string|Error = @java:Method {
+        'class: "org.wssec.WsSecurity"
+    } external;
 }

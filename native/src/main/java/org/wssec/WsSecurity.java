@@ -88,4 +88,80 @@ public class WsSecurity {
             return createError(e.getMessage());
         }
     }
+
+    public static Object applySignatureOnlyPolicy(BObject wsSecHeader, BObject balSignature, Object x509FilePath) {
+        BHandle handle = (BHandle) wsSecHeader.get(StringUtils.fromString(NATIVE_SEC_HEADER));
+        WsSecurityHeader wsSecurityHeader = (WsSecurityHeader) handle.getValue();
+        handle = (BHandle) balSignature.get(StringUtils.fromString(NATIVE_SIGNATURE));
+        Signature signature = (Signature) handle.getValue();
+        try {
+            Document xmlDocument = createSignatureTags(wsSecurityHeader, x509FilePath);
+            WsSecurityUtils.setSignatureValue(xmlDocument, signature.getSignatureValue(),
+                    signature.getSignatureAlgorithm());
+            return convertDocumentToString(xmlDocument);
+        } catch (Exception e) {
+            return createError(e.getMessage());
+        }
+    }
+
+    public static Object applyEncryptionOnlyPolicy(BObject wsSecHeader, BObject balEncryption) {
+        BHandle handle = (BHandle) wsSecHeader.get(StringUtils.fromString(NATIVE_SEC_HEADER));
+        WsSecurityHeader wsSecurityHeader = (WsSecurityHeader) handle.getValue();
+        handle = (BHandle) balEncryption.get(StringUtils.fromString(NATIVE_ENCRYPTION));
+        Encryption encryption = (Encryption) handle.getValue();
+        try {
+            byte[] key = UsernameTokenUtil.generateDerivedKey("password",
+                    UsernameTokenUtil.generateSalt(true), ITERATION);
+            Document xmlDocument = encryptEnvelope(wsSecurityHeader, key);
+            WsSecurityUtils.setEncryptedData(xmlDocument, encryption.getEncryptedData(),
+                                             encryption.getEncryptionAlgorithm());
+            return convertDocumentToString(xmlDocument);
+        } catch (Exception e) {
+            return createError(e.getMessage());
+        }
+    }
+
+    public static Document encryptEnvelope(WsSecurityHeader wsSecurityHeader, byte[] rawKey)
+            throws WSSecurityException {
+        Init.init();
+        JCEMapper.registerDefaultAlgorithms();
+        WSSecDKEncrypt encryptionBuilder = new WSSecDKEncrypt(wsSecurityHeader.getWsSecHeader());
+        encryptionBuilder.setSymmetricEncAlgorithm(AES_128_GCM);
+        return encryptionBuilder.build(rawKey);
+    }
+
+    public static Document createSignatureTags(WsSecurityHeader wsSecurityHeader,
+                                               Object x509FilePath) throws Exception {
+        RequestData reqData = new RequestData();
+        reqData.setSecHeader(wsSecurityHeader.getWsSecHeader());
+        reqData.setWssConfig(WSSConfig.getNewInstance());
+        reqData.setWsDocInfo(new WSDocInfo(wsSecurityHeader.getDocument()));
+        WSSecSignature wsSecSignature = prepareSignature(reqData, x509FilePath);
+        WsSecurityUtils.buildSignature(reqData, wsSecSignature);
+        return wsSecSignature.build(null);
+    }
+
+    public static WSSecSignature prepareSignature(RequestData reqData, Object x509FilePath) {
+        WSSecSignature sign = new WSSecSignature(reqData.getSecHeader());
+        try {
+            byte[] key = UsernameTokenUtil.generateDerivedKey("password",
+                    UsernameTokenUtil.generateSalt(true), ITERATION);
+            sign.setSecretKey(key);
+            sign.setWsDocInfo(reqData.getWsDocInfo());
+            sign.setSignatureAlgorithm(HMAC_SHA1);
+            sign.setKeyIdentifierType(CUSTOM_KEY_IDENTIFIER);
+            if (x509FilePath != null) {
+                    FileInputStream fis = new FileInputStream(x509FilePath.toString());
+                    CertificateFactory certificateFactory = CertificateFactory.getInstance(X509);
+                    X509Certificate x509Certificate = (X509Certificate) certificateFactory.generateCertificate(fis);
+                    sign.setKeyIdentifierType(X509_KEY_IDENTIFIER);
+                    sign.setX509Certificate(x509Certificate);
+                    fis.close();
+            }
+        sign.prepare(null);
+        } catch (CertificateException | WSSecurityException | IOException e) {
+            throw createError(e.getMessage());
+        }
+        return sign;
+    }
 }

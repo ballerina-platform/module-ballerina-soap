@@ -31,3 +31,19 @@ public type UsernameTokenConfig record {|
 public type TimestampTokenConfig record {|
     int timeToLive = 300;
 |};
+
+# Represents the record for Symmetric Binding policy.
+#
+# + symmetricKey - The key to sign and encrypt the SOAP envelope 
+# + servicePublicKey - The key to encrypt the symmetric key  
+# + signatureAlgorithm - The algorithm to sign the SOAP envelope
+# + encryptionAlgorithm - The algorithm to encrypt the SOAP envelope
+# + x509Token - The path or token of the X509 certificate
+public type SymmetricBindingConfig record {|
+    crypto:PrivateKey symmetricKey;
+    crypto:PublicKey servicePublicKey;
+    SignatureAlgorithm signatureAlgorithm?;
+    EncryptionAlgorithm encryptionAlgorithm?;
+    string x509Token?;
+|};
+
