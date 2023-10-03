@@ -27,10 +27,6 @@ class Document {
         }
     }
 
-    public function getDocument() returns string|Error = @java:Method {
-        'class: "org.wssec.DocumentBuilder"
-    } external;
-
     public function getEncryptedData() returns byte[] = @java:Method {
         'class: "org.wssec.DocumentBuilder"
     } external;

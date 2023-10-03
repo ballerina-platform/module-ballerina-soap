@@ -28,7 +28,7 @@ function addSecurityHeader(Document document) returns WSSecurityHeader|Error {
 }
 
 public function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
-                     byte[]|crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
+                            crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
     Encryption encrypt = check new ();
     return encrypt.decryptData(cipherText, encryptionAlgorithm, key);
 }
@@ -63,9 +63,6 @@ function applyEncryptedKey(string envelopeString, crypto:PrivateKey symmetricKey
         }
         else if securedEnvelope.includesMatch(re`<wsse:SecurityTokenReference .*/>`) {
             securedEnvelope = regex:replace(securedEnvelope, string`<wsse:SecurityTokenReference .*/>`, replace);
-        }
-        else if securedEnvelope.includesMatch(re`<wsse:SecurityTokenReference .*>.*</wsse:SecurityTokenReference>`) {
-            securedEnvelope = regex:replace(securedEnvelope, string`<wsse:SecurityTokenReference .*/>.*</wsse:SecurityTokenReference>`, replace);
         }
         return securedEnvelope;
     } on fail var e {

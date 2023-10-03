@@ -76,10 +76,6 @@ class Signature {
     public function setSignatureValue(byte[] signatureValue) = @java:Method {
         'class: "org.wssec.Signature"
     } external;
-
-    public function getSignatureValue() returns byte[] = @java:Method {
-        'class: "org.wssec.Signature"
-    } external;
 }
 
 function newSignature() returns handle = @java:Constructor {
