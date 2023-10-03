@@ -159,3 +159,37 @@ public function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symm
     return convertStringToXml(securedEnvelope);
 }
 
+# Apply asymmetric binding security policy with X509 token to the SOAP envelope.
+#
+# + envelope - The SOAP envelope
+# + asymmetricBinding - The `AsymmetricBindingConfig` record with the required parameters
+# + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
+public function applyAsymmetricBinding(xml envelope, *AsymmetricBindingConfig asymmetricBinding) returns xml|Error {
+    Document document = check new (envelope);
+    WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
+    string securedEnvelope = envelope.toBalString();
+    if asymmetricBinding.signatureAlgorithm !is () {
+        Signature signature = check new ();
+        byte[] signedData = check signature.signData((envelope/<soap:Body>/*).toString(),
+                                                     <SignatureAlgorithm>asymmetricBinding.signatureAlgorithm,
+                                                     <crypto:PrivateKey>asymmetricBinding.signatureKey);                                           
+        Signature signatureResult = check addSignature(signature,
+                                                       <SignatureAlgorithm>asymmetricBinding.signatureAlgorithm,
+                                                       signedData);
+        WsSecurity wsSecurity = new;
+        securedEnvelope = check wsSecurity.applySignatureOnlyPolicy(wsSecurityHeader, signatureResult,
+                                                                           asymmetricBinding.x509Token);
+    }
+    if asymmetricBinding.encryptionAlgorithm !is () {
+        Encryption encryption = check new ();
+        byte[] encryptData = check encryption.encryptData((envelope/<soap:Body>/*).toString(),
+                                                          <EncryptionAlgorithm>asymmetricBinding.encryptionAlgorithm,
+                                                          <crypto:PublicKey>asymmetricBinding.encryptionKey);
+        Encryption encryptionResult = check addEncryption(encryption,
+                                                          <EncryptionAlgorithm>asymmetricBinding.encryptionAlgorithm,
+                                                          encryptData);
+        WsSecurity wsSecurity = new;
+        securedEnvelope = check wsSecurity.applyEncryptionOnlyPolicy(wsSecurityHeader, encryptionResult);
+    }
+    return convertStringToXml(securedEnvelope);
+}

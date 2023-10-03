@@ -47,3 +47,17 @@ public type SymmetricBindingConfig record {|
     string x509Token?;
 |};
 
+# Represents the record for Username Token with Asymmetric Binding policy.
+#
+# + signatureKey - The private key to sign the SOAP envelope
+# + encryptionKey - The public key to encrypt the SOAP body
+# + signatureAlgorithm - The algorithm to sign the SOAP envelope
+# + encryptionAlgorithm - The algorithm to encrypt the SOAP body
+# + x509Token - field description
+public type AsymmetricBindingConfig record {|
+    crypto:PrivateKey signatureKey?;
+    crypto:PublicKey encryptionKey?;
+    SignatureAlgorithm signatureAlgorithm?;
+    EncryptionAlgorithm encryptionAlgorithm?;
+    string x509Token?;
+|};
