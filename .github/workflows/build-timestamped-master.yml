@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - main
+      - 2201.7.x
     paths-ignore:
       - '*.md'
   workflow_dispatch:

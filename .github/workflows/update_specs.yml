@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - 2201.7.x
     paths:
       - 'docs/spec/**'
 
