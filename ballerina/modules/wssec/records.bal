@@ -61,3 +61,8 @@ public type AsymmetricBindingConfig record {|
     EncryptionAlgorithm encryptionAlgorithm?;
     string x509Token?;
 |};
+
+# Represents the record for Transport Binding policy.
+# + protocol - Protocol of the endpoint
+public type TransportBindingConfig "TransportBinding";
+

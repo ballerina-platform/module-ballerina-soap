@@ -31,7 +31,8 @@ public client class Client {
     # + return - `error` in case of errors or `()` otherwise
     public function init(string url, *common:ClientConfig config) returns Error? {
         do {
-            self.soapClient = check new (url, retrieveHttpClientConfig(config));
+            check common:validateTransportBindingPolicy(config);
+            self.soapClient = check new (url, common:retrieveHttpClientConfig(config));
         } on fail var err {
             return error Error(SOAP_CLIENT_ERROR, err);
         }

@@ -32,7 +32,7 @@ public client class Client {
     # + return - `error` in case of errors or `()` otherwise
     public function init(string url, *common:ClientConfig config) returns Error? {
         do {
-            self.soapClient = check new (url, retrieveHttpClientConfig(config));
+            check common:validateTransportBindingPolicy(config);
             self.soapClient = check new (url, common:retrieveHttpClientConfig(config));
             self.inboundSecurity = config.inboundSecurity;
             self.outboundSecurity = config.outboundSecurity;
