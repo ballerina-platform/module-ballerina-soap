@@ -74,26 +74,28 @@ public function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundS
     return securedEnvelope;
 }
 
-public function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope) returns xml|Error {
+public function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope) returns xml|wssec:Error|Error {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
     xml soapEnvelope = envelope;
     do {
-        if outboundSecurity.decryptionAlgorithm !is () {
+        wssec:EncryptionAlgorithm? encryptionAlgorithm = outboundSecurity.decryptionAlgorithm;
+        if encryptionAlgorithm !is () {
             crypto:PrivateKey|crypto:PublicKey? clientPrivateKey = outboundSecurity.decryptionKey;
             if clientPrivateKey !is () {
                 byte[] encData = check wssec:getEncryptedData(soapEnvelope);
-                byte[] decryptDataResult = check wssec:decryptData(encData, wssec:RSA_ECB, clientPrivateKey);
+                byte[] decryptDataResult = check wssec:decryptData(encData, encryptionAlgorithm, clientPrivateKey);
                 string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
                 string decryptedEnv = regex:replace(soapEnvelope.toString(), string `<soap:Body .*>.*</soap:Body>`, decryptedBody);
                 soapEnvelope = check xml:fromString(decryptedEnv);
             }
         }
-        if outboundSecurity.signatureAlgorithm !is () {
+        wssec:SignatureAlgorithm? signatureAlgorithm = outboundSecurity.signatureAlgorithm;
+        if signatureAlgorithm !is () {
             crypto:PublicKey? serverPublicKey = outboundSecurity.verificationKey;
             if serverPublicKey !is () {
                 byte[] signatureData = check wssec:getSignatureData(soapEnvelope);
-                boolean verify = check crypto:verifyRsaSha256Signature((soapEnvelope/<soap:Body>/*).toBalString().toBytes(),
-                                                                        signatureData, serverPublicKey);
+                boolean verify = check wssec:verifyData((soapEnvelope/<soap:Body>/*).toString().toBytes(),
+                                                        signatureData, serverPublicKey, signatureAlgorithm);
                 if !verify {
                     return error Error("Signature verification of the SOAP envelope has been failed");
                 }

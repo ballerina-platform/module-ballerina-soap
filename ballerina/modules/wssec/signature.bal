@@ -24,7 +24,7 @@ class Signature {
     }
 
     public function signData(string dataString, SignatureAlgorithm signatureAlgorithm,
-            crypto:PrivateKey privateKey) returns byte[]|Error {
+                             crypto:PrivateKey privateKey) returns byte[]|Error {
         byte[] data = dataString.toBytes();
         do {
             match signatureAlgorithm {
@@ -37,11 +37,8 @@ class Signature {
                 RSA_SHA384 => {
                     return check crypto:signRsaSha384(data, privateKey);
                 }
-                RSA_SHA512 => {
-                    return check crypto:signRsaSha512(data, privateKey);
-                }
                 _ => {
-                    return error Error("Invalid signature algorithm!");
+                    return check crypto:signRsaSha512(data, privateKey);
                 }
             }
         } on fail var e {
@@ -50,7 +47,7 @@ class Signature {
     }
 
     public function verifySignature(byte[] data, byte[] signature, crypto:PublicKey publicKey,
-            SignatureAlgorithm signatureAlgorithm = RSA_SHA256) returns boolean|Error {
+                                    SignatureAlgorithm signatureAlgorithm) returns boolean|Error {
         do {
             match signatureAlgorithm {
                 RSA_SHA1 => {
@@ -62,11 +59,8 @@ class Signature {
                 RSA_SHA384 => {
                     return check crypto:verifyRsaSha384Signature(data, signature, publicKey);
                 }
-                RSA_SHA512 => {
-                    return check crypto:verifyRsaSha512Signature(data, signature, publicKey);
-                }
                 _ => {
-                    return error Error("Invalid signature algorithm!");
+                    return check crypto:verifyRsaSha512Signature(data, signature, publicKey);
                 }
             }
 

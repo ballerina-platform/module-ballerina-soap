@@ -33,6 +33,12 @@ public function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlg
     return encrypt.decryptData(cipherText, encryptionAlgorithm, key);
 }
 
+public function verifyData(byte[] data, byte[] signature, crypto:PublicKey publicKey,
+                           SignatureAlgorithm signatureAlgorithm) returns boolean|Error {
+    Signature sign = check new ();
+    return sign.verifySignature(data, signature, publicKey, signatureAlgorithm);
+}
+
 function addSignature(Signature sign, string signatureAlgorithm, byte[] signature) returns Signature|Error {
     sign.setSignatureAlgorithm(signatureAlgorithm);
     sign.setSignatureValue(signature);
