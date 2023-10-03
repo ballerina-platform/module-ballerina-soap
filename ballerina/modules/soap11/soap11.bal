@@ -13,18 +13,16 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+import soap.common;
+import soap.wssec;
 
 import ballerina/http;
 import ballerina/mime;
 
-# Soap client configurations.
-#
-public type ClientConfiguration record {|
-    *http:ClientConfiguration;
-|};
+xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 
 # Object for the basic SOAP client endpoint.
-public isolated client class Client {
+public client class Client {
     private final http:Client soapClient;
 
     # Gets invoked during object initialization.
@@ -32,11 +30,14 @@ public isolated client class Client {
     # + url - URL endpoint
     # + config - Configurations for SOAP client
     # + return - `error` in case of errors or `()` otherwise
-    public function init(string url, *ClientConfiguration config) returns Error? {
+    public function init(string url, *common:ClientConfig config) returns Error? {
         do {
             self.soapClient = check new (url, retrieveHttpClientConfig(config));
+            self.soapClient = check new (url, common:retrieveHttpClientConfig(config));
+            self.inboundSecurity = config.inboundSecurity;
+            self.outboundSecurity = config.outboundSecurity;
         } on fail var err {
-            return error Error("Failed to initialize soap client", err);
+            return error Error(SOAP_CLIENT_ERROR, err);
         }
     }
 
@@ -51,7 +52,17 @@ public isolated client class Client {
     # + return - If successful, returns the response. Else, returns an error
     remote function sendReceive(xml|mime:Entity[] body, string action,
                                 map<string|string[]> headers = {}) returns xml|mime:Entity[]|Error {
+        do {
+            if body is xml {
+                xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);
+                xml response = check common:sendReceive(applySecurityPoliciesResult, self.soapClient,
+                                                        action, headers, false);
         return sendReceive(body, self.soapClient, action, headers);
+            }
+            return check common:sendReceive(body, self.soapClient, action, headers, false);
+        } on fail var e {
+            return error Error(e.message());
+        }
     }
 
     # Fires and forgets requests. Sends the request without the possibility of any response from the
@@ -65,7 +76,19 @@ public isolated client class Client {
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns `nil`. Else, returns an error
     remote function sendOnly(xml|mime:Entity[] body, string action,
-                             map<string|string[]> headers = {}) returns Error? {
-        return sendOnly(body, self.soapClient, action, headers);
+            map<string|string[]> headers = {}) returns Error? {
+        if body is xml {
+            do {
+                xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);
+                return check common:sendOnly(applySecurityPoliciesResult, self.soapClient, action, headers, false);
+            } on fail var e {
+                return error Error(e.message());
+            }
+        }
+        do {
+            return check common:sendOnly(body, self.soapClient, action, headers, false);
+        } on fail var e {
+            return error Error(e.message());
+        }
     }
 }

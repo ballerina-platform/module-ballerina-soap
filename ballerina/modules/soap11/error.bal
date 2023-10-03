@@ -14,5 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-# Defines the common error type for the module.
+# Defines the common error type for the SOAP 1.1 module.
 public type Error distinct error;
+
+const SOAP_RESPONSE_ERROR = "Failed to create SOAP response.";
+const SOAP_CLIENT_ERROR = "Failed to initialize SOAP 1.1 client.";
