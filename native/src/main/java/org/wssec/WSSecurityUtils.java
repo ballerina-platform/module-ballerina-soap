@@ -63,6 +63,61 @@ import static org.wssec.Constants.XML_ENC_NS;
 
 public class WsSecurityUtils {
 
+    public static void buildSignature(RequestData reqData, WSSecSignature sign) throws Exception {
+        List<WSEncryptionPart> parts;
+        parts = new ArrayList<>(1);
+        Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
+        parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
+        List<Reference> referenceList = sign.addReferencesToSign(parts);
+        sign.computeSignature(referenceList);
+        reqData.getSignatureValues().add(sign.getSignatureValue());
+    }
+
+    public static void setSignatureValue(Document doc, byte[] signature, String algorithm) {
+        doc.getElementsByTagName(SIGNATURE_METHOD_TAG)
+                .item(0).getAttributes().item(0).setNodeValue(algorithm);
+        NodeList digestValueList = doc.getElementsByTagName(SIGNATURE_VALUE_TAG);
+        digestValueList.item(0).getFirstChild().setNodeValue(Base64.getEncoder().encodeToString(signature));
+    }
+
+    public static byte[] getSignatureValue(Document doc) {
+        String signature = doc.getElementsByTagName(SIGNATURE_VALUE_TAG).item(0).getFirstChild().getNodeValue();
+        return Base64.getDecoder().decode(signature);
+    }
+
+    public static void setEncryptedData(Document doc, byte[] encryptedData, String algorithm) {
+        Element cipherDataElement = (Element) doc
+                .getElementsByTagNameNS(NAMESPACE_URI_ENC, CIPHER_VALUE_TAG).item(0);
+        cipherDataElement.getFirstChild().setNodeValue(Base64.getEncoder().encodeToString(encryptedData));
+        doc.getElementsByTagName(ENCRYPTION_METHOD_TAG).item(0).getAttributes().item(0)
+                .setNodeValue(algorithm);
+    }
+
+    public static byte[] getEncryptedData(Document document) {
+        String encryptedText = document
+                .getElementsByTagNameNS(NAMESPACE_URI_ENC, CIPHER_VALUE_TAG).item(0)
+                .getFirstChild().getNodeValue();
+        return Base64.getDecoder().decode(encryptedText);
+    }
+
+    public static Object getEncryptedKeyElement(byte[] encryptKey) throws Exception {
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Element encryptedKey = document.createElement(ENCRYPTED_KEY_TAG);
+        encryptedKey.setAttribute(XML_ENC_NS, ENC_NS);
+        Element encryptionMethod = document.createElement(ENCRYPTION_METHOD_TAG);
+        encryptionMethod.setAttribute(ALGORITHM, KEYTRANSPORT_RSA15);
+        encryptedKey.appendChild(encryptionMethod);
+        Element keyInfo = document.createElement(KEY_INFO_TAG);
+        keyInfo.setAttribute(XML_DS_NS, SIG_NS);
+        encryptedKey.appendChild(keyInfo);
+        Element cipherData = document.createElement(CIPHER_DATA_TAG);
+        Text cipherText = document.createTextNode(Base64.getEncoder().encodeToString(encryptKey));
+        cipherData.appendChild(cipherText);
+        encryptedKey.appendChild(cipherData);
+        document.appendChild(encryptedKey);
+        return convertDocumentToString(document);
+    }
+
     public static void setUTChildElements(WSSecUsernameToken usernameToken, String passwordType,
                                           String username, String password) {
         if (Objects.equals(passwordType, DIGEST)
