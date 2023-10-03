@@ -38,3 +38,5 @@ target
 # Ballerina
 velocity.log*
 *Ballerina.lock
+
+.vscode
