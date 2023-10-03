@@ -15,6 +15,33 @@
 // under the License.
 import ballerina/crypto;
 import ballerina/regex;
+
+xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
+xmlns "http://www.w3.org/2000/09/xmldsig#" as ds;
+function addSecurityHeader(Document document) returns WSSecurityHeader|Error {
+    WSSecurityHeader wsSecHeader = check new (document);
+    Error? insertHeader = wsSecHeader.insertSecHeader();
+    if insertHeader is () {
+        return wsSecHeader;
+    }
+    return insertHeader;
+}
+# Apply timestamp token security policy to the SOAP envelope.
+#
+# + envelope - The SOAP envelope
+# + timestampToken - The `TSRecord` record with the required parameters
+# + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
+public function applyTimestampToken(xml envelope, *TimestampTokenConfig timestampToken) returns xml|Error {
+    if timestampToken.timeToLive <= 0 {
+        return error Error("Invalid value for `timeToLive`");
+    }
+    Document document = check new (envelope);
+    WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
+    WsSecurity wsSecurity = new;
+    string securedEnvelope = check wsSecurity.applyTimestampPolicy(wsSecurityHeader, timestampToken.timeToLive);
+    return convertStringToXml(securedEnvelope);
+}
+
 # Apply username token security policy to the SOAP envelope.
 #
 # + envelope - The SOAP envelope

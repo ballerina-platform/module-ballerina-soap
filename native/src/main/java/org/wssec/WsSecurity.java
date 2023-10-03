@@ -77,4 +77,15 @@ public class WsSecurity {
         }
     }
 
+    public static Object applyTimestampPolicy(BObject wsSecHeader, int timeToLive) {
+        BHandle handle = (BHandle) wsSecHeader.get(StringUtils.fromString(NATIVE_SEC_HEADER));
+        WsSecurityHeader wsSecurityHeader = (WsSecurityHeader) handle.getValue();
+        WSSecTimestamp timestamp = new WSSecTimestamp(wsSecurityHeader.getWsSecHeader());
+        timestamp.setTimeToLive(timeToLive);
+        try {
+            return convertDocumentToString(timestamp.build());
+        } catch (Exception e) {
+            return createError(e.getMessage());
+        }
+    }
 }

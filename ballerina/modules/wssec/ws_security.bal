@@ -20,4 +20,9 @@ class WsSecurity {
                                       string password, string pwType) returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
+
+    function applyTimestampPolicy(WSSecurityHeader wsSecurityHeader, int timeToLive)
+        returns string|Error = @java:Method {
+        'class: "org.wssec.WsSecurity"
+    } external;
 }
