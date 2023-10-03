@@ -13,14 +13,18 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+import soap.wssec;
 
-import ballerina/test;
 import ballerina/mime;
+import ballerina/test;
 
-@test:Config {}
-function testSendReceive12() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+const wssec:TransportBindingConfig TRANSPORT_BINDING = "TransportBinding";
+const wssec:NoPolicy NO_POLICY = "NoPolicy";
 
+@test:Config {
+    groups: ["soap12", "send_only"]
+}
+function testSendOnly12() returns error? {
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                         soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
@@ -32,34 +36,37 @@ function testSendReceive12() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+
+    _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
+}
+
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
+function testSendReceive12() returns error? {
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+
+    xml body = xml `<soap:Envelope
+                    xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                    soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                    <soap:Body>
+                      <quer:Add xmlns:quer="http://tempuri.org/">
+                        <quer:intA>2</quer:intA>
+                        <quer:intB>3</quer:intB>
+                      </quer:Add>
+                    </soap:Body>
+                </soap:Envelope>`;
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
 
     xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
     test:assertEquals(response, expected);
 }
 
-@test:Config {}
-function testSendOnly12() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-
-    xml body = xml `<soap:Envelope
-                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
-                        <soap:Body>
-                          <quer:Add xmlns:quer="http://tempuri.org/">
-                            <quer:intA>2</quer:intA>
-                            <quer:intB>3</quer:intB>
-                          </quer:Add>
-                        </soap:Body>
-                    </soap:Envelope>`;
-
-    _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
+@test:Config {
+    groups: ["soap12", "send_receive"]
 }
-
-@test:Config {}
 function testSendReceive12WithHeaders() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                         soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
@@ -70,18 +77,20 @@ function testSendReceive12WithHeaders() returns error? {
                           </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
+
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add",
-                                                               {foo: ["bar1", "bar2"]});
+                                                                {foo: ["bar1", "bar2"]});
 
     xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
     test:assertEquals(response, expected);
 }
 
-@test:Config {}
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
 function testSendReceive12WithoutSoapAction() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                         soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
@@ -92,6 +101,8 @@ function testSendReceive12WithoutSoapAction() returns error? {
                           </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
+
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
     xml|mime:Entity[] response = check soapClient->sendReceive(body);
 
@@ -99,10 +110,10 @@ function testSendReceive12WithoutSoapAction() returns error? {
     test:assertEquals(response, expected);
 }
 
-@test:Config {}
+@test:Config {
+    groups: ["soap12", "send_only"]
+}
 function testSendOnly12WithoutSoapAction() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                         soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
@@ -113,14 +124,16 @@ function testSendOnly12WithoutSoapAction() returns error? {
                           </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
+
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
     _ = check soapClient->sendOnly(body);
 }
 
-@test:Config {}
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
 function testSendReceive12IncludingHeadersWithoutSoapAction() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                         soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
@@ -132,7 +145,38 @@ function testSendReceive12IncludingHeadersWithoutSoapAction() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
+    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+
     xml|mime:Entity[] response = check soapClient->sendReceive(body, (), {foo: ["bar1", "bar2"]});
     xml expected = xml `<soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
     test:assertEquals(response, expected);
+}
+
+@test:Config {
+    groups: ["soap12"]
+}
+function testTransportBindingError() returns error? {
+    Client|Error soapClient = new ("http://www.dneonline.com/calculator.asmx?WSDL", inboundSecurity = TRANSPORT_BINDING);
+    test:assertTrue(soapClient is Error);
+    test:assertEquals((<Error>soapClient).message(), SOAP_CLIENT_ERROR);
+}
+
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
+function testSendReceiveError() returns error? {
+    Client soapClient = check new ("http://www.dneonline.com/invalidcalculator.asmx?WSDL");
+    xml body = xml `<soap:Envelope
+                    xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                    soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                    <soap:Body>
+                      <quer:Add xmlns:quer="http://tempuri.org/">
+                        <quer:intA>2</quer:intA>
+                        <quer:intB>3</quer:intB>
+                      </quer:Add>
+                    </soap:Body>
+                </soap:Envelope>`;
+    xml|mime:Entity[]|Error response = soapClient->sendReceive(body, "http://tempuri.org/Add");
+    test:assertTrue(response is Error);
+    test:assertEquals((<Error>response).message(), SOAP_RESPONSE_ERROR);
 }
