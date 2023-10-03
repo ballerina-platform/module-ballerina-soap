@@ -71,11 +71,8 @@ class Encryption {
                 RSA_ECB if key is crypto:PublicKey|crypto:PrivateKey => {
                     return check crypto:decryptRsaEcb(cipherText, key);
                 }
-                _ if key !is crypto:PublicKey|crypto:PrivateKey => {
-                    return error Error("Invalid/Missing key!");
-                }
                 _ => {
-                    return error Error("Decryption Algorithm is not supported");
+                    return error Error("Invalid/Missing key!");
                 }
             }
         } on fail var e {
