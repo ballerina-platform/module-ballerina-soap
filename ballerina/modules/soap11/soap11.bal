@@ -86,15 +86,11 @@ public client class Client {
     # + return - If successful, returns `nil`. Else, returns an error
     remote function sendOnly(xml|mime:Entity[] body, string action,
             map<string|string[]> headers = {}) returns Error? {
-        if body is xml {
-            do {
+        do {
+            if body is xml {
                 xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);
                 return check common:sendOnly(applySecurityPoliciesResult, self.soapClient, action, headers, false);
-            } on fail var e {
-                return error Error(e.message());
             }
-        }
-        do {
             return check common:sendOnly(body, self.soapClient, action, headers, false);
         } on fail var e {
             return error Error(e.message());
