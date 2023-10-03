@@ -162,6 +162,19 @@ function testTransportBindingError() returns error? {
 }
 
 @test:Config {
+    groups: ["soap12"]
+}
+function testTransportBindingError2() returns error? {
+    Client|Error soapClient = new ("http://www.dneonline.com/calculator.asmx?WSDL",
+      inboundSecurity = [
+        TRANSPORT_BINDING
+      ]
+    );
+    test:assertTrue(soapClient is Error);
+    test:assertEquals((<Error>soapClient).message(), SOAP_CLIENT_ERROR);
+}
+
+@test:Config {
     groups: ["soap12", "send_receive"]
 }
 function testSendReceiveError() returns error? {
