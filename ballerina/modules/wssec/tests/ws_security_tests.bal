@@ -217,13 +217,13 @@ function testSymmetricBindingPolicyWithSignatureOnly() returns error? {
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
-    SymmetricBindingConfig utSymmetricBinding = {
+    SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
 
-    xml securedEnvelope = check applySymmetricBinding(envelope, utSymmetricBinding);
+    xml securedEnvelope = check applySymmetricBinding(envelope, symmetricBinding);
     string envelopeString = securedEnvelope.toString();
     byte[] signedData = check getSignatureData(securedEnvelope);
 
@@ -257,13 +257,13 @@ function testSymmetricBindingPolicyEncryptionOnly() returns error? {
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
-    SymmetricBindingConfig utSymmetricBinding = {
+    SymmetricBindingConfig symmetricBinding = {
         encryptionAlgorithm: RSA_ECB,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
 
-    xml securedEnvelope = check applySymmetricBinding(envelope, utSymmetricBinding);
+    xml securedEnvelope = check applySymmetricBinding(envelope, symmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] encData = check getEncryptedData(securedEnvelope);
@@ -297,13 +297,13 @@ function testSymmetricBindingWithSignatureAndEncryption() returns error? {
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
-    SymmetricBindingConfig utSymmetricBinding = {
+    SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
-    xml securedEnvelope = check applySymmetricBinding(envelope, utSymmetricBinding);
+    xml securedEnvelope = check applySymmetricBinding(envelope, symmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -343,7 +343,7 @@ function testSymmetricBindingPolicyWithX509SignatureAndEncryption() returns erro
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
-    SymmetricBindingConfig utSymmetricBinding = {
+    SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         symmetricKey: symmetricKey,
@@ -351,7 +351,7 @@ function testSymmetricBindingPolicyWithX509SignatureAndEncryption() returns erro
         x509Token: X509_PUBLIC_CERT_PATH_2
     };
 
-    xml securedEnvelope = check applySymmetricBinding(envelope, utSymmetricBinding);
+    xml securedEnvelope = check applySymmetricBinding(envelope, symmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -399,13 +399,13 @@ function testUsernameTokenWithSymmetricBinding() returns error? {
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
-    SymmetricBindingConfig utSymmetricBinding = {
+    SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
-    xml securedEnvelope = check applySymmetricBinding(envelope, utSymmetricBinding);
+    xml securedEnvelope = check applySymmetricBinding(envelope, symmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -455,7 +455,7 @@ function testUsernameTokenTimestampWithSymmetricBindingAndX509Token() returns er
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
-    SymmetricBindingConfig utSymmetricBinding = {
+    SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         symmetricKey: symmetricKey,
@@ -463,7 +463,7 @@ function testUsernameTokenTimestampWithSymmetricBindingAndX509Token() returns er
         x509Token: X509_PUBLIC_CERT_PATH_2
     };
 
-    xml securedEnvelope = check applySymmetricBinding(envelope, utSymmetricBinding);
+    xml securedEnvelope = check applySymmetricBinding(envelope, symmetricBinding);
     string envelopeString = securedEnvelope.toString();
     byte[] signedData = check getSignatureData(securedEnvelope);
 
@@ -504,14 +504,14 @@ function testSymmetricBindingWithOutboundConfig() returns error? {
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
-    SymmetricBindingConfig utSymmetricBinding = {
+    SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
 
-    xml securedEnvelope = check applySymmetricBinding(envelope, utSymmetricBinding);
+    xml securedEnvelope = check applySymmetricBinding(envelope, symmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     OutboundSecurityConfig outboundConfig = {
@@ -558,15 +558,15 @@ function testAsymmetricBindingWithSignature() returns error? {
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
 
-    AsymmetricBindingConfig utAsymmBinding = {
+    AsymmetricBindingConfig asymmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         signatureKey: clientPrivateKey,
         encryptionKey: serverPublicKey
     };
-    xml securedEnvelope = check applyAsymmetricBinding(envelope, utAsymmBinding);
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
     byte[] signedData = check getSignatureData(securedEnvelope);
-    boolean validity = check crypto:verifyRsaSha256Signature((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey);
+    boolean validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA256);
     test:assertTrue(validity);
 
     assertSignatureWithoutX509(envelopeString);
@@ -595,13 +595,13 @@ function testAsymmetricBindingWithX509Signature() returns error? {
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
 
-    AsymmetricBindingConfig utAsymmBinding = {
+    AsymmetricBindingConfig asymmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         signatureKey: clientPrivateKey,
         encryptionKey: serverPublicKey,
         x509Token: X509_PUBLIC_CERT_PATH_2
     };
-    xml securedEnvelope = check applyAsymmetricBinding(envelope, utAsymmBinding);
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -634,12 +634,12 @@ function testAsymmetricBindingWithEncryption() returns error? {
     };
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
 
-    AsymmetricBindingConfig utAsymmBinding = {
+    AsymmetricBindingConfig asymmetricBinding = {
         encryptionAlgorithm: RSA_ECB,
         signatureKey: clientPrivateKey,
         encryptionKey: serverPublicKey
     };
-    xml securedEnvelope = check applyAsymmetricBinding(envelope, utAsymmBinding);
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] encData = check getEncryptedData(securedEnvelope);
@@ -673,14 +673,14 @@ function testAsymmetricBindingWithSignatureAndEncryption() returns error? {
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
 
-    AsymmetricBindingConfig utAsymmBinding = {
+    AsymmetricBindingConfig asymmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         signatureKey: clientPrivateKey,
         encryptionKey: serverPublicKey
     };
 
-    xml securedEnvelope = check applyAsymmetricBinding(envelope, utAsymmBinding);
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -719,14 +719,14 @@ function testAsymmetricBindingWithX509SignatureAndEncryption() returns error? {
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
 
-    AsymmetricBindingConfig utAsymmBinding = {
+    AsymmetricBindingConfig asymmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         signatureKey: clientPrivateKey,
         encryptionKey: serverPublicKey,
         x509Token: X509_PUBLIC_CERT_PATH_2
     };
-    xml securedEnvelope = check applyAsymmetricBinding(envelope, utAsymmBinding);
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -772,14 +772,14 @@ function testUsernameTokenWithAsymmetricBindingAndX509() returns error? {
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
 
-    AsymmetricBindingConfig utAsymmBinding = {
+    AsymmetricBindingConfig asymmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         signatureKey: clientPrivateKey,
         encryptionKey: serverPublicKey,
         x509Token: X509_PUBLIC_CERT_PATH_2
     };
-    xml securedEnvelope = check applyAsymmetricBinding(envelope, utAsymmBinding);
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -827,14 +827,14 @@ function testUsernameTokenTimestampWithAsymmetricBindingAndX509() returns error?
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
 
-    AsymmetricBindingConfig utAsymmBinding = {
+    AsymmetricBindingConfig asymmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         signatureKey: clientPrivateKey,
         encryptionKey: serverPublicKey,
         x509Token: X509_PUBLIC_CERT_PATH_2
     };
-    xml securedEnvelope = check applyAsymmetricBinding(envelope, utAsymmBinding);
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -876,7 +876,7 @@ function testAsymmetricBindingWithOutboundConfig() returns error? {
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
     crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
 
-    AsymmetricBindingConfig utAsymmBinding = {
+    AsymmetricBindingConfig asymmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
         encryptionAlgorithm: RSA_ECB,
         signatureKey: clientPrivateKey,
@@ -890,7 +890,7 @@ function testAsymmetricBindingWithOutboundConfig() returns error? {
         decryptionKey: serverPrivateKey
     };
 
-    xml securedEnvelope = check applyAsymmetricBinding(envelope, utAsymmBinding);
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
     crypto:PrivateKey|crypto:PublicKey? privateKey = outboundConfig.decryptionKey;
     if privateKey !is () {
@@ -903,4 +903,115 @@ function testAsymmetricBindingWithOutboundConfig() returns error? {
     byte[] signedData = check getSignatureData(securedEnvelope);
     boolean validity = check crypto:verifyRsaSha256Signature((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey);
     test:assertTrue(validity);
+}
+
+@test:Config {
+    groups: ["username_token", "signature", "asymmetric_binding"]
+}
+function testAsymmetricBindingWithSignatureWithRsaSha1() returns error? {
+    xml envelope =
+    xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+            <soap:Body><person></person></soap:Body>
+        </soap:Envelope>`;
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
+
+    crypto:KeyStore serverKeyStore = {
+        path: X509_KEY_STORE_PATH,
+        password: KEY_PASSWORD
+    };
+    crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
+
+    crypto:KeyStore clientKeyStore = {
+        path: X509_KEY_STORE_PATH_2,
+        password: KEY_PASSWORD
+    };
+    crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
+    crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
+
+    AsymmetricBindingConfig asymmetricBinding = {
+        signatureAlgorithm: RSA_SHA1,
+        signatureKey: clientPrivateKey,
+        encryptionKey: serverPublicKey
+    };
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
+    string envelopeString = securedEnvelope.toString();
+    byte[] signedData = check getSignatureData(securedEnvelope);
+    boolean validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA1);
+    test:assertTrue(validity);
+
+    assertSignatureWithoutX509(envelopeString);
+}
+
+@test:Config {
+    groups: ["username_token", "signature", "asymmetric_binding"]
+}
+function testAsymmetricBindingWithSignatureWithRsaSha384() returns error? {
+    xml envelope =
+    xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+            <soap:Body><person></person></soap:Body>
+        </soap:Envelope>`;
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
+
+    crypto:KeyStore serverKeyStore = {
+        path: X509_KEY_STORE_PATH,
+        password: KEY_PASSWORD
+    };
+    crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
+
+    crypto:KeyStore clientKeyStore = {
+        path: X509_KEY_STORE_PATH_2,
+        password: KEY_PASSWORD
+    };
+    crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
+    crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
+
+    AsymmetricBindingConfig asymmetricBinding = {
+        signatureAlgorithm: RSA_SHA384,
+        signatureKey: clientPrivateKey,
+        encryptionKey: serverPublicKey
+    };
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
+    string envelopeString = securedEnvelope.toString();
+    byte[] signedData = check getSignatureData(securedEnvelope);
+    boolean validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA384);
+    test:assertTrue(validity);
+
+    assertSignatureWithoutX509(envelopeString);
+}
+
+@test:Config {
+    groups: ["username_token", "signature", "asymmetric_binding"]
+}
+function testAsymmetricBindingWithSignatureWithRsaSha512() returns error? {
+    xml envelope =
+    xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+            <soap:Body><person></person></soap:Body>
+        </soap:Envelope>`;
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
+
+    crypto:KeyStore serverKeyStore = {
+        path: X509_KEY_STORE_PATH,
+        password: KEY_PASSWORD
+    };
+    crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
+
+    crypto:KeyStore clientKeyStore = {
+        path: X509_KEY_STORE_PATH_2,
+        password: KEY_PASSWORD
+    };
+    crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
+    crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
+
+    AsymmetricBindingConfig asymmetricBinding = {
+        signatureAlgorithm: RSA_SHA512,
+        signatureKey: clientPrivateKey,
+        encryptionKey: serverPublicKey
+    };
+    xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
+    string envelopeString = securedEnvelope.toString();
+    byte[] signedData = check getSignatureData(securedEnvelope);
+    boolean validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA512);
+    test:assertTrue(validity);
+
+    assertSignatureWithoutX509(envelopeString);
 }
