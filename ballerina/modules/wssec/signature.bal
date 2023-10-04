@@ -17,6 +17,7 @@ import ballerina/crypto;
 import ballerina/jballerina.java;
 
 class Signature {
+
     private handle nativeSignature;
 
     function init() returns Error? {

@@ -13,7 +13,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 import ballerina/test;
 
 const string USERNAME = "username";
@@ -38,6 +37,7 @@ function assertTimestampToken(string envelopeString) {
     test:assertTrue(envelopeString.includesMatch(created));
     test:assertTrue(envelopeString.includesMatch(expires));
 }
+
 function assertUsernameToken(string envelopeString, PasswordType passwordType) {
     string:RegExp usernameTokenTag = re `<wsse:UsernameToken .*>.*</wsse:UsernameToken>`;
     string:RegExp usernameTag = re `<wsse:Username>${USERNAME}</wsse:Username>`;
@@ -64,6 +64,7 @@ function assertUsernameToken(string envelopeString, PasswordType passwordType) {
         }
     }
 }
+
 function assertSignatureWithX509(string securedEnvelope) {
     string:RegExp keyIdentifier = re `<wsse:KeyIdentifier EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3">.*</wsse:KeyIdentifier>`;
     test:assertTrue(securedEnvelope.includesMatch(keyIdentifier));

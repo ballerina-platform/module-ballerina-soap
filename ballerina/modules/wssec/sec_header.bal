@@ -16,6 +16,7 @@
 import ballerina/jballerina.java;
 
 class WSSecurityHeader {
+
     private handle nativeSecHeader;
 
     function init(Document document) returns Error? {
