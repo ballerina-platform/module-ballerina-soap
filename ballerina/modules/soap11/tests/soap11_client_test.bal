@@ -19,15 +19,13 @@ import ballerina/crypto;
 import ballerina/mime;
 import ballerina/test;
 
-const wssec:TransportBindingConfig TRANSPORT_BINDING = "TransportBinding";
-const wssec:NoPolicy NO_POLICY = "NoPolicy";
 const string KEY_ALIAS = "wss40";
 const string KEY_PASSWORD = "security";
 const string KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
-const string X509_PUBLIC_CERT_PATH = "modules/wssec/tests/resources/x509_certificate.crt";
-const string X509_PUBLIC_CERT_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.crt";
 const string X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
 const string X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
+const wssec:TransportBindingConfig TRANSPORT_BINDING = "TransportBinding";
+const wssec:NoPolicy NO_POLICY = "NoPolicy";
 
 @test:Config {
     groups: ["soap11", "send_only"]
