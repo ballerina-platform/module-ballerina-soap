@@ -168,7 +168,7 @@ function testSendReceiveWithTimestampTokenSecurity() returns error? {
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
    at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body>`;
-    test:assertEquals(response, expected);
+    test:assertEquals(response.toString(), expected.toString());
 }
 
 @test:Config {
@@ -201,7 +201,7 @@ function testSendReceiveWithUsernameTokenSecurity() returns error? {
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
    at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body>`;
-    test:assertEquals(response, expected);
+    test:assertEquals(response.toString(), expected.toString());
 }
 
 @test:Config {
@@ -247,7 +247,7 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
    at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body>`;
-    test:assertEquals(response, expected);
+    test:assertEquals(response.toString(), expected.toString());
 }
 
 @test:Config {
@@ -292,5 +292,5 @@ function testSendReceiveWithSymmetricBindingSecurity() returns error? {
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
    at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body>`;
-    test:assertEquals(response, expected);
+    test:assertEquals(response.toString(), expected.toString());
 }
