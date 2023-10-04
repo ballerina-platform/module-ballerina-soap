@@ -29,14 +29,7 @@ class Encryption {
         returns byte[]|Error {
         byte[] data = dataString.toBytes();
         do {
-            match encryptionAlgorithm {
-                RSA_ECB => {
-                    return check crypto:encryptRsaEcb(data, key);
-                }
-                _ => {
-                    return error Error("Invalid/Missing key!");
-                }
-            }
+            return check crypto:encryptRsaEcb(data, key);
         } on fail var e {
             return error(e.message());
         }
@@ -46,14 +39,7 @@ class Encryption {
                                 crypto:PublicKey|crypto:PrivateKey key)
         returns byte[]|Error {
         do {
-            match encryptionAlgorithm {
-                RSA_ECB => {
-                    return check crypto:decryptRsaEcb(cipherText, key);
-                }
-                _ => {
-                    return error Error("Invalid/Missing key!");
-                }
-            }
+            return check crypto:decryptRsaEcb(cipherText, key);
         } on fail var e {
             return error Error(e.message());
         }
