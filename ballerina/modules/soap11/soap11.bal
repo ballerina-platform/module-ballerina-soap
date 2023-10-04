@@ -65,7 +65,8 @@ public client class Client {
                         return check common:applyOutboundConfig(outboundSecurity, response);
                     }
                 } on fail var e {
-                    return error Error("Outbound security configurations do not match with the SOAP response. ", e.cause());
+                    return error Error("Outbound security configurations do not match with the SOAP response. ",
+                                       e.cause());
                 }
             }
             return check common:sendReceive(body, self.soapClient, action, headers, false);
@@ -84,8 +85,7 @@ public client class Client {
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body, string action,
-            map<string|string[]> headers = {}) returns Error? {
+    remote function sendOnly(xml|mime:Entity[] body, string action, map<string|string[]> headers = {}) returns Error? {
         do {
             if body is xml {
                 xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);

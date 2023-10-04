@@ -13,10 +13,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+import soap.common;
+import soap.wssec;
+
 import ballerina/http;
 import ballerina/mime;
-import soap.wssec;
-import soap.common;
 
 xmlns "http://www.w3.org/2003/05/soap-envelope" as soap;
 
@@ -63,7 +64,8 @@ public client class Client {
                         return check common:applyOutboundConfig(outboundSecurity, response);
                     }
                 } on fail var e {
-                    return error Error("Outbound security configurations do not match with the SOAP response. ", e.cause());
+                    return error Error("Outbound security configurations do not match with the SOAP response. ",
+                                       e.cause());
                 }
                 return response;
             }

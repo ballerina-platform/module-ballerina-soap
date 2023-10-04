@@ -17,6 +17,7 @@
 package org.wssec;
 
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BObject;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -47,13 +48,14 @@ public class WsSecurityHeader {
         return wsSecHeader;
     }
 
-    public static void insertSecHeader(BObject secHeader) {
+    public static BError insertSecHeader(BObject secHeader) {
         BHandle handle = (BHandle) secHeader.get(StringUtils.fromString(NATIVE_SEC_HEADER));
         WsSecurityHeader wsSecurityHeader = (WsSecurityHeader) handle.getValue();
         try {
             wsSecurityHeader.getWsSecHeader().insertSecurityHeader();
         } catch (WSSecurityException e) {
-            throw createError(e.getMessage());
+            return createError(e.getMessage());
         }
+        return null;
     }
 }

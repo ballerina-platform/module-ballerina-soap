@@ -18,6 +18,7 @@ import ballerina/regex;
 
 xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 xmlns "http://www.w3.org/2000/09/xmldsig#" as ds;
+
 function addSecurityHeader(Document document) returns WSSecurityHeader|Error {
     WSSecurityHeader wsSecHeader = check new (document);
     Error? insertHeader = wsSecHeader.insertSecHeader();
@@ -51,18 +52,21 @@ function addEncryption(Encryption encrypt, string encryptionAlgorithm, byte[] en
     return encrypt;
 }
 
-function applyEncryptedKey(string envelopeString, crypto:PrivateKey symmetricKey, crypto:PublicKey encryptKey) returns string|Error {
+function applyEncryptedKey(string envelopeString, crypto:PrivateKey symmetricKey, crypto:PublicKey encryptKey)
+    returns string|Error {
     string securedEnvelope = envelopeString;
     do {
         Encryption encryption = check new ();
         byte[] encryptedKey = check crypto:encryptRsaEcb(symmetricKey.toBalString().toBytes(), encryptKey);
         string encryptedKeyElements = check encryption.getEncryptedKeyElements(encryptedKey);
         string replace = regex:replace(encryptedKeyElements, string `<?.*?><`, "<");
-        if securedEnvelope.includesMatch(re`<wsse:SecurityTokenReference.*><wsse:Reference URI="#null"/></wsse:SecurityTokenReference>`) {
-            securedEnvelope = regex:replace(securedEnvelope, string`<wsse:SecurityTokenReference.*><wsse:Reference URI="#null"/></wsse:SecurityTokenReference>`, replace);
+        string:RegExp securityToken = 
+            re `<wsse:SecurityTokenReference.*><wsse:Reference URI="#null"/></wsse:SecurityTokenReference>`;
+        if securedEnvelope.includesMatch(securityToken) {
+            securedEnvelope = regex:replace(securedEnvelope, securityToken.toString(), replace);
         }
-        else if securedEnvelope.includesMatch(re`<wsse:SecurityTokenReference .*/>`) {
-            securedEnvelope = regex:replace(securedEnvelope, string`<wsse:SecurityTokenReference .*/>`, replace);
+        else if securedEnvelope.includesMatch(re `<wsse:SecurityTokenReference .*/>`) {
+            securedEnvelope = regex:replace(securedEnvelope, string `<wsse:SecurityTokenReference .*/>`, replace);
         }
         return securedEnvelope;
     } on fail var e {
@@ -145,7 +149,7 @@ public function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symm
                                                        signedData);
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applySignatureOnlyPolicy(wsSecurityHeader, signatureResult,
-                                                                           symmetricBinding.x509Token);
+                                                                    symmetricBinding.x509Token);
     }
     if symmetricBinding.encryptionAlgorithm !is () {
         Encryption encryption = check new ();
@@ -158,7 +162,8 @@ public function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symm
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applyEncryptionOnlyPolicy(wsSecurityHeader, encryptionResult);
     }
-    securedEnvelope = check applyEncryptedKey(securedEnvelope, symmetricBinding.symmetricKey, symmetricBinding.servicePublicKey);
+    securedEnvelope = check applyEncryptedKey(securedEnvelope, symmetricBinding.symmetricKey,
+                                              symmetricBinding.servicePublicKey);
     return convertStringToXml(securedEnvelope);
 }
 
@@ -175,13 +180,13 @@ public function applyAsymmetricBinding(xml envelope, *AsymmetricBindingConfig as
         Signature signature = check new ();
         byte[] signedData = check signature.signData((envelope/<soap:Body>/*).toString(),
                                                      <SignatureAlgorithm>asymmetricBinding.signatureAlgorithm,
-                                                     <crypto:PrivateKey>asymmetricBinding.signatureKey);                                           
+                                                     <crypto:PrivateKey>asymmetricBinding.signatureKey);
         Signature signatureResult = check addSignature(signature,
                                                        <SignatureAlgorithm>asymmetricBinding.signatureAlgorithm,
                                                        signedData);
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applySignatureOnlyPolicy(wsSecurityHeader, signatureResult,
-                                                                           asymmetricBinding.x509Token);
+                                                                    asymmetricBinding.x509Token);
     }
     if asymmetricBinding.encryptionAlgorithm !is () {
         Encryption encryption = check new ();

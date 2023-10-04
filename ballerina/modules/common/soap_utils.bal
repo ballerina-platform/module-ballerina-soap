@@ -24,11 +24,11 @@ public function validateTransportBindingPolicy(ClientConfig config) returns Erro
     if config.httpConfig.secureSocket is () {
         wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] securityPolicy = config.inboundSecurity;
         if securityPolicy is wssec:TransportBindingConfig {
-            return error Error("Invalid protocol detected: Please use the `https` protocol instead of `http`.");
+            return error Error(INVALID_PROTOCOL_ERROR);
         } else if securityPolicy is wssec:InboundSecurityConfig[] {
             foreach wssec:InboundSecurityConfig policy in securityPolicy {
                 if policy is wssec:TransportBindingConfig {
-                    return error Error("Invalid protocol detected: Please use the `https` protocol instead of `http`.");
+                    return error Error(INVALID_PROTOCOL_ERROR);
                 }
             }
         }
@@ -50,8 +50,8 @@ public function retrieveHttpClientConfig(ClientConfig config) returns http:Clien
     };
 }
 
-public function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity, xml envelope)
-    returns xml|wssec:Error {
+public function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity,
+                                      xml envelope) returns xml|wssec:Error {
     wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] securityPolicy = inboundSecurity;
     xml securedEnvelope;
     if securityPolicy is wssec:InboundSecurityConfig {
@@ -74,7 +74,8 @@ public function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundS
     return securedEnvelope;
 }
 
-public function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope) returns xml|wssec:Error|Error {
+public function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope)
+    returns xml|wssec:Error|Error {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
     xml soapEnvelope = envelope;
     do {
@@ -85,7 +86,8 @@ public function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurit
                 byte[] encData = check wssec:getEncryptedData(soapEnvelope);
                 byte[] decryptDataResult = check wssec:decryptData(encData, encryptionAlgorithm, clientPrivateKey);
                 string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
-                string decryptedEnv = regex:replace(soapEnvelope.toString(), string `<soap:Body .*>.*</soap:Body>`, decryptedBody);
+                string decryptedEnv = regex:replace(soapEnvelope.toString(), string `<soap:Body .*>.*</soap:Body>`,
+                                                    decryptedBody);
                 soapEnvelope = check xml:fromString(decryptedEnv);
             }
         }
@@ -117,9 +119,8 @@ public function sendReceive(xml|mime:Entity[] body, http:Client httpClient, stri
     } else {
         req = createSoap11HttpRequest(body, <string>soapAction, headers);
     }
-    http:Response response;
     do {
-        response = check httpClient->post(path, req);
+        http:Response response = check httpClient->post(path, req);
         if soap12 {
             return check createSoap12Response(response);
         }
@@ -137,10 +138,9 @@ public function sendOnly(xml|mime:Entity[] body, http:Client httpClient, string?
     } else {
         req = createSoap11HttpRequest(body, <string>soapAction, headers);
     }
-    do {
-        http:Response _ = check httpClient->post(path, req);
-    } on fail var err {
-        return error Error(SOAP_RESPONSE_ERROR, err);
+    http:Response|http:ClientError response = httpClient->post(path, req);
+    if response is http:ClientError {
+        return error Error(response.message());
     }
 }
 
@@ -188,7 +188,6 @@ function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAction,
 function createSoap12Response(http:Response response) returns xml|error {
     xml payload = check response.getXmlPayload();
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
-
     return payload/<soap12:Body>;
 }
 

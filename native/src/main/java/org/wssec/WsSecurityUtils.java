@@ -26,7 +26,6 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -111,8 +110,7 @@ public class WsSecurityUtils {
         keyInfo.setAttribute(XML_DS_NS, SIG_NS);
         encryptedKey.appendChild(keyInfo);
         Element cipherData = document.createElement(CIPHER_DATA_TAG);
-        Text cipherText = document.createTextNode(Base64.getEncoder().encodeToString(encryptKey));
-        cipherData.appendChild(cipherText);
+        cipherData.appendChild(document.createTextNode(Base64.getEncoder().encodeToString(encryptKey)));
         encryptedKey.appendChild(cipherData);
         document.appendChild(encryptedKey);
         return convertDocumentToString(document);
@@ -136,8 +134,7 @@ public class WsSecurityUtils {
         if (document == null) {
             return ErrorCreator.createError(StringUtils.fromString(EMPTY_XML_DOCUMENT_ERROR));
         }
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(document), new StreamResult(writer));
         return StringUtils.fromString(writer.toString());

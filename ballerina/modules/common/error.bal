@@ -18,3 +18,4 @@
 public type Error distinct error;
 
 const SOAP_RESPONSE_ERROR = "Failed to create SOAP response.";
+const INVALID_PROTOCOL_ERROR = "Invalid protocol detected: Please use the `https` protocol instead of `http`.";
