@@ -64,8 +64,7 @@ public client class Client {
                         return check common:applyOutboundConfig(outboundSecurity, response);
                     }
                 } on fail var e {
-                    return error Error("Outbound security configurations do not match with the SOAP response. ",
-                                       e.cause());
+                    return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
                 }
                 return response;
             }
