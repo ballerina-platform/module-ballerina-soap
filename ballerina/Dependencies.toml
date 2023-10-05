@@ -288,7 +288,6 @@ dependencies = [
 ]
 modules = [
 	{org = "ballerina", packageName = "soap", moduleName = "soap"},
-	{org = "ballerina", packageName = "soap", moduleName = "soap.common"},
 	{org = "ballerina", packageName = "soap", moduleName = "soap.soap11"},
 	{org = "ballerina", packageName = "soap", moduleName = "soap.soap12"},
 	{org = "ballerina", packageName = "soap", moduleName = "soap.wssec"}
