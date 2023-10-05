@@ -55,20 +55,22 @@ public client class Client {
     remote function sendReceive(xml|mime:Entity[] body, string? action = (),
                                 map<string|string[]> headers = {}) returns xml|mime:Entity[]|Error {
         do {
+            xml securedBody;
             if body is xml {
-                xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);
-                xml response = check common:sendReceive(applySecurityPoliciesResult, self.soapClient, action, headers);
-                wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
-                do {
-                    if outboundSecurity !is () {
-                        return check common:applyOutboundConfig(outboundSecurity, response);
-                    }
-                } on fail var e {
-                    return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
-                }
-                return response;
+                securedBody = check common:applySecurityPolicies(self.inboundSecurity, body);
+            } else {
+                securedBody = check common:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
             }
-            return check common:sendReceive(body, self.soapClient, action, headers);
+            xml response = check common:sendReceive(securedBody, self.soapClient, action, headers);
+            wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
+            do {
+                if outboundSecurity !is () {
+                    return check common:applyOutboundConfig(outboundSecurity, response);
+                }
+            } on fail var e {
+                return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
+            }
+            return response;
         } on fail var e {
             return error Error(e.message());
         }
@@ -87,15 +89,13 @@ public client class Client {
     remote function sendOnly(xml|mime:Entity[] body, string? action = (),
                              map<string|string[]> headers = {}) returns Error? {
         do {
+            xml securedBody;
             if body is xml {
-                do {
-                    xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);
-                    return check common:sendOnly(applySecurityPoliciesResult, self.soapClient, action, headers);
-                } on fail var e {
-                    return error Error(e.message());
-                }
+                securedBody = check common:applySecurityPolicies(self.inboundSecurity, body);
+            } else {
+                securedBody = check common:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
             }
-            return check common:sendOnly(body, self.soapClient, action, headers);
+            return check common:sendOnly(securedBody, self.soapClient, action, headers);
         } on fail var e {
             return error Error(e.message());
         }

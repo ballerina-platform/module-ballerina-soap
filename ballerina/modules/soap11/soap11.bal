@@ -45,7 +45,7 @@ public client class Client {
 
     # Sends SOAP request and expects a response.
     # ```ballerina
-    # xml|mime:Entity[] response = check soapClient->sendReceive(body);
+    # xml|mime:Entity[] response = check soapClient->sendReceive(body, action);
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
@@ -55,20 +55,23 @@ public client class Client {
     remote function sendReceive(xml|mime:Entity[] body, string action,
                                 map<string|string[]> headers = {}) returns xml|mime:Entity[]|Error {
         do {
+            xml securedBody;
             if body is xml {
-                xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);
-                xml response = check common:sendReceive(applySecurityPoliciesResult, self.soapClient,
-                                                        action, headers, false);
-                wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
-                do {
-                    if outboundSecurity !is () {
-                        return check common:applyOutboundConfig(outboundSecurity, response);
-                    }
-                } on fail var e {
-                    return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
-                }
+                securedBody = check common:applySecurityPolicies(self.inboundSecurity, body);
+            } else {
+                securedBody = check common:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
             }
-            return check common:sendReceive(body, self.soapClient, action, headers, false);
+            xml response = check common:sendReceive(securedBody, self.soapClient,
+                                                    action, headers, false);
+            wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
+            do {
+                if outboundSecurity !is () {
+                    return check common:applyOutboundConfig(outboundSecurity, response);
+                }
+            } on fail var e {
+                return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
+            }
+            return response;
         } on fail var e {
             return error Error(e.message());
         }
@@ -77,7 +80,7 @@ public client class Client {
     # Fires and forgets requests. Sends the request without the possibility of any response from the
     # service (even an error).
     # ```ballerina
-    # check soapClient->sendOnly(body);
+    # check soapClient->sendOnly(body, action);
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
@@ -86,11 +89,13 @@ public client class Client {
     # + return - If successful, returns `nil`. Else, returns an error
     remote function sendOnly(xml|mime:Entity[] body, string action, map<string|string[]> headers = {}) returns Error? {
         do {
+            xml securedBody;
             if body is xml {
-                xml applySecurityPoliciesResult = check common:applySecurityPolicies(self.inboundSecurity, body);
-                return check common:sendOnly(applySecurityPoliciesResult, self.soapClient, action, headers, false);
+                securedBody = check common:applySecurityPolicies(self.inboundSecurity, body);
+            } else {
+                securedBody = check common:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
             }
-            return check common:sendOnly(body, self.soapClient, action, headers, false);
+            return check common:sendOnly(securedBody, self.soapClient, action, headers, false);
         } on fail var e {
             return error Error(e.message());
         }
