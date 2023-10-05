@@ -13,13 +13,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-import soap.common;
+import soap;
 import soap.wssec;
 
 import ballerina/http;
 import ballerina/mime;
-
-xmlns "http://www.w3.org/2003/05/soap-envelope" as soap;
 
 # Object for the basic SOAP client endpoint.
 public client class Client {
@@ -32,10 +30,10 @@ public client class Client {
     # + url - URL endpoint
     # + config - Configurations for SOAP client
     # + return - `error` in case of errors or `()` otherwise
-    public function init(string url, *common:ClientConfig config) returns Error? {
+    public function init(string url, *soap:ClientConfig config) returns Error? {
         do {
-            check common:validateTransportBindingPolicy(config);
-            self.soapClient = check new (url, common:retrieveHttpClientConfig(config));
+            check soap:validateTransportBindingPolicy(config);
+            self.soapClient = check new (url, soap:retrieveHttpClientConfig(config));
             self.inboundSecurity = config.inboundSecurity;
             self.outboundSecurity = config.outboundSecurity;
         } on fail var err {
@@ -57,15 +55,15 @@ public client class Client {
         do {
             xml securedBody;
             if body is xml {
-                securedBody = check common:applySecurityPolicies(self.inboundSecurity, body);
+                securedBody = check soap:applySecurityPolicies(self.inboundSecurity, body);
             } else {
-                securedBody = check common:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
+                securedBody = check soap:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
             }
-            xml response = check common:sendReceive(securedBody, self.soapClient, action, headers);
+            xml response = check soap:sendReceive(securedBody, self.soapClient, action, headers);
             wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
             do {
                 if outboundSecurity !is () {
-                    return check common:applyOutboundConfig(outboundSecurity, response);
+                    return check soap:applyOutboundConfig(outboundSecurity, response);
                 }
             } on fail var e {
                 return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
@@ -91,11 +89,11 @@ public client class Client {
         do {
             xml securedBody;
             if body is xml {
-                securedBody = check common:applySecurityPolicies(self.inboundSecurity, body);
+                securedBody = check soap:applySecurityPolicies(self.inboundSecurity, body);
             } else {
-                securedBody = check common:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
+                securedBody = check soap:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
             }
-            return check common:sendOnly(securedBody, self.soapClient, action, headers);
+            return check soap:sendOnly(securedBody, self.soapClient, action, headers);
         } on fail var e {
             return error Error(e.message());
         }

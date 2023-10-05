@@ -13,11 +13,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-import soap.wssec;
+import soap;
 
 import ballerina/mime;
 import ballerina/test;
 import ballerina/crypto;
+import soap.wssec;
 
 const string KEY_ALIAS = "wss40";
 const string KEY_PASSWORD = "security";
@@ -243,7 +244,7 @@ function testSendReceiveWithUsernameTokenSecurity() returns error? {
             inboundSecurity: {
                 username: "user",
                 password: "password",
-                passwordType: wssec:TEXT
+                passwordType: soap:TEXT
             },
             outboundSecurity: {}
         }
@@ -288,8 +289,8 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
         {
             inboundSecurity: {
-                signatureAlgorithm: wssec:RSA_SHA256,
-                encryptionAlgorithm: wssec:RSA_ECB,
+                signatureAlgorithm: soap:RSA_SHA256,
+                encryptionAlgorithm: soap:RSA_ECB,
                 signatureKey: clientPrivateKey,
                 encryptionKey: serverPublicKey
             }
@@ -334,8 +335,8 @@ function testSendReceiveWithSymmetricBindingSecurity() returns error? {
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
         {
             inboundSecurity: {
-                signatureAlgorithm: wssec:RSA_SHA256,
-                encryptionAlgorithm: wssec:RSA_ECB,
+                signatureAlgorithm: soap:RSA_SHA256,
+                encryptionAlgorithm: soap:RSA_ECB,
                 symmetricKey: symmetricKey,
                 servicePublicKey: serverPublicKey
             }
