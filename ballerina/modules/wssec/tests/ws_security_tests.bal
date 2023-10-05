@@ -538,7 +538,7 @@ function testSymmetricBindingWithOutboundConfig() returns error? {
 @test:Config {
     groups: ["username_token", "signature", "asymmetric_binding"]
 }
-function testAsymmetricBindingWithSignature() returns error? {
+function testAsymmetricBindingWithSignatureRsaSha256() returns error? {
     xml envelope =
     xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
             <soap:Body><person></person></soap:Body>
