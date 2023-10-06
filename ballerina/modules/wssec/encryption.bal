@@ -25,8 +25,7 @@ class Encryption {
     }
 
     function encryptData(string dataString, EncryptionAlgorithm encryptionAlgorithm,
-                         crypto:PublicKey|crypto:PrivateKey key)
-        returns byte[]|Error {
+                         crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
         byte[] data = dataString.toBytes();
         do {
             return check crypto:encryptRsaEcb(data, key);
@@ -36,8 +35,7 @@ class Encryption {
     }
 
     public function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
-                                crypto:PublicKey|crypto:PrivateKey key)
-        returns byte[]|Error {
+                                crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
         do {
             return check crypto:decryptRsaEcb(cipherText, key);
         } on fail var e {

@@ -125,8 +125,9 @@ public function applyUsernameToken(xml envelope, *UsernameTokenConfig usernameTo
     Document document = check new (envelope);
     WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
     WsSecurity wsSecurity = new;
-    string securedEnvelope = check wsSecurity.applyUsernameTokenPolicy(wsSecurityHeader, usernameToken.username,
-                                                                       usernameToken.password, usernameToken.passwordType);
+    string securedEnvelope = check wsSecurity
+        .applyUsernameTokenPolicy(wsSecurityHeader, usernameToken.username, usernameToken.password,
+                                  usernameToken.passwordType);
     return convertStringToXml(securedEnvelope);
 }
 

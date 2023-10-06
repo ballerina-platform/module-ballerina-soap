@@ -60,7 +60,7 @@ public client class Client {
                 securedBody = check soap:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
             }
             xml response = check soap:sendReceive(securedBody, self.soapClient,
-                                                    action, headers, false);
+                                                  action, headers, false);
             wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
             do {
                 if outboundSecurity !is () {
@@ -85,7 +85,8 @@ public client class Client {
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body, string action, map<string|string[]> headers = {}) returns Error? {
+    remote function sendOnly(xml|mime:Entity[] body, string action,
+                             map<string|string[]> headers = {}) returns Error? {
         do {
             xml securedBody;
             if body is xml {

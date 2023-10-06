@@ -75,7 +75,7 @@ public function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundS
 }
 
 public function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope)
-    returns xml|wssec:Error|Error {
+    returns xml|Error {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
     xml soapEnvelope = envelope;
     do {

@@ -64,7 +64,6 @@ class Signature {
                     return check crypto:verifyRsaSha512Signature(data, signature, publicKey);
                 }
             }
-
         } on fail var e {
             return error Error(e.message());
         }
