@@ -32,6 +32,7 @@ dependencies {
     implementation 'org.apache.wss4j:wss4j-ws-security-dom:3.0.1'
     implementation 'org.apache.santuario:xmlsec:3.0.2'
     implementation 'org.apache.wss4j:wss4j-ws-security-common:3.0.1'
+    compileOnly group: 'org.graalvm.nativeimage', name: 'svm', version: '22.2.0'
 }
 
 checkstyle {
