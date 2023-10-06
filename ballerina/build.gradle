@@ -32,7 +32,7 @@ buildscript {
 }
 
 
-description = 'Ballerina - SOAP Java Utils'
+description = 'Ballerina - SOAP Module'
 
 def packageName = "soap"
 def packageOrg = "ballerina"
