@@ -40,3 +40,4 @@ velocity.log*
 *Ballerina.lock
 
 .vscode
+config-dir

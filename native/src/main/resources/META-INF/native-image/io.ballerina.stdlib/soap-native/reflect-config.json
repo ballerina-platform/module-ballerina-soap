@@ -1,21 +1,17 @@
 [
 {
-  "name":"java.security.SecureRandomParameters"
+  "name":"org.apache.commons.pool.impl.EvictionTimer"
 },
 {
-  "name":"java.util.concurrent.atomic.AtomicBoolean",
-  "fields":[{"name":"value"}]
-},
-{
-  "name":"java.util.concurrent.atomic.AtomicReference",
-  "fields":[{"name":"value"}]
-},
-{
-  "name":"sun.security.provider.NativePRNG",
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"<init>","parameterTypes":["java.security.SecureRandomParameters"] }]
-},
-{
-  "name":"sun.security.provider.SHA",
+  "name":"org.apache.wss4j.dom.transform.AttachmentCiphertextTransform",
   "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xml.security.c14n.implementations.CanonicalizerPhysical",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xml.security.utils.XMLUtils",
+  "fields":[{"name":"ignoreLineBreaks"}]
 }
 ]
