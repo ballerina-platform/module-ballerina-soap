@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+# Represents enums for all the supported password types.
+#
 public enum PasswordType {
     TEXT,
     DIGEST,
@@ -21,6 +23,8 @@ public enum PasswordType {
     DERIVED_KEY_DIGEST
 }
 
+# Represents enums for all the supported signature algorithms.
+#
 public enum SignatureAlgorithm {
     RSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
     RSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
@@ -28,6 +32,8 @@ public enum SignatureAlgorithm {
     RSA_SHA512 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"
 }
 
+# Represents enums for all the supported encryption algorithms.
+#
 public enum EncryptionAlgorithm {
     RSA_ECB = "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
 }

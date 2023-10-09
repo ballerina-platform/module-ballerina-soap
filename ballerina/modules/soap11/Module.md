@@ -1,12 +1,12 @@
 ## Overview
 
-This module offers a set of APIs that facilitate the transmission of XML requests to a SOAP backend. It excels in managing security policies within SOAP requests, ensuring the transmission of secured SOAP envelopes. Moreover, it possesses the capability to efficiently extract data from security-applied SOAP responses.
+This module offers a set of APIs that facilitate the transmission of XML requests to a SOAP 1.1 backend. It excels in managing security policies within SOAP requests, ensuring the transmission of secured SOAP envelopes. Moreover, it possesses the capability to efficiently extract data from security-applied SOAP responses.
 
 SOAP module abstracts out the details of the creation of a SOAP envelope, headers, and the body in a SOAP message.
 
 ## Client
 
-The `Client` is used to connect to and interact with `SOAP` endpoints.
+The `Client` is used to connect to and interact with `SOAP` 1.1 endpoints.
 
 ### SOAP 1.1 Client
 
@@ -14,14 +14,6 @@ The `Client` is used to connect to and interact with `SOAP` endpoints.
 import ballerina/soap:soap11;
 
 soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-```
-
-### SOAP 1.2 Client
-
-```ballerina
-import ballerina/soap:soap12;
-
-soap12:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 ```
 
 ## APIs associated with SOAP
@@ -133,53 +125,20 @@ These policies empower SOAP clients to enhance the security of their web service
 
 ### Apply Security Policies
 
-#### SOAP 1.1 Client: UsernameToken and TranportBinding Policy
+#### SOAP 1.1 Client with Asymmetric Binding and Outbound Security Configuration
 
-```
+```ballerina
 import ballerina/crypto;
 import ballerina/mime;
 import ballerina/soap;
 import ballerina/soap:soap11;
 
 public function main() returns error? {
-    soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL", 
-        {
-            inboundSecurity: [
-            {
-                username: "username",
-                password: "password",
-                passwordType: soap:TEXT
-            },
-            TRANSPORT_BINDING
-            ]
-        });
-
-    xml envelope = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                            <soap:Body>
-                            <quer:Add xmlns:quer="http://tempuri.org/">
-                                <quer:intA>2</quer:intA>
-                                <quer:intB>3</quer:intB>
-                            </quer:Add>
-                            </soap:Body>
-                        </soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(envelope, "http://tempuri.org/Add");
-}
-```
-
-#### SOAP 1.2 Client with Asymmetric Binding and Outbound Security Configuration
-
-```ballerina
-import ballerina/crypto;
-import ballerina/mime;
-import ballerina/soap;
-import ballerina/soap:soap12;
-
-public function main() returns error? {
     crypto:PrivateKey clientPrivateKey = ...//
     crypto:PublicKey clientPublicKey = ...//
     ​​crypto:PublicKey serverPublicKey = ...//
 
-    soap12:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
     {
         inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
