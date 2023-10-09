@@ -135,7 +135,7 @@ These policies empower SOAP clients to enhance the security of their web service
 
 #### SOAP 1.1 Client: UsernameToken and TranportBinding Policy
 
-```
+```ballerina
 import ballerina/crypto;
 import ballerina/mime;
 import ballerina/soap;
@@ -194,6 +194,15 @@ public function main() returns error? {
                 decryptionAlgorithm: soap:RSA_ECB
         }
     });
+    xml envelope = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                            <soap:Body>
+                            <quer:Add xmlns:quer="http://tempuri.org/">
+                                <quer:intA>2</quer:intA>
+                                <quer:intB>3</quer:intB>
+                            </quer:Add>
+                            </soap:Body>
+                        </soap:Envelope>`;
+    xml|mime:Entity[] response = check soapClient->sendReceive(envelope, "http://tempuri.org/Add");
 }
 ```
 
