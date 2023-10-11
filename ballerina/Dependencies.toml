@@ -287,7 +287,6 @@ dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "mime"},
 	{org = "ballerina", name = "regex"},
-	{org = "ballerina", name = "tcp"},
 	{org = "ballerina", name = "test"},
 	{org = "ballerinai", name = "observe"}
 ]
@@ -305,18 +304,6 @@ version = "2.5.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
-]
-
-[[package]]
-org = "ballerina"
-name = "tcp"
-version = "1.9.0"
-dependencies = [
-	{org = "ballerina", name = "crypto"},
-	{org = "ballerina", name = "jballerina.java"}
-]
-modules = [
-	{org = "ballerina", packageName = "tcp", moduleName = "tcp"}
 ]
 
 [[package]]
