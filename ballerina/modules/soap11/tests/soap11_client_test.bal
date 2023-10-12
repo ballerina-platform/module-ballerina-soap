@@ -44,7 +44,7 @@ function testSendOnly() returns error? {
                     </soap:Envelope>`;
 
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-    _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
+    check soapClient->sendOnly(body, "http://tempuri.org/Add");
 }
 
 @test:Config {

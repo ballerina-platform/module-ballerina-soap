@@ -59,7 +59,7 @@ public function main() returns error? {
                             </quer:Add>
                             </soap:Body>
                         </soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendOnly(envelope, "http://tempuri.org/Add");
+    check soapClient->sendOnly(envelope, "http://tempuri.org/Add");
 }
 ```
 ## Security
