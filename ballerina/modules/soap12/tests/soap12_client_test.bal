@@ -20,11 +20,11 @@ import ballerina/test;
 import ballerina/crypto;
 import soap.wssec;
 
-const string KEY_ALIAS = "wss40";
-const string KEY_PASSWORD = "security";
-const string KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
-const string X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
-const string X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
+const KEY_ALIAS = "wss40";
+const KEY_PASSWORD = "security";
+const KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
+const X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
+const X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
 const wssec:TransportBindingConfig TRANSPORT_BINDING = "TransportBinding";
 const wssec:NoPolicy NO_POLICY = "NoPolicy";
 
