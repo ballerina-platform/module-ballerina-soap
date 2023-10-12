@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 import ballerina/crypto;
-import ballerina/regex;
+import ballerina/lang.regexp;
 
 xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 xmlns "http://www.w3.org/2000/09/xmldsig#" as ds;
@@ -22,10 +22,7 @@ xmlns "http://www.w3.org/2000/09/xmldsig#" as ds;
 function addSecurityHeader(Document document) returns WSSecurityHeader|Error {
     WSSecurityHeader wsSecHeader = check new (document);
     Error? insertHeader = wsSecHeader.insertSecHeader();
-    if insertHeader is () {
-        return wsSecHeader;
-    }
-    return insertHeader;
+    return insertHeader ?: wsSecHeader;
 }
 
 public function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
@@ -59,14 +56,14 @@ function applyEncryptedKey(string envelopeString, crypto:PrivateKey symmetricKey
         Encryption encryption = check new ();
         byte[] encryptedKey = check crypto:encryptRsaEcb(symmetricKey.toBalString().toBytes(), encryptKey);
         string encryptedKeyElements = check encryption.getEncryptedKeyElements(encryptedKey);
-        string replace = regex:replace(encryptedKeyElements, string `<?.*?><`, "<");
+        string replace = regexp:replace(re `<?.*?><`, encryptedKeyElements, "<");
         string:RegExp securityToken = 
             re `<wsse:SecurityTokenReference.*><wsse:Reference URI="#null"/></wsse:SecurityTokenReference>`;
         if securedEnvelope.includesMatch(securityToken) {
-            securedEnvelope = regex:replace(securedEnvelope, securityToken.toString(), replace);
+            securedEnvelope = regexp:replace(securityToken, securedEnvelope, replace);
         }
         else if securedEnvelope.includesMatch(re `<wsse:SecurityTokenReference .*/>`) {
-            securedEnvelope = regex:replace(securedEnvelope, string `<wsse:SecurityTokenReference .*/>`, replace);
+            securedEnvelope = regexp:replace(re `<wsse:SecurityTokenReference .*/>`, securedEnvelope, replace);
         }
         return securedEnvelope;
     } on fail var e {
@@ -75,11 +72,11 @@ function applyEncryptedKey(string envelopeString, crypto:PrivateKey symmetricKey
 }
 
 function convertStringToXml(string envelope) returns xml|Error {
-    do {
-        return check xml:fromString(regex:replace(envelope, string `<?.*?><`, "<"));
-    } on fail var e {
-        return error Error(e.message());
+    xml|error xmlEnvelope = xml:fromString(regexp:replace(re `<?.*?><`, envelope, "<"));
+    if xmlEnvelope is error {
+        return error Error(xmlEnvelope.message());
     }
+    return xmlEnvelope;
 }
 
 # Returns the encrypted data of the SOAP envelope.
@@ -140,26 +137,22 @@ public function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symm
     Document document = check new (envelope);
     WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
     string securedEnvelope = envelope.toBalString();
-    if symmetricBinding.signatureAlgorithm !is () {
+    SignatureAlgorithm? signatureAlgorithm = symmetricBinding.signatureAlgorithm;
+    EncryptionAlgorithm? encryptionAlgorithm = symmetricBinding.encryptionAlgorithm;
+    if signatureAlgorithm is SignatureAlgorithm {
         Signature signature = check new ();
-        byte[] signedData = check signature.signData((envelope/<soap:Body>/*).toString(),
-                                                     <SignatureAlgorithm>symmetricBinding.signatureAlgorithm,
-                                                     symmetricBinding.symmetricKey);
-        Signature signatureResult = check addSignature(signature,
-                                                       <SignatureAlgorithm>symmetricBinding.signatureAlgorithm,
-                                                       signedData);
+        byte[] signedData = check signature.signData((envelope/<soap:Body>/*).toString(), signatureAlgorithm
+                                                     , symmetricBinding.symmetricKey);
+        Signature signatureResult = check addSignature(signature, signatureAlgorithm, signedData);
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applySignatureOnlyPolicy(wsSecurityHeader, signatureResult,
                                                                     symmetricBinding.x509Token);
     }
-    if symmetricBinding.encryptionAlgorithm !is () {
+    if encryptionAlgorithm is EncryptionAlgorithm {
         Encryption encryption = check new ();
-        byte[] encryptData = check encryption.encryptData((envelope/<soap:Body>/*).toString(),
-                                                          <EncryptionAlgorithm>symmetricBinding.encryptionAlgorithm,
-                                                          symmetricBinding.symmetricKey);
-        Encryption encryptionResult = check addEncryption(encryption,
-                                                          <EncryptionAlgorithm>symmetricBinding.encryptionAlgorithm,
-                                                          encryptData);
+        byte[] encryptData = check encryption.encryptData((envelope/<soap:Body>/*).toString(), encryptionAlgorithm
+                                                          , symmetricBinding.symmetricKey);
+        Encryption encryptionResult = check addEncryption(encryption, encryptionAlgorithm, encryptData);
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applyEncryptionOnlyPolicy(wsSecurityHeader, encryptionResult);
     }
@@ -177,26 +170,30 @@ public function applyAsymmetricBinding(xml envelope, *AsymmetricBindingConfig as
     Document document = check new (envelope);
     WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
     string securedEnvelope = envelope.toBalString();
-    if asymmetricBinding.signatureAlgorithm !is () {
+    SignatureAlgorithm? signatureAlgorithm = asymmetricBinding.signatureAlgorithm;
+    EncryptionAlgorithm? encryptionAlgorithm = asymmetricBinding.encryptionAlgorithm;
+    if signatureAlgorithm is SignatureAlgorithm {
         Signature signature = check new ();
+        crypto:PrivateKey? signatureKey = asymmetricBinding.signatureKey;
+        if signatureKey !is crypto:PrivateKey {
+            return error Error("Signature key cannot be nil");
+        }
         byte[] signedData = check signature.signData((envelope/<soap:Body>/*).toString(),
-                                                     <SignatureAlgorithm>asymmetricBinding.signatureAlgorithm,
-                                                     <crypto:PrivateKey>asymmetricBinding.signatureKey);
-        Signature signatureResult = check addSignature(signature,
-                                                       <SignatureAlgorithm>asymmetricBinding.signatureAlgorithm,
-                                                       signedData);
+                                                     signatureAlgorithm, signatureKey);
+        Signature signatureResult = check addSignature(signature, signatureAlgorithm, signedData);
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applySignatureOnlyPolicy(wsSecurityHeader, signatureResult,
                                                                     asymmetricBinding.x509Token);
     }
-    if asymmetricBinding.encryptionAlgorithm !is () {
+    if encryptionAlgorithm is EncryptionAlgorithm {
         Encryption encryption = check new ();
-        byte[] encryptData = check encryption.encryptData((envelope/<soap:Body>/*).toString(),
-                                                          <EncryptionAlgorithm>asymmetricBinding.encryptionAlgorithm,
-                                                          <crypto:PublicKey>asymmetricBinding.encryptionKey);
-        Encryption encryptionResult = check addEncryption(encryption,
-                                                          <EncryptionAlgorithm>asymmetricBinding.encryptionAlgorithm,
-                                                          encryptData);
+        crypto:PublicKey? encryptionKey = asymmetricBinding.encryptionKey;
+        if encryptionKey !is crypto:PublicKey {
+            return error Error("Encryption key cannot be nil");
+        }
+        byte[] encryptData = check encryption.encryptData((envelope/<soap:Body>/*).toString(), encryptionAlgorithm,
+                                                          encryptionKey);
+        Encryption encryptionResult = check addEncryption(encryption, encryptionAlgorithm, encryptData);
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applyEncryptionOnlyPolicy(wsSecurityHeader, encryptionResult);
     }

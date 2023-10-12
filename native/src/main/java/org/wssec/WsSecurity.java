@@ -49,6 +49,7 @@ import static org.wssec.Constants.ITERATION;
 import static org.wssec.Constants.NATIVE_ENCRYPTION;
 import static org.wssec.Constants.NATIVE_SEC_HEADER;
 import static org.wssec.Constants.NATIVE_SIGNATURE;
+import static org.wssec.Constants.PASSWORD;
 import static org.wssec.Constants.X509;
 import static org.wssec.Utils.createError;
 import static org.wssec.WsSecurityUtils.convertDocumentToString;
@@ -144,7 +145,7 @@ public class WsSecurity {
     public static WSSecSignature prepareSignature(RequestData reqData, Object x509FilePath) {
         WSSecSignature sign = new WSSecSignature(reqData.getSecHeader());
         try {
-            byte[] key = UsernameTokenUtil.generateDerivedKey("password",
+            byte[] key = UsernameTokenUtil.generateDerivedKey(PASSWORD,
                     UsernameTokenUtil.generateSalt(true), ITERATION);
             sign.setSecretKey(key);
             sign.setWsDocInfo(reqData.getWsDocInfo());

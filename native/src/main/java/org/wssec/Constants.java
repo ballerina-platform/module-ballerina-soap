@@ -22,6 +22,7 @@ public class Constants {
     public static final String DIGEST = "DIGEST";
     public static final String DERIVED_KEY_TEXT = "DERIVED_KEY_TEXT";
     public static final String DERIVED_KEY_DIGEST = "DERIVED_KEY_DIGEST";
+    public static final String PASSWORD = "password";
     public static final String NATIVE_SEC_HEADER = "nativeSecHeader";
     public static final String NATIVE_DOCUMENT = "nativeDocumentBuilder";
     public static final String NATIVE_SIGNATURE = "nativeSignature";

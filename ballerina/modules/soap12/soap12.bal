@@ -33,7 +33,7 @@ public client class Client {
     public function init(string url, *soap:ClientConfig config) returns Error? {
         do {
             check soap:validateTransportBindingPolicy(config);
-            self.soapClient = check new (url, soap:retrieveHttpClientConfig(config));
+            self.soapClient = check new (url, config.httpConfig);
             self.inboundSecurity = config.inboundSecurity;
             self.outboundSecurity = config.outboundSecurity;
         } on fail var err {
@@ -53,20 +53,15 @@ public client class Client {
     remote function sendReceive(xml|mime:Entity[] body, string? action = (),
                                 map<string|string[]> headers = {}) returns xml|mime:Entity[]|Error {
         do {
-            xml securedBody;
-            if body is xml {
-                securedBody = check soap:applySecurityPolicies(self.inboundSecurity, body);
-            } else {
-                securedBody = check soap:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
-            }
+            xml envelope = body is xml ? body : check body[0].getXml();
+            xml securedBody = check soap:applySecurityPolicies(self.inboundSecurity, envelope);
             xml response = check soap:sendReceive(securedBody, self.soapClient, action, headers);
             wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
-            do {
-                if outboundSecurity !is () {
-                    return check soap:applyOutboundConfig(outboundSecurity, response);
+            if outboundSecurity is wssec:OutboundSecurityConfig {
+                xml|error security = soap:applyOutboundConfig(outboundSecurity, response);
+                if security is error {
+                    return error Error(INVALID_OUTBOUND_SECURITY_ERROR, security.cause());
                 }
-            } on fail var e {
-                return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
             }
             return response;
         } on fail var e {

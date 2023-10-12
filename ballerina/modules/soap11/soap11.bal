@@ -33,7 +33,7 @@ public client class Client {
     public function init(string url, *soap:ClientConfig config) returns Error? {
         do {
             check soap:validateTransportBindingPolicy(config);
-            self.soapClient = check new (url, soap:retrieveHttpClientConfig(config));
+            self.soapClient = check new (url, config.httpConfig);
             self.inboundSecurity = config.inboundSecurity;
             self.outboundSecurity = config.outboundSecurity;
         } on fail var err {
@@ -63,7 +63,7 @@ public client class Client {
                                                   action, headers, false);
             wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity;
             do {
-                if outboundSecurity !is () {
+                if outboundSecurity is wssec:OutboundSecurityConfig {
                     return check soap:applyOutboundConfig(outboundSecurity, response);
                 }
             } on fail var e {

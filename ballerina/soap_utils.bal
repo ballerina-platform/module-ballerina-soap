@@ -18,7 +18,7 @@ import soap.wssec;
 import ballerina/crypto;
 import ballerina/http;
 import ballerina/mime;
-import ballerina/regex;
+import ballerina/lang.regexp;
 
 public function validateTransportBindingPolicy(ClientConfig config) returns Error? {
     if config.httpConfig.secureSocket is () {
@@ -33,21 +33,6 @@ public function validateTransportBindingPolicy(ClientConfig config) returns Erro
             }
         }
     }
-}
-
-public function retrieveHttpClientConfig(ClientConfig config) returns http:ClientConfiguration {
-    return {
-        httpVersion: config.httpConfig.httpVersion,
-        http1Settings: config.httpConfig.http1Settings,
-        http2Settings: config.httpConfig.http2Settings,
-        timeout: config.httpConfig.timeout,
-        poolConfig: config.httpConfig?.poolConfig,
-        auth: config.httpConfig?.auth,
-        retryConfig: config.httpConfig?.retryConfig,
-        responseLimits: config.httpConfig.responseLimits,
-        secureSocket: config.httpConfig?.secureSocket,
-        circuitBreaker: config.httpConfig?.circuitBreaker
-    };
 }
 
 public function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity,
@@ -80,21 +65,21 @@ public function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurit
     xml soapEnvelope = envelope;
     do {
         wssec:EncryptionAlgorithm? encryptionAlgorithm = outboundSecurity.decryptionAlgorithm;
-        if encryptionAlgorithm !is () {
+        if encryptionAlgorithm is wssec:EncryptionAlgorithm {
             crypto:PrivateKey|crypto:PublicKey? clientPrivateKey = outboundSecurity.decryptionKey;
-            if clientPrivateKey !is () {
+            if clientPrivateKey is crypto:PrivateKey|crypto:PublicKey {
                 byte[] encData = check wssec:getEncryptedData(soapEnvelope);
                 byte[] decryptDataResult = check wssec:decryptData(encData, encryptionAlgorithm, clientPrivateKey);
                 string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
-                string decryptedEnv = regex:replace(soapEnvelope.toString(), string `<soap:Body .*>.*</soap:Body>`,
-                                                    decryptedBody);
+                string decryptedEnv = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, soapEnvelope.toString(),
+                                                     decryptedBody);
                 soapEnvelope = check xml:fromString(decryptedEnv);
             }
         }
         wssec:SignatureAlgorithm? signatureAlgorithm = outboundSecurity.signatureAlgorithm;
-        if signatureAlgorithm !is () {
+        if signatureAlgorithm is wssec:SignatureAlgorithm {
             crypto:PublicKey? serverPublicKey = outboundSecurity.verificationKey;
-            if serverPublicKey !is () {
+            if serverPublicKey is crypto:PublicKey {
                 byte[] signatureData = check wssec:getSignatureData(soapEnvelope);
                 boolean verify = check wssec:verifyData((soapEnvelope/<soap:Body>/*).toString().toBytes(),
                                                         signatureData, serverPublicKey, signatureAlgorithm);
