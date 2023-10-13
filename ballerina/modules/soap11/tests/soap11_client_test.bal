@@ -66,7 +66,7 @@ function testSendReceiveWithMime() returns error? {
     bytesPart.setContentId("<image1>");
     mtomMessage.push(bytesPart);
 
-    xml|mime:Entity[] response = check soapClient->sendReceive(mtomMessage, "http://tempuri.org/Add", path = "/albums");
+    xml|mime:Entity[] response = check soapClient->sendReceive(mtomMessage, "http://tempuri.org/Add", path = "/getPayload");
     xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                           <quer:Add xmlns:quer="http://tempuri.org/">
                             <quer:intA>2</quer:intA>
@@ -270,14 +270,6 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
     };
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
 
-    // wssec:AsymmetricBindingConfig asymmetricConfig = {
-    //     signatureAlgorithm: soap:RSA_SHA256,
-    //     encryptionAlgorithm: soap:RSA_ECB,
-    //     signatureKey: clientPrivateKey,
-    //     encryptionKey: serverPublicKey
-    // };
-    // wssec:AsymmetricBindingConfig & readonly asymmetricConfig2 = <wssec:AsymmetricBindingConfig & readonly>asymmetricConfig.clone();
-    // readonly & wssec:AsymmetricBindingConfig immutableRecord = asymmetricConfig;
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
         {
             inboundSecurity: {

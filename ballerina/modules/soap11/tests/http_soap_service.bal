@@ -17,7 +17,7 @@ import ballerina/http;
 
 service / on new http:Listener(9090) {
 
-    resource function post albums(http:Request request) returns http:Response|error {
+    resource function post getPayload(http:Request request) returns http:Response|error {
         http:Response response = new;
         response.setPayload(check (check request.getBodyParts())[0].getXml());
         return response;
