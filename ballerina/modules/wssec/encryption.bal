@@ -16,15 +16,15 @@
 import ballerina/crypto;
 import ballerina/jballerina.java;
 
-class Encryption {
+isolated class Encryption {
 
     private handle nativeEncryption;
 
-    function init() returns Error? {
+    isolated function init() returns Error? {
         self.nativeEncryption = newEncryption();
     }
 
-    function encryptData(string dataString, EncryptionAlgorithm encryptionAlgorithm,
+    isolated function encryptData(string dataString, EncryptionAlgorithm encryptionAlgorithm,
                          crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
         byte[] data = dataString.toBytes();
         do {
@@ -34,7 +34,7 @@ class Encryption {
         }
     }
 
-    public function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
+    public isolated function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
                                 crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
         do {
             return check crypto:decryptRsaEcb(cipherText, key);
@@ -43,19 +43,19 @@ class Encryption {
         }
     }
 
-    public function setEncryptionAlgorithm(string encryptionAlgorithm) = @java:Method {
+    public isolated function setEncryptionAlgorithm(string encryptionAlgorithm) = @java:Method {
         'class: "org.wssec.Encryption"
     } external;
 
-    public function setEncryptedData(byte[] encryptedData) = @java:Method {
+    public isolated function setEncryptedData(byte[] encryptedData) = @java:Method {
         'class: "org.wssec.Encryption"
     } external;
 
-    public function getEncryptedKeyElements(byte[] encryptedKey) returns string|Error = @java:Method {
+    public isolated function getEncryptedKeyElements(byte[] encryptedKey) returns string|Error = @java:Method {
         'class: "org.wssec.Encryption"
     } external;
 }
 
-function newEncryption() returns handle = @java:Constructor {
+isolated function newEncryption() returns handle = @java:Constructor {
     'class: "org.wssec.Encryption"
 } external;

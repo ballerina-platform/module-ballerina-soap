@@ -18,6 +18,7 @@ package org.wssec;
 
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BHandle;
+import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -163,5 +164,10 @@ public class WsSecurity {
             throw createError(e.getMessage());
         }
         return sign;
+    }
+
+    public static BMap getReadOnlyRecords(BMap securityConfig) {
+        securityConfig.freezeDirect();
+        return securityConfig;
     }
 }

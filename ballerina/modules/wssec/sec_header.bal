@@ -15,19 +15,19 @@
 // under the License.
 import ballerina/jballerina.java;
 
-class WSSecurityHeader {
+isolated class WSSecurityHeader {
 
     private handle nativeSecHeader;
 
-    function init(Document document) returns Error? {
+    isolated function init(Document document) returns Error? {
         self.nativeSecHeader = newSecHeader(document);
     }
 
-    function insertSecHeader() returns Error? = @java:Method {
+    isolated function insertSecHeader() returns Error? = @java:Method {
         'class: "org.wssec.WsSecurityHeader"
     } external;
 }
 
-function newSecHeader(Document document) returns handle = @java:Constructor {
+isolated function newSecHeader(Document document) returns handle = @java:Constructor {
     'class: "org.wssec.WsSecurityHeader"
 } external;

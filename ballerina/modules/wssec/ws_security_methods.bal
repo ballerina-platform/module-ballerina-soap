@@ -19,7 +19,7 @@ import ballerina/regex;
 xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 xmlns "http://www.w3.org/2000/09/xmldsig#" as ds;
 
-function addSecurityHeader(Document document) returns WSSecurityHeader|Error {
+isolated function addSecurityHeader(Document document) returns WSSecurityHeader|Error {
     WSSecurityHeader wsSecHeader = check new (document);
     Error? insertHeader = wsSecHeader.insertSecHeader();
     if insertHeader is () {
@@ -28,31 +28,31 @@ function addSecurityHeader(Document document) returns WSSecurityHeader|Error {
     return insertHeader;
 }
 
-public function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
+public isolated function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
                             crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
     Encryption encrypt = check new ();
     return encrypt.decryptData(cipherText, encryptionAlgorithm, key);
 }
 
-public function verifyData(byte[] data, byte[] signature, crypto:PublicKey publicKey,
+public isolated function verifyData(byte[] data, byte[] signature, crypto:PublicKey publicKey,
                            SignatureAlgorithm signatureAlgorithm) returns boolean|Error {
     Signature sign = check new ();
     return sign.verifySignature(data, signature, publicKey, signatureAlgorithm);
 }
 
-function addSignature(Signature sign, string signatureAlgorithm, byte[] signature) returns Signature|Error {
+isolated function addSignature(Signature sign, string signatureAlgorithm, byte[] signature) returns Signature|Error {
     sign.setSignatureAlgorithm(signatureAlgorithm);
     sign.setSignatureValue(signature);
     return sign;
 }
 
-function addEncryption(Encryption encrypt, string encryptionAlgorithm, byte[] encryption) returns Encryption|Error {
+isolated function addEncryption(Encryption encrypt, string encryptionAlgorithm, byte[] encryption) returns Encryption|Error {
     encrypt.setEncryptionAlgorithm(encryptionAlgorithm);
     encrypt.setEncryptedData(encryption);
     return encrypt;
 }
 
-function applyEncryptedKey(string envelopeString, crypto:PrivateKey symmetricKey, crypto:PublicKey encryptKey)
+isolated function applyEncryptedKey(string envelopeString, crypto:PrivateKey symmetricKey, crypto:PublicKey encryptKey)
     returns string|Error {
     string securedEnvelope = envelopeString;
     do {
@@ -74,7 +74,7 @@ function applyEncryptedKey(string envelopeString, crypto:PrivateKey symmetricKey
     }
 }
 
-function convertStringToXml(string envelope) returns xml|Error {
+isolated function convertStringToXml(string envelope) returns xml|Error {
     do {
         return check xml:fromString(regex:replace(envelope, string `<?.*?><`, "<"));
     } on fail var e {
@@ -86,7 +86,7 @@ function convertStringToXml(string envelope) returns xml|Error {
 #
 # + envelope - The SOAP envelope
 # + return - A `byte[]` if the encrypted data is successfully decoded or else `wssec:Error`
-public function getEncryptedData(xml envelope) returns byte[]|Error {
+public isolated function getEncryptedData(xml envelope) returns byte[]|Error {
     Document document = check new (envelope);
     return document.getEncryptedData();
 }
@@ -95,7 +95,7 @@ public function getEncryptedData(xml envelope) returns byte[]|Error {
 #
 # + envelope - The SOAP envelope
 # + return - A `byte[]` if the signed data is successfully decoded or else `wssec:Error`
-public function getSignatureData(xml envelope) returns byte[]|Error {
+public isolated function getSignatureData(xml envelope) returns byte[]|Error {
     Document document = check new (envelope);
     return document.getSignatureData();
 }
@@ -105,7 +105,7 @@ public function getSignatureData(xml envelope) returns byte[]|Error {
 # + envelope - The SOAP envelope
 # + timestampToken - The `TSRecord` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
-public function applyTimestampToken(xml envelope, *TimestampTokenConfig timestampToken) returns xml|Error {
+public isolated function applyTimestampToken(xml envelope, *TimestampTokenConfig timestampToken) returns xml|Error {
     if timestampToken.timeToLive <= 0 {
         return error Error("Invalid value for `timeToLive`");
     }
@@ -121,7 +121,7 @@ public function applyTimestampToken(xml envelope, *TimestampTokenConfig timestam
 # + envelope - The SOAP envelope
 # + usernameToken - The `UsernameTokenConfig` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
-public function applyUsernameToken(xml envelope, *UsernameTokenConfig usernameToken) returns xml|Error {
+public isolated function applyUsernameToken(xml envelope, *UsernameTokenConfig usernameToken) returns xml|Error {
     Document document = check new (envelope);
     WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
     WsSecurity wsSecurity = new;
@@ -136,7 +136,7 @@ public function applyUsernameToken(xml envelope, *UsernameTokenConfig usernameTo
 # + envelope - The SOAP envelope
 # + symmetricBinding - The `SymmetricBindingConfig` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
-public function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symmetricBinding) returns xml|Error {
+public isolated function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symmetricBinding) returns xml|Error {
     Document document = check new (envelope);
     WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
     string securedEnvelope = envelope.toBalString();
@@ -173,7 +173,7 @@ public function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symm
 # + envelope - The SOAP envelope
 # + asymmetricBinding - The `AsymmetricBindingConfig` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
-public function applyAsymmetricBinding(xml envelope, *AsymmetricBindingConfig asymmetricBinding) returns xml|Error {
+public isolated function applyAsymmetricBinding(xml envelope, *AsymmetricBindingConfig asymmetricBinding) returns xml|Error {
     Document document = check new (envelope);
     WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
     string securedEnvelope = envelope.toBalString();

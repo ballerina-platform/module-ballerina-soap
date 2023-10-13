@@ -15,23 +15,23 @@
 // under the License.
 import ballerina/jballerina.java;
 
-class WsSecurity {
-    function applyUsernameTokenPolicy(WSSecurityHeader wsSecurityHeader, string username, 
+isolated class WsSecurity {
+    isolated function applyUsernameTokenPolicy(WSSecurityHeader wsSecurityHeader, string username, 
                                       string password, string pwType) returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
 
-    function applyTimestampPolicy(WSSecurityHeader wsSecurityHeader, int timeToLive)
+    isolated function applyTimestampPolicy(WSSecurityHeader wsSecurityHeader, int timeToLive)
         returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
 
-    function applySignatureOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Signature signature, string? x509FilePath)
+    isolated function applySignatureOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Signature signature, string? x509FilePath)
         returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
 
-    function applyEncryptionOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Encryption encryption)
+    isolated function applyEncryptionOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Encryption encryption)
         returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;

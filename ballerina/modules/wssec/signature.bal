@@ -16,16 +16,16 @@
 import ballerina/crypto;
 import ballerina/jballerina.java;
 
-class Signature {
+isolated class Signature {
 
     private handle nativeSignature;
 
-    function init() returns Error? {
+    isolated function init() returns Error? {
         self.nativeSignature = newSignature();
     }
 
-    public function signData(string dataString, SignatureAlgorithm signatureAlgorithm,
-                             crypto:PrivateKey privateKey) returns byte[]|Error {
+    public isolated function signData(string dataString, SignatureAlgorithm signatureAlgorithm,
+                                      crypto:PrivateKey privateKey) returns byte[]|Error {
         byte[] data = dataString.toBytes();
         do {
             match signatureAlgorithm {
@@ -47,7 +47,7 @@ class Signature {
         }
     }
 
-    public function verifySignature(byte[] data, byte[] signature, crypto:PublicKey publicKey,
+    public isolated function verifySignature(byte[] data, byte[] signature, crypto:PublicKey publicKey,
                                     SignatureAlgorithm signatureAlgorithm) returns boolean|Error {
         do {
             match signatureAlgorithm {
@@ -69,15 +69,15 @@ class Signature {
         }
     }
 
-    public function setSignatureAlgorithm(string signatureAlgorithm) = @java:Method {
+    public isolated function setSignatureAlgorithm(string signatureAlgorithm) = @java:Method {
         'class: "org.wssec.Signature"
     } external;
 
-    public function setSignatureValue(byte[] signatureValue) = @java:Method {
+    public isolated function setSignatureValue(byte[] signatureValue) = @java:Method {
         'class: "org.wssec.Signature"
     } external;
 }
 
-function newSignature() returns handle = @java:Constructor {
+isolated function newSignature() returns handle = @java:Constructor {
     'class: "org.wssec.Signature"
 } external;

@@ -15,11 +15,11 @@
 // under the License.
 import ballerina/jballerina.java;
 
-class Document {
+isolated class Document {
     
     private handle nativeDocumentBuilder;
 
-    public function init(xml xmlPayload) returns Error? {
+    public isolated function init(xml xmlPayload) returns Error? {
         handle|error documentBuilder = newDocument(xmlPayload);
         if documentBuilder is error {
             return error Error(documentBuilder.message());
@@ -28,15 +28,15 @@ class Document {
         }
     }
 
-    public function getEncryptedData() returns byte[] = @java:Method {
+    public isolated function getEncryptedData() returns byte[] = @java:Method {
         'class: "org.wssec.DocumentBuilder"
     } external;
 
-    public function getSignatureData() returns byte[] = @java:Method {
+    public isolated function getSignatureData() returns byte[] = @java:Method {
         'class: "org.wssec.DocumentBuilder"
     } external;
 }
 
-function newDocument(xml xmlPayload) returns handle|error = @java:Constructor {
+isolated function newDocument(xml xmlPayload) returns handle|error = @java:Constructor {
     'class: "org.wssec.DocumentBuilder"
 } external;

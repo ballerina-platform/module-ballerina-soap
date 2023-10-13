@@ -19,8 +19,9 @@ import ballerina/crypto;
 import ballerina/http;
 import ballerina/mime;
 import ballerina/regex;
+import ballerina/jballerina.java;
 
-public function validateTransportBindingPolicy(ClientConfig config) returns Error? {
+public isolated function validateTransportBindingPolicy(ClientConfig config) returns Error? {
     if config.httpConfig.secureSocket is () {
         wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] securityPolicy = config.inboundSecurity;
         if securityPolicy is wssec:TransportBindingConfig {
@@ -35,7 +36,7 @@ public function validateTransportBindingPolicy(ClientConfig config) returns Erro
     }
 }
 
-public function retrieveHttpClientConfig(ClientConfig config) returns http:ClientConfiguration {
+public isolated function retrieveHttpClientConfig(ClientConfig config) returns http:ClientConfiguration {
     return {
         httpVersion: config.httpConfig.httpVersion,
         http1Settings: config.httpConfig.http1Settings,
@@ -50,7 +51,11 @@ public function retrieveHttpClientConfig(ClientConfig config) returns http:Clien
     };
 }
 
-public function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity,
+public isolated function getReadOnlyRecords(ClientConfig original) returns readonly & ClientConfig = @java:Method {
+        'class: "org.wssec.WsSecurity"
+} external;
+
+public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity,
                                       xml envelope) returns xml|wssec:Error {
     wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] securityPolicy = inboundSecurity;
     xml securedEnvelope;
@@ -74,7 +79,7 @@ public function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundS
     return securedEnvelope;
 }
 
-public function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope)
+public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope)
     returns xml|Error {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
     xml soapEnvelope = envelope;
@@ -144,8 +149,8 @@ public function sendOnly(xml|mime:Entity[] body, http:Client httpClient, string?
     }
 }
 
-function createSoap11HttpRequest(xml|mime:Entity[] body,
-                                 string soapAction, map<string|string[]> headers = {}) returns http:Request {
+isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAction,
+                                          map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
     if body is xml {
         req.setXmlPayload(body);
@@ -160,7 +165,7 @@ function createSoap11HttpRequest(xml|mime:Entity[] body,
     return req;
 }
 
-function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAction,
+isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAction,
                                  map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
     if body is xml {
@@ -185,13 +190,13 @@ function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAction,
     return req;
 }
 
-function createSoap12Response(http:Response response) returns xml|error {
+isolated function createSoap12Response(http:Response response) returns xml|error {
     xml payload = check response.getXmlPayload();
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
     return payload/<soap12:Body>;
 }
 
-function createSoap11Response(http:Response response) returns xml|error {
+isolated function createSoap11Response(http:Response response) returns xml|error {
     xml payload = check response.getXmlPayload();
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     return payload/<soap11:Body>;
