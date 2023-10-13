@@ -1,5 +1,4 @@
-import ballerina/crypto;
-// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com) All Rights Reserved.
 //
 // WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -14,8 +13,9 @@ import ballerina/crypto;
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+import ballerina/crypto;
 import ballerina/test;
-import ballerina/regex;
+import ballerina/lang.regexp;
 
 @test:Config {
     groups: ["timestamp_token"]
@@ -522,11 +522,11 @@ function testSymmetricBindingWithOutboundConfig() returns error? {
     };
 
     crypto:PrivateKey|crypto:PublicKey? privateKey = outboundConfig.decryptionKey;
-    if privateKey !is () {
+    if privateKey is crypto:PrivateKey|crypto:PublicKey {
         byte[] encData = check getEncryptedData(securedEnvelope);
         byte[] decryptDataResult = check decryptData(encData, RSA_ECB, privateKey);
         string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
-        envelopeString = regex:replace(envelopeString, string`<soap:Body .*>.*</soap:Body>`, decryptedBody);
+        envelopeString = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, envelopeString, decryptedBody);
         securedEnvelope = check xml:fromString(envelopeString);
     }
     byte[] signedData = check getSignatureData(securedEnvelope);
@@ -893,11 +893,11 @@ function testAsymmetricBindingWithOutboundConfig() returns error? {
     xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
     crypto:PrivateKey|crypto:PublicKey? privateKey = outboundConfig.decryptionKey;
-    if privateKey !is () {
+    if privateKey is crypto:PrivateKey|crypto:PublicKey {
         byte[] encData = check getEncryptedData(securedEnvelope);
         byte[] decryptDataResult = check decryptData(encData, RSA_ECB, privateKey);
         string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
-        envelopeString = regex:replace(envelopeString, string`<soap:Body .*>.*</soap:Body>`, decryptedBody);
+        envelopeString = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, envelopeString, decryptedBody);
         securedEnvelope = check xml:fromString(envelopeString);
     }
     byte[] signedData = check getSignatureData(securedEnvelope);

@@ -1,4 +1,4 @@
-// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com) All Rights Reserved.
 //
 // WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -20,11 +20,11 @@ import ballerina/test;
 import ballerina/crypto;
 import soap.wssec;
 
-const string KEY_ALIAS = "wss40";
-const string KEY_PASSWORD = "security";
-const string KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
-const string X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
-const string X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
+const KEY_ALIAS = "wss40";
+const KEY_PASSWORD = "security";
+const KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
+const X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
+const X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
 const wssec:TransportBindingConfig TRANSPORT_BINDING = "TransportBinding";
 const wssec:NoPolicy NO_POLICY = "NoPolicy";
 
@@ -45,7 +45,7 @@ function testSendOnly12() returns error? {
 
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
+    check soapClient->sendOnly(body, "http://tempuri.org/Add");
 }
 
 @test:Config {
@@ -134,7 +134,7 @@ function testSendOnly12WithoutSoapAction() returns error? {
 
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    _ = check soapClient->sendOnly(body);
+    check soapClient->sendOnly(body);
 }
 
 @test:Config {

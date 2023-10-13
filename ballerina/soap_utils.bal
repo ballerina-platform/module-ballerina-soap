@@ -1,4 +1,4 @@
-// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com) All Rights Reserved.
 //
 // WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -18,7 +18,7 @@ import soap.wssec;
 import ballerina/crypto;
 import ballerina/http;
 import ballerina/mime;
-import ballerina/regex;
+import ballerina/lang.regexp;
 import ballerina/jballerina.java;
 
 public isolated function validateTransportBindingPolicy(ClientConfig config) returns Error? {
@@ -85,21 +85,21 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
     xml soapEnvelope = envelope;
     do {
         wssec:EncryptionAlgorithm? encryptionAlgorithm = outboundSecurity.decryptionAlgorithm;
-        if encryptionAlgorithm !is () {
+        if encryptionAlgorithm is wssec:EncryptionAlgorithm {
             crypto:PrivateKey|crypto:PublicKey? clientPrivateKey = outboundSecurity.decryptionKey;
-            if clientPrivateKey !is () {
+            if clientPrivateKey is crypto:PrivateKey|crypto:PublicKey {
                 byte[] encData = check wssec:getEncryptedData(soapEnvelope);
                 byte[] decryptDataResult = check wssec:decryptData(encData, encryptionAlgorithm, clientPrivateKey);
                 string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
-                string decryptedEnv = regex:replace(soapEnvelope.toString(), string `<soap:Body .*>.*</soap:Body>`,
-                                                    decryptedBody);
+                string decryptedEnv = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, soapEnvelope.toString(),
+                                                     decryptedBody);
                 soapEnvelope = check xml:fromString(decryptedEnv);
             }
         }
         wssec:SignatureAlgorithm? signatureAlgorithm = outboundSecurity.signatureAlgorithm;
-        if signatureAlgorithm !is () {
+        if signatureAlgorithm is wssec:SignatureAlgorithm {
             crypto:PublicKey? serverPublicKey = outboundSecurity.verificationKey;
-            if serverPublicKey !is () {
+            if serverPublicKey is crypto:PublicKey {
                 byte[] signatureData = check wssec:getSignatureData(soapEnvelope);
                 boolean verify = check wssec:verifyData((soapEnvelope/<soap:Body>/*).toString().toBytes(),
                                                         signatureData, serverPublicKey, signatureAlgorithm);

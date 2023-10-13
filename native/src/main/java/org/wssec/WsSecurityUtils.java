@@ -1,4 +1,4 @@
-// Copyright (c) 2023, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -31,7 +31,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -118,8 +117,7 @@ public class WsSecurityUtils {
 
     public static void setUTChildElements(WSSecUsernameToken usernameToken, String passwordType,
                                           String username, String password) {
-        if (Objects.equals(passwordType, DIGEST)
-                || Objects.equals(passwordType, DERIVED_KEY_DIGEST)) {
+        if (DIGEST.equals(passwordType) || DERIVED_KEY_DIGEST.equals(passwordType)) {
             usernameToken.setPasswordType(PASSWORD_DIGEST);
             usernameToken.setUserInfo(username, password);
             usernameToken.addCreated();

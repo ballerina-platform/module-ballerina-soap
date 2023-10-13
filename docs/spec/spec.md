@@ -85,7 +85,7 @@ public function main () returns error? {
          <quer:LicenseKey>0</quer:LicenseKey>
       </quer:CheckPhoneNumber>`;
 
-    _ = check soapClient->sendOnly(body);
+    check soapClient->sendOnly(body);
 }
 ```
 
