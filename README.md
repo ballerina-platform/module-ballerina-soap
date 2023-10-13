@@ -185,9 +185,9 @@ import ballerina/soap;
 import ballerina/soap:soap12;
 
 public function main() returns error? {
-    crypto:PrivateKey clientPrivateKey = ...//
-    crypto:PublicKey clientPublicKey = ...//
-    ​​crypto:PublicKey serverPublicKey = ...//
+    configurable crypto:PrivateKey clientPrivateKey = ?;
+    configurable crypto:PublicKey clientPublicKey = ?;
+    configurable ​crypto:PublicKey serverPublicKey = ?;
 
     soap12:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
     {
