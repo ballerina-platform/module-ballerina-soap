@@ -19,14 +19,100 @@ import ballerina/crypto;
 import ballerina/mime;
 import ballerina/test;
 import soap.wssec;
+import ballerina/io;
 
 const string KEY_ALIAS = "wss40";
 const string KEY_PASSWORD = "security";
+const IMAGE_PATH = "../ballerina/icon.png";
+const FILE_PATH =  "../ballerina/Module.md";
 const string KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
 const string X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
 const string X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
 const wssec:TransportBindingConfig TRANSPORT_BINDING = "TransportBinding";
 const wssec:NoPolicy NO_POLICY = "NoPolicy";
+
+@test:Config {
+    groups: ["soap11", "send_receive", "mime", "aa"]
+}
+function testSendReceiveWithMime() returns error? {
+    Client soapClient = check new ("http://localhost:9090");
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    mime:Entity[] mtomMessage = [];
+    mime:Entity envelope = new;
+    check envelope.setContentType("application/xop+xml");
+    envelope.setContentId("<soap@envelope>");
+    envelope.setBody(body);
+    mtomMessage.push(envelope);
+
+    mime:Entity bytesPart = new;
+    string readContent = check io:fileReadString(FILE_PATH);
+    bytesPart.setFileAsEntityBody(FILE_PATH);
+    string|byte[]|io:ReadableByteChannel|mime:EncodeError bytes = mime:base64Encode(readContent.toBytes());
+    if bytes !is byte[] {
+        return error("error");
+    }
+    bytesPart.setBody(bytes);
+    check bytesPart.setContentType("image/jpeg");
+    bytesPart.setContentId("<image1>");
+    mtomMessage.push(bytesPart);
+
+    xml|mime:Entity[] response = check soapClient->sendReceive(mtomMessage, "http://tempuri.org/Add", path = "/albums");
+    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>`;
+    test:assertEquals(response, expected);
+}
+
+// @test:Config {
+//     groups: ["soap11", "send_only", "mime"]
+// }
+// function testSendOnlyWithMime() returns error? {
+//     xml body = xml `<soap:Envelope
+//                         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+//                         soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+//                         <soap:Body>
+//                           <quer:Add xmlns:quer="http://tempuri.org/">
+//                             <quer:intA>2</quer:intA>
+//                             <quer:intB>3</quer:intB>
+//                           </quer:Add>
+//                         </soap:Body>
+//                     </soap:Envelope>`;
+
+//     mime:Entity[] mtomMessage = [];
+//     mime:Entity envelope = new;
+//     check envelope.setContentType("application/xop+xml");
+//     envelope.setContentId("<soap@envelope>");
+//     envelope.setBody(body);
+//     mtomMessage.push(envelope);
+
+//     mime:Entity bytesPart = new;
+//     string readContent = check io:fileReadString(FILE_PATH);
+//     bytesPart.setFileAsEntityBody(FILE_PATH);
+//     string|byte[]|io:ReadableByteChannel|mime:EncodeError bytes = mime:base64Encode(readContent.toBytes());
+//     if bytes !is byte[] {
+//         return error("error");
+//     }
+//     bytesPart.setBody(bytes);
+//     check bytesPart.setContentType("image/jpeg");
+//     bytesPart.setContentId("<image1>");
+//     mtomMessage.push(bytesPart);
+
+//     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+//     check soapClient->sendOnly(mtomMessage, "http://tempuri.org/Add");
+// }
 
 @test:Config {
     groups: ["soap11", "send_only"]
@@ -44,7 +130,7 @@ function testSendOnly() returns error? {
                     </soap:Envelope>`;
 
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-    _ = check soapClient->sendOnly(body, "http://tempuri.org/Add");
+    check soapClient->sendOnly(body, "http://tempuri.org/Add");
 }
 
 @test:Config {
@@ -141,7 +227,7 @@ function testSendReceiveError() returns error? {
 }
 
 @test:Config {
-    groups: ["soap11", "send_receive"]
+    groups: ["soap11", "send_receive", "kl"]
 }
 function testSendReceiveWithTimestampTokenSecurity() returns error? {
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
@@ -222,6 +308,14 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
     };
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
 
+    // wssec:AsymmetricBindingConfig asymmetricConfig = {
+    //     signatureAlgorithm: soap:RSA_SHA256,
+    //     encryptionAlgorithm: soap:RSA_ECB,
+    //     signatureKey: clientPrivateKey,
+    //     encryptionKey: serverPublicKey
+    // };
+    // wssec:AsymmetricBindingConfig & readonly asymmetricConfig2 = <wssec:AsymmetricBindingConfig & readonly>asymmetricConfig.clone();
+    // readonly & wssec:AsymmetricBindingConfig immutableRecord = asymmetricConfig;
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
         {
             inboundSecurity: {
@@ -232,6 +326,7 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
             }
         }
     );
+    
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
                         soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">

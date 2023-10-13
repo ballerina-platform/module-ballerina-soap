@@ -50,9 +50,10 @@ public isolated client class Client {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
+    # + path - The resource path
     # + return - If successful, returns the response. Else, returns an error
-    remote function sendReceive(xml|mime:Entity[] body, string action,
-                                map<string|string[]> headers = {}) returns xml|mime:Entity[]|Error {
+    remote isolated function sendReceive(xml|mime:Entity[] body, string action,
+                                         map<string|string[]> headers = {}, string path = "") returns xml|mime:Entity[]|Error {
         do {
             xml securedBody;
             xml response;
@@ -63,10 +64,9 @@ public isolated client class Client {
             }
             if body is mime:Entity[] {
                 body[0].setXml(securedBody);
-            if body is xml {
-                securedBody = check soap:applySecurityPolicies(self.inboundSecurity, body);
+                response = check soap:sendReceive(body, self.soapClient, action, headers, path, false);
             } else {
-                securedBody = check soap:applySecurityPolicies(self.inboundSecurity, check body[0].getXml());
+                response = check soap:sendReceive(securedBody, self.soapClient, action, headers, path, false);
             }
             lock {
                 wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity.clone();
@@ -93,9 +93,10 @@ public isolated client class Client {
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
+    # + path - The resource path
     # + return - If successful, returns `nil`. Else, returns an error
-    remote function sendOnly(xml|mime:Entity[] body, string action,
-                             map<string|string[]> headers = {}) returns Error? {
+    remote isolated function sendOnly(xml|mime:Entity[] body, string action,
+                                      map<string|string[]> headers = {}, string path = "") returns Error? {
         do {
             xml securedBody;
             xml mimeEntity = body is xml ? body : check body[0].getXml();
@@ -103,7 +104,7 @@ public isolated client class Client {
                 xml envelope = body is xml ? body.clone() : mimeEntity.clone();
                 securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone());
             }
-            return check soap:sendOnly(securedBody, self.soapClient, action, headers, false);
+            return check soap:sendOnly(securedBody, self.soapClient, action, headers, path, false);
         } on fail var e {
             return error Error(e.message());
         }

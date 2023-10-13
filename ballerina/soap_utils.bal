@@ -116,8 +116,8 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
 
 string path = "";
 
-public function sendReceive(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-                            map<string|string[]> headers = {}, boolean soap12 = true) returns xml|Error {
+public isolated function sendReceive(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
+                                     map<string|string[]> headers = {}, string path = "", boolean soap12 = true) returns xml|Error {
     http:Request req;
     if soap12 {
         req = createSoap12HttpRequest(body, soapAction, headers);
@@ -135,8 +135,8 @@ public function sendReceive(xml|mime:Entity[] body, http:Client httpClient, stri
     }
 }
 
-public function sendOnly(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-                         map<string|string[]> headers = {}, boolean soap12 = true) returns Error? {
+public isolated function sendOnly(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
+                         map<string|string[]> headers = {}, string path = "", boolean soap12 = true) returns Error? {
     http:Request req;
     if soap12 {
         req = createSoap12HttpRequest(body, soapAction, headers);
@@ -154,10 +154,11 @@ isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAct
     http:Request req = new;
     if body is xml {
         req.setXmlPayload(body);
+        req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
     } else {
         req.setBodyParts(body);
+        req.setHeader(mime:CONTENT_TYPE, mime:MULTIPART_MIXED);
     }
-    req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
     req.addHeader(SOAP_ACTION, soapAction);
     foreach string key in headers.keys() {
         req.addHeader(key, headers[key].toBalString());
