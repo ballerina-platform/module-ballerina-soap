@@ -71,7 +71,7 @@ public isolated client class Client {
             lock {
                 wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity.clone();
                 do {
-                    if outboundSecurity !is () {
+                    if outboundSecurity is wssec:OutboundSecurityConfig {
                         return check soap:applyOutboundConfig(outboundSecurity.clone(), response.clone());
                     }
                 } on fail var e {
