@@ -17,9 +17,7 @@
 package org.wssec;
 
 import io.ballerina.runtime.api.creators.ValueCreator;
-import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
-import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BXml;
 import org.w3c.dom.Document;
@@ -35,10 +33,11 @@ public class DocumentBuilder {
 
     private final Document document;
 
-    public DocumentBuilder(BXml xmlPayload) throws Exception {
+    public DocumentBuilder(BObject documentBuilder, BXml xmlPayload) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         this.document = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xmlPayload.toString())));
+        documentBuilder.addNativeData(NATIVE_DOCUMENT, this.document);
     }
 
     protected DocumentBuilder(Document document) {
@@ -46,15 +45,13 @@ public class DocumentBuilder {
     }
 
     public static BArray getSignatureData(BObject document) {
-        BHandle handle = (BHandle) document.get(StringUtils.fromString(NATIVE_DOCUMENT));
-        DocumentBuilder docBuilder = (DocumentBuilder) handle.getValue();
-        return ValueCreator.createArrayValue(WsSecurityUtils.getSignatureValue(docBuilder.getNativeDocument()));
+        Document nativeDocument = (Document) document.getNativeData().get(NATIVE_DOCUMENT);
+        return ValueCreator.createArrayValue(WsSecurityUtils.getSignatureValue(nativeDocument));
     }
 
     public static BArray getEncryptedData(BObject document) {
-        BHandle handle = (BHandle) document.get(StringUtils.fromString(NATIVE_DOCUMENT));
-        DocumentBuilder docBuilder = (DocumentBuilder) handle.getValue();
-        return ValueCreator.createArrayValue(WsSecurityUtils.getEncryptedData(docBuilder.getNativeDocument()));
+        Document nativeDocument = (Document) document.getNativeData().get(NATIVE_DOCUMENT);
+        return ValueCreator.createArrayValue(WsSecurityUtils.getEncryptedData(nativeDocument));
     }
 
     protected Document getNativeDocument() {

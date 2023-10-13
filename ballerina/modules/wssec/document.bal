@@ -16,15 +16,11 @@
 import ballerina/jballerina.java;
 
 isolated class Document {
-    
-    private handle nativeDocumentBuilder;
 
     public isolated function init(xml xmlPayload) returns Error? {
-        handle|error documentBuilder = newDocument(xmlPayload);
+        handle|error documentBuilder = newDocument(self, xmlPayload);
         if documentBuilder is error {
             return error Error(documentBuilder.message());
-        } else {
-            self.nativeDocumentBuilder = documentBuilder;
         }
     }
 
@@ -37,6 +33,6 @@ isolated class Document {
     } external;
 }
 
-isolated function newDocument(xml xmlPayload) returns handle|error = @java:Constructor {
+isolated function newDocument(Document doc, xml xmlPayload) returns handle|error = @java:Constructor {
     'class: "org.wssec.DocumentBuilder"
 } external;

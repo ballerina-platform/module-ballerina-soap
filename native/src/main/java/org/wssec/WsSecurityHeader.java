@@ -34,10 +34,9 @@ public class WsSecurityHeader {
     private final Document document;
 
     public WsSecurityHeader(BObject documentBuilder) {
-        BHandle handle = (BHandle) documentBuilder.get(StringUtils.fromString(NATIVE_DOCUMENT));
-        DocumentBuilder docBuilder = (DocumentBuilder) handle.getValue();
-        this.wsSecHeader = new WSSecHeader(docBuilder.getNativeDocument());
-        this.document = docBuilder.getNativeDocument();
+        Document document = (Document) documentBuilder.getNativeData().get(NATIVE_DOCUMENT);
+        this.wsSecHeader = new WSSecHeader(document);
+        this.document = document;
     }
 
     protected Document getDocument() {
