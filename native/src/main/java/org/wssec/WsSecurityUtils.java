@@ -62,8 +62,7 @@ import static org.wssec.Constants.XML_ENC_NS;
 public class WsSecurityUtils {
 
     public static void buildSignature(RequestData reqData, WSSecSignature sign) throws Exception {
-        List<WSEncryptionPart> parts;
-        parts = new ArrayList<>(1);
+        List<WSEncryptionPart> parts = new ArrayList<>(1);
         Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
         parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
         List<Reference> referenceList = sign.addReferencesToSign(parts);
