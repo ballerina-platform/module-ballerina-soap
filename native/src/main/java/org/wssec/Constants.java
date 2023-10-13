@@ -18,6 +18,9 @@ package org.wssec;
 
 public class Constants {
 
+    private Constants() {
+    }
+
     public static final int ITERATION = 1000;
     public static final String DIGEST = "DIGEST";
     public static final String DERIVED_KEY_TEXT = "DERIVED_KEY_TEXT";
