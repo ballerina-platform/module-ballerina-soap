@@ -32,9 +32,12 @@ public isolated function decryptData(byte[] cipherText, EncryptionAlgorithm encr
 }
 
 public isolated function verifyData(byte[] data, byte[] signature, crypto:PublicKey publicKey,
-                           SignatureAlgorithm signatureAlgorithm) returns boolean|Error {
+                                    SignatureAlgorithm signatureAlgorithm) returns Error? {
     Signature sign = check new ();
-    return sign.verifySignature(data, signature, publicKey, signatureAlgorithm);
+    boolean verifySignature = check sign.verifySignature(data, signature, publicKey, signatureAlgorithm);
+    if !verifySignature {
+        return error Error("Signature verification of the SOAP envelope has been failed");
+    }
 }
 
 isolated function addSignature(Signature sign, string signatureAlgorithm, byte[] signature) returns Signature|Error {

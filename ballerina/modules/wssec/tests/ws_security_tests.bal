@@ -566,8 +566,8 @@ function testAsymmetricBindingWithSignatureRsaSha256() returns error? {
     xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
     byte[] signedData = check getSignatureData(securedEnvelope);
-    boolean validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA256);
-    test:assertTrue(validity);
+    Error? validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA256);
+    test:assertTrue(validity is ());
 
     assertSignatureWithoutX509(envelopeString);
 }
@@ -936,8 +936,8 @@ function testAsymmetricBindingWithSignatureWithRsaSha1() returns error? {
     xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
     byte[] signedData = check getSignatureData(securedEnvelope);
-    boolean validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA1);
-    test:assertTrue(validity);
+    Error? validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA1);
+    test:assertTrue(validity is ());
 
     assertSignatureWithoutX509(envelopeString);
 }
@@ -973,8 +973,8 @@ function testAsymmetricBindingWithSignatureWithRsaSha384() returns error? {
     xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
     byte[] signedData = check getSignatureData(securedEnvelope);
-    boolean validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA384);
-    test:assertTrue(validity);
+    Error? validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA384);
+    test:assertTrue(validity is ());
 
     assertSignatureWithoutX509(envelopeString);
 }
@@ -1010,8 +1010,8 @@ function testAsymmetricBindingWithSignatureWithRsaSha512() returns error? {
     xml securedEnvelope = check applyAsymmetricBinding(envelope, asymmetricBinding);
     string envelopeString = securedEnvelope.toString();
     byte[] signedData = check getSignatureData(securedEnvelope);
-    boolean validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA512);
-    test:assertTrue(validity);
+    Error? validity = check verifyData((envelope/<soap:Body>/*).toString().toBytes(), signedData, clientPublicKey, RSA_SHA512);
+    test:assertTrue(validity is ());
 
     assertSignatureWithoutX509(envelopeString);
 }
