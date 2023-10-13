@@ -34,7 +34,7 @@ public isolated client class Client {
         do {
             check soap:validateTransportBindingPolicy(config);
             self.soapClient = check new (url, config.httpConfig);
-            readonly & soap:ClientConfig readonlyConfig = soap:getReadOnlyRecords(config);
+            readonly & soap:ClientConfig readonlyConfig = soap:getReadOnlyClientConfig(config);
             self.inboundSecurity = readonlyConfig.inboundSecurity;
             self.outboundSecurity = readonlyConfig.outboundSecurity;
         } on fail var err {

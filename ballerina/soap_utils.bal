@@ -36,32 +36,29 @@ public isolated function validateTransportBindingPolicy(ClientConfig config) ret
     }
 }
 
-public isolated function getReadOnlyRecords(ClientConfig original) returns readonly & ClientConfig = @java:Method {
+public isolated function getReadOnlyClientConfig(ClientConfig original) returns readonly & ClientConfig = @java:Method {
         'class: "org.wssec.WsSecurity"
 } external;
 
-public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity,
-                                      xml envelope) returns xml|wssec:Error {
-    wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] securityPolicy = inboundSecurity;
-    xml securedEnvelope;
-    if securityPolicy is wssec:InboundSecurityConfig {
-        if securityPolicy is wssec:TimestampTokenConfig {
-            securedEnvelope = check wssec:applyTimestampToken(envelope, securityPolicy);
-        } else if securityPolicy is wssec:UsernameTokenConfig {
-            securedEnvelope = check wssec:applyUsernameToken(envelope, securityPolicy);
-        } else if securityPolicy is wssec:SymmetricBindingConfig {
-            securedEnvelope = check wssec:applySymmetricBinding(envelope, securityPolicy);
-        } else if securityPolicy is wssec:AsymmetricBindingConfig {
-            securedEnvelope = check wssec:applyAsymmetricBinding(envelope, securityPolicy);
-        } else {
-            securedEnvelope = envelope;
-        }
-    } else {
-        foreach wssec:InboundSecurityConfig policy in securityPolicy {
+public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] security,
+                                               xml envelope) returns xml|wssec:Error {
+    if security is wssec:TimestampTokenConfig {
+        return wssec:applyTimestampToken(envelope, security);
+    } else if security is wssec:UsernameTokenConfig {
+        return wssec:applyUsernameToken(envelope, security);
+    } else if security is wssec:SymmetricBindingConfig {
+        return wssec:applySymmetricBinding(envelope, security);
+    } else if security is wssec:AsymmetricBindingConfig {
+        return wssec:applyAsymmetricBinding(envelope, security);
+    } else if security is wssec:InboundSecurityConfig {
+        return envelope;
+    } else if security is wssec:InboundSecurityConfig[] {
+        xml securedEnvelope;
+        foreach wssec:InboundSecurityConfig policy in security {
             securedEnvelope = check applySecurityPolicies(policy, envelope);
         }
+        return securedEnvelope;
     }
-    return securedEnvelope;
 }
 
 public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope)
@@ -92,20 +89,15 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
         }
         return soapEnvelope;
     } on fail var e {
-        return error Error("Outbound security configurations do not match with the SOAP response. ", e.cause());
+        return error Error("Outbound security configurations do not match with the SOAP response.", e.cause());
     }
 }
 
-string path = "";
-
 public isolated function sendReceive(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-                                     map<string|string[]> headers = {}, string path = "", boolean soap12 = true) returns xml|Error {
-    http:Request req;
-    if soap12 {
-        req = createSoap12HttpRequest(body, soapAction, headers);
-    } else {
-        req = createSoap11HttpRequest(body, <string>soapAction, headers);
-    }
+                                     map<string|string[]> headers = {}, string path = "", boolean soap12 = true)
+    returns xml|Error {
+    http:Request req = soap12 ? createSoap12HttpRequest(body, soapAction, headers)
+        : createSoap11HttpRequest(body, <string>soapAction, headers);
     do {
         http:Response response = check httpClient->post(path, req);
         if soap12 {
@@ -119,12 +111,8 @@ public isolated function sendReceive(xml|mime:Entity[] body, http:Client httpCli
 
 public isolated function sendOnly(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
                          map<string|string[]> headers = {}, string path = "", boolean soap12 = true) returns Error? {
-    http:Request req;
-    if soap12 {
-        req = createSoap12HttpRequest(body, soapAction, headers);
-    } else {
-        req = createSoap11HttpRequest(body, <string>soapAction, headers);
-    }
+    http:Request req = soap12 ? createSoap12HttpRequest(body, soapAction, headers)
+        : createSoap11HttpRequest(body, <string>soapAction, headers);
     http:Response|http:ClientError response = httpClient->post(path, req);
     if response is http:ClientError {
         return error Error(response.message());
@@ -157,11 +145,9 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
         req.setBodyParts(body);
     }
     if soapAction is string {
-        map<string> stringMap = {};
-        stringMap[ACTION] = string `${soapAction}`;
         var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
         if mediaType is mime:MediaType {
-            mediaType.parameters = stringMap;
+            mediaType.parameters = {[ACTION]: soapAction};
             req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
         }
     } else {

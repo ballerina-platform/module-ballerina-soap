@@ -167,7 +167,7 @@ public class WsSecurity {
         return sign;
     }
 
-    public static BMap getReadOnlyRecords(BMap securityConfig) {
+    public static BMap getReadOnlyClientConfig(BMap securityConfig) {
         securityConfig.freezeDirect();
         return securityConfig;
     }
