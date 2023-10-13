@@ -76,44 +76,6 @@ function testSendReceiveWithMime() returns error? {
     test:assertEquals(response, expected);
 }
 
-// @test:Config {
-//     groups: ["soap11", "send_only", "mime"]
-// }
-// function testSendOnlyWithMime() returns error? {
-//     xml body = xml `<soap:Envelope
-//                         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-//                         soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-//                         <soap:Body>
-//                           <quer:Add xmlns:quer="http://tempuri.org/">
-//                             <quer:intA>2</quer:intA>
-//                             <quer:intB>3</quer:intB>
-//                           </quer:Add>
-//                         </soap:Body>
-//                     </soap:Envelope>`;
-
-//     mime:Entity[] mtomMessage = [];
-//     mime:Entity envelope = new;
-//     check envelope.setContentType("application/xop+xml");
-//     envelope.setContentId("<soap@envelope>");
-//     envelope.setBody(body);
-//     mtomMessage.push(envelope);
-
-//     mime:Entity bytesPart = new;
-//     string readContent = check io:fileReadString(FILE_PATH);
-//     bytesPart.setFileAsEntityBody(FILE_PATH);
-//     string|byte[]|io:ReadableByteChannel|mime:EncodeError bytes = mime:base64Encode(readContent.toBytes());
-//     if bytes !is byte[] {
-//         return error("error");
-//     }
-//     bytesPart.setBody(bytes);
-//     check bytesPart.setContentType("image/jpeg");
-//     bytesPart.setContentId("<image1>");
-//     mtomMessage.push(bytesPart);
-
-//     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
-//     check soapClient->sendOnly(mtomMessage, "http://tempuri.org/Add");
-// }
-
 @test:Config {
     groups: ["soap11", "send_only"]
 }
