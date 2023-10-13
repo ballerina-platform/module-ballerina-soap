@@ -112,7 +112,7 @@ public class WsSecurity {
         handle = (BHandle) balEncryption.get(StringUtils.fromString(NATIVE_ENCRYPTION));
         Encryption encryption = (Encryption) handle.getValue();
         try {
-            byte[] key = UsernameTokenUtil.generateDerivedKey("password",
+            byte[] key = UsernameTokenUtil.generateDerivedKey(PASSWORD,
                     UsernameTokenUtil.generateSalt(true), ITERATION);
             Document xmlDocument = encryptEnvelope(wsSecurityHeader, key);
             WsSecurityUtils.setEncryptedData(xmlDocument, encryption.getEncryptedData(),
