@@ -36,21 +36,6 @@ public isolated function validateTransportBindingPolicy(ClientConfig config) ret
     }
 }
 
-public isolated function retrieveHttpClientConfig(ClientConfig config) returns http:ClientConfiguration {
-    return {
-        httpVersion: config.httpConfig.httpVersion,
-        http1Settings: config.httpConfig.http1Settings,
-        http2Settings: config.httpConfig.http2Settings,
-        timeout: config.httpConfig.timeout,
-        poolConfig: config.httpConfig?.poolConfig,
-        auth: config.httpConfig?.auth,
-        retryConfig: config.httpConfig?.retryConfig,
-        responseLimits: config.httpConfig.responseLimits,
-        secureSocket: config.httpConfig?.secureSocket,
-        circuitBreaker: config.httpConfig?.circuitBreaker
-    };
-}
-
 public isolated function getReadOnlyRecords(ClientConfig original) returns readonly & ClientConfig = @java:Method {
         'class: "org.wssec.WsSecurity"
 } external;
@@ -101,11 +86,8 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
             crypto:PublicKey? serverPublicKey = outboundSecurity.verificationKey;
             if serverPublicKey is crypto:PublicKey {
                 byte[] signatureData = check wssec:getSignatureData(soapEnvelope);
-                boolean verify = check wssec:verifyData((soapEnvelope/<soap:Body>/*).toString().toBytes(),
-                                                        signatureData, serverPublicKey, signatureAlgorithm);
-                if !verify {
-                    return error Error("Signature verification of the SOAP envelope has been failed");
-                }
+                check wssec:verifyData((soapEnvelope/<soap:Body>/*).toString().toBytes(),
+                                       signatureData, serverPublicKey, signatureAlgorithm);
             }
         }
         return soapEnvelope;

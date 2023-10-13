@@ -33,7 +33,7 @@ public isolated client class Client {
     public isolated function init(string url, *soap:ClientConfig config) returns Error? {
         do {
             check soap:validateTransportBindingPolicy(config);
-            self.soapClient = check new (url, soap:retrieveHttpClientConfig(config));
+            self.soapClient = check new (url, config.httpConfig);
             readonly & soap:ClientConfig readonlyConfig = soap:getReadOnlyRecords(config);
             self.inboundSecurity = readonlyConfig.inboundSecurity;
             self.outboundSecurity = readonlyConfig.outboundSecurity;
