@@ -158,7 +158,7 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
     }
     if soapAction is string {
         map<string> stringMap = {};
-        stringMap[ACTION] = "\"" + soapAction + "\"";
+        stringMap[ACTION] = string `${soapAction}`;
         var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
         if mediaType is mime:MediaType {
             mediaType.parameters = stringMap;
