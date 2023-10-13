@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 import ballerina/test;
+import ballerina/crypto;
 
 const USERNAME = "username";
 const PASSWORD = "password";
@@ -28,6 +29,29 @@ const X509_PUBLIC_CERT_PATH = "modules/wssec/tests/resources/x509_certificate.cr
 const X509_PUBLIC_CERT_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.crt";
 const X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
 const X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
+
+const crypto:KeyStore clientKeyStore = {
+    path: X509_KEY_STORE_PATH_2,
+    password: KEY_PASSWORD
+};
+crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS,
+                                                                                  KEY_PASSWORD);
+crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
+
+const crypto:KeyStore serverKeyStore = {
+    path: X509_KEY_STORE_PATH,
+    password: KEY_PASSWORD
+};
+crypto:PrivateKey serverPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(serverKeyStore, KEY_ALIAS,
+                                                                                  KEY_PASSWORD);
+crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
+
+crypto:KeyStore keyStore = {
+    path: KEY_STORE_PATH,
+    password: KEY_PASSWORD
+};
+crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
+crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
 function assertTimestampToken(string envelopeString) {
     string:RegExp ts_token = re `<wsu:Timestamp wsu:Id=".*">`;
