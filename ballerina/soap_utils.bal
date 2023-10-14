@@ -52,7 +52,7 @@ public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec
         return wssec:applyAsymmetricBinding(envelope, security);
     } else if security is wssec:InboundSecurityConfig {
         return envelope;
-    } else if security is wssec:InboundSecurityConfig[] {
+    } else {
         xml securedEnvelope;
         foreach wssec:InboundSecurityConfig policy in security {
             securedEnvelope = check applySecurityPolicies(policy, envelope);
@@ -162,11 +162,11 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
 isolated function createSoap12Response(http:Response response) returns xml|error {
     xml payload = check response.getXmlPayload();
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
-    return payload/<soap12:Body>;
+    return payload;
 }
 
 isolated function createSoap11Response(http:Response response) returns xml|error {
     xml payload = check response.getXmlPayload();
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
-    return payload/<soap11:Body>;
+    return payload;
 }
