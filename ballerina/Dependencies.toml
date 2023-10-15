@@ -157,7 +157,6 @@ dependencies = [
 org = "ballerina"
 name = "lang.error"
 version = "0.0.0"
-scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -301,7 +300,6 @@ dependencies = [
 org = "ballerina"
 name = "test"
 version = "0.0.0"
-scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.error"}
