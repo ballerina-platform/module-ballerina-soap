@@ -20,6 +20,7 @@ import ballerina/http;
 import ballerina/mime;
 import ballerina/lang.regexp;
 import ballerina/jballerina.java;
+import ballerina/test;
 
 public isolated function validateTransportBindingPolicy(ClientConfig config) returns Error? {
     if config.httpConfig.secureSocket is () {
@@ -169,4 +170,40 @@ isolated function createSoap11Response(http:Response response) returns xml|error
     xml payload = check response.getXmlPayload();
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     return payload;
+}
+
+public function assertUsernameToken(string envelopeString, string username, string password,
+                             wssec:PasswordType passwordType, string body) returns error? {
+    string:RegExp bodyData = check regexp:fromString(body);           
+    test:assertTrue(envelopeString.includesMatch(bodyData));
+    string:RegExp usernameTokenTag = re `<wsse:UsernameToken .*>.*</wsse:UsernameToken>`;
+    string:RegExp usernameTag = re `<wsse:Username>${username}</wsse:Username>`;
+    test:assertTrue(envelopeString.includesMatch(usernameTokenTag));
+    test:assertTrue(envelopeString.includesMatch(usernameTag));
+    string:RegExp passwordTag = re `<wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${password}</wsse:Password>`;
+    test:assertTrue(envelopeString.includesMatch(passwordTag));
+}
+
+public function assertSymmetricBinding(string envelopeString, string body) returns error? {
+    string:RegExp bodyData = check regexp:fromString(body);           
+    test:assertTrue(envelopeString.includesMatch(bodyData));
+    assertSignatureWithoutX509(envelopeString);
+}
+
+public function assertSignatureWithoutX509(string securedEnvelope) {
+    string:RegExp signature = re `<ds:Signature xmlns:ds=".*" .*">.*</ds:Signature>`;
+    string:RegExp signatureInfo = re `<ds:SignedInfo>.*</ds:SignedInfo>`;
+    string:RegExp canonicalizationMethod = re `<ds:CanonicalizationMethod Algorithm=".*">`;
+    string:RegExp signatureMethod = re `<ds:SignatureMethod Algorithm=".*"/>`;
+    string:RegExp transformMethod = re `<ds:Transform Algorithm=".*"/>`;
+    string:RegExp digestMethod = re `<ds:DigestMethod Algorithm=".*"/>`;
+    string:RegExp signatureValue = re `<ds:SignatureValue>.*</ds:SignatureValue>`;
+
+    test:assertTrue(securedEnvelope.includesMatch(signature));
+    test:assertTrue(securedEnvelope.includesMatch(signatureInfo));
+    test:assertTrue(securedEnvelope.includesMatch(canonicalizationMethod));
+    test:assertTrue(securedEnvelope.includesMatch(signatureMethod));
+    test:assertTrue(securedEnvelope.includesMatch(transformMethod));
+    test:assertTrue(securedEnvelope.includesMatch(digestMethod));
+    test:assertTrue(securedEnvelope.includesMatch(signatureValue));
 }
