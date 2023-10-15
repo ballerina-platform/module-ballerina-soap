@@ -14,12 +14,56 @@
 // specific language governing permissions and limitations
 // under the License.
 import ballerina/http;
+import ballerina/crypto;
+import ballerina/soap;
+
+crypto:KeyStore serverKeyStore = {
+    path: X509_KEY_STORE_PATH,
+    password: KEY_PASSWORD
+};
+crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
+crypto:PrivateKey serverPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(serverKeyStore, KEY_ALIAS,
+                                                                                  KEY_PASSWORD);
+
+crypto:KeyStore clientKeyStore = {
+    path: X509_KEY_STORE_PATH_2,
+    password: KEY_PASSWORD
+};
+crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
 
 service / on new http:Listener(9090) {
 
     resource function post getPayload(http:Request request) returns http:Response|error {
         http:Response response = new;
         response.setPayload(check (check request.getBodyParts())[0].getXml());
+        return response;
+    }
+
+    resource function post getSamePayload(http:Request request) returns http:Response|error {
+        http:Response response = new;
+        xml payload = check request.getXmlPayload();
+        response.setPayload(payload);
+        return response;
+    }
+
+    resource function post getSecuredPayload(http:Request request) returns http:Response|error {
+        http:Response response = new;
+        xml payload = check request.getXmlPayload();
+        xml applyOutboundConfig = check soap:applyOutboundConfig({
+            verificationKey: clientPublicKey,
+            signatureAlgorithm: soap:RSA_SHA256,
+            decryptionAlgorithm: soap:RSA_ECB,
+            decryptionKey: serverPrivateKey
+        }, payload);
+
+        xml securedEnv = check soap:applySecurityPolicies({
+            signatureAlgorithm: soap:RSA_SHA256,
+            encryptionAlgorithm: soap:RSA_ECB,
+            signatureKey: serverPrivateKey,
+            encryptionKey: clientPublicKey
+        }, applyOutboundConfig);
+
+        response.setPayload(securedEnv);
         return response;
     }
 }
