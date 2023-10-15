@@ -49,6 +49,7 @@ service / on new http:Listener(9090) {
             decryptionAlgorithm: soap:RSA_ECB,
             decryptionKey: serverPrivateKey
         }, payload);
+
         xml securedEnv = check soap:applySecurityPolicies({
             signatureAlgorithm: soap:RSA_SHA256,
             encryptionAlgorithm: soap:RSA_ECB,

@@ -14,22 +14,37 @@
 // specific language governing permissions and limitations
 // under the License.
 import soap;
+import soap.wssec;
 
 import ballerina/crypto;
+import ballerina/io;
 import ballerina/mime;
 import ballerina/test;
-import soap.wssec;
-import ballerina/io;
 
 const string KEY_ALIAS = "wss40";
 const string KEY_PASSWORD = "security";
 const IMAGE_PATH = "../ballerina/icon.png";
-const FILE_PATH =  "../ballerina/Module.md";
+const FILE_PATH = "../ballerina/Module.md";
 const string KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
 const string X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
 const string X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
 const wssec:TransportBindingConfig TRANSPORT_BINDING = "TransportBinding";
 const wssec:NoPolicy NO_POLICY = "NoPolicy";
+
+const crypto:KeyStore clientKeyStore = {
+    path: X509_KEY_STORE_PATH_2,
+    password: KEY_PASSWORD
+};
+crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS,
+                                                                                KEY_PASSWORD);
+crypto:PublicKey clientPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(clientKeyStore, KEY_ALIAS);
+
+crypto:KeyStore keyStore = {
+    path: KEY_STORE_PATH,
+    password: KEY_PASSWORD
+};
+crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
+crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
 @test:Config {
     groups: ["soap11", "send_receive", "mime", "aa"]
@@ -274,7 +289,7 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
             }
         }
     );
-    
+
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
                         soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -337,4 +352,74 @@ function testSendReceiveWithSymmetricBindingSecurity() returns error? {
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
    at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body></soap:Envelope>`;
     test:assertEquals(response.toString(), expected.toString());
+}
+
+@test:Config {
+    groups: ["soap11", "send_receive"]
+}
+function testSoapEndpoint() returns error? {
+    string username = "user";
+    string password = "password";
+    Client soapClient = check new ("http://localhost:9090",
+        {
+            inboundSecurity: {
+                username: username,
+                password: password,
+                passwordType: wssec:TEXT
+            }
+        }
+    );
+    xml body = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSamePayload");
+    return soap:assertUsernameToken(response.toString(), username, password, wssec:TEXT, string `<soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body>`);
+}
+
+@test:Config {
+    groups: ["soap11", "send_receive"]
+}
+function testSoapReceiveWithSymmetricBindingAndOutboundConfig() returns error? {
+    Client soapClient = check new ("http://localhost:9090",
+        {
+            inboundSecurity: {
+                signatureAlgorithm: wssec:RSA_SHA256,
+                encryptionAlgorithm: wssec:RSA_ECB,
+                symmetricKey: symmetricKey,
+                servicePublicKey: serverPublicKey
+            },
+            outboundSecurity: {
+                verificationKey: publicKey,
+                signatureAlgorithm: wssec:RSA_SHA256,
+                decryptionAlgorithm: wssec:RSA_ECB,
+                decryptionKey: publicKey
+            }
+        }
+    );
+    xml body = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSamePayload");
+    return soap:assertSymmetricBinding(response.toString(), string `<soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body>`);
+}
+
+@test:Config {
+    groups: ["soap11", "send_receive", "j"]
+}
+function testSendReceiveWithAsymmetricBindingAndOutboundConfig() returns error? {
+    Client soapClient = check new ("http://localhost:9090",
+        {
+            inboundSecurity: {
+                signatureAlgorithm: soap:RSA_SHA256,
+                encryptionAlgorithm: soap:RSA_ECB,
+                signatureKey: clientPrivateKey,
+                encryptionKey: serverPublicKey
+            },
+            outboundSecurity: {
+                verificationKey: serverPublicKey,
+                signatureAlgorithm: soap:RSA_SHA256,
+                decryptionAlgorithm: soap:RSA_ECB,
+                decryptionKey: clientPrivateKey
+            }
+        }
+    );
+    xml body = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
+    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSecuredPayload");
+    return soap:assertSymmetricBinding(response.toString(), string `<soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body>`);
 }
