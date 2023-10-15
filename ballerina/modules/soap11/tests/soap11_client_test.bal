@@ -67,13 +67,7 @@ function testSendReceiveWithMime() returns error? {
     mtomMessage.push(bytesPart);
 
     xml|mime:Entity[] response = check soapClient->sendReceive(mtomMessage, "http://tempuri.org/Add", path = "/getPayload");
-    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                          <quer:Add xmlns:quer="http://tempuri.org/">
-                            <quer:intA>2</quer:intA>
-                            <quer:intB>3</quer:intB>
-                          </quer:Add>
-                        </soap:Body>`;
-    test:assertEquals(response, expected);
+    test:assertEquals(response, body);
 }
 
 @test:Config {
@@ -117,7 +111,7 @@ function testSendReceive() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
-    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
+    xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body></soap:Envelope>`;
     test:assertEquals(response, expected);
 }
 
@@ -140,7 +134,7 @@ function testSendReceiveWithHeaders() returns error? {
 
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add",
                                                                 {foo: ["bar1", "bar2"]});
-    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body>`;
+    xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body></soap:Envelope>`;
     test:assertEquals(response, expected);
 }
 
@@ -212,11 +206,11 @@ function testSendReceiveWithTimestampTokenSecurity() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
-    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
+    xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
-   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body>`;
+   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body></soap:Envelope>`;
     test:assertEquals(response.toString(), expected.toString());
 }
 
@@ -245,11 +239,11 @@ function testSendReceiveWithUsernameTokenSecurity() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
-    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
+    xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
-   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body>`;
+   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body></soap:Envelope>`;
     test:assertEquals(response.toString(), expected.toString());
 }
 
@@ -292,11 +286,11 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
-    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
+    xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
-   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body>`;
+   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body></soap:Envelope>`;
     test:assertEquals(response.toString(), expected.toString());
 }
 
@@ -337,10 +331,10 @@ function testSendReceiveWithSymmetricBindingSecurity() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
-    xml expected = xml `<soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
+    xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
    at System.Web.Services.Protocols.WebServiceHandler.Invoke()
-   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body>`;
+   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</faultstring></soap:Fault></soap:Body></soap:Envelope>`;
     test:assertEquals(response.toString(), expected.toString());
 }
