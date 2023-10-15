@@ -136,7 +136,8 @@ public isolated function applyUsernameToken(xml envelope, *UsernameTokenConfig u
 # + envelope - The SOAP envelope
 # + symmetricBinding - The `SymmetricBindingConfig` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
-public isolated function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symmetricBinding) returns xml|Error {
+public isolated function applySymmetricBinding(xml envelope, *SymmetricBindingConfig symmetricBinding)
+    returns xml|crypto:Error|Error {
     Document document = check new (envelope);
     WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
     string securedEnvelope = envelope.toBalString();
@@ -153,8 +154,8 @@ public isolated function applySymmetricBinding(xml envelope, *SymmetricBindingCo
     }
     if encryptionAlgorithm is EncryptionAlgorithm {
         Encryption encryption = check new ();
-        byte[] encryptData = check encryption.encryptData((envelope/<soap:Body>/*).toString(), encryptionAlgorithm
-                                                          , symmetricBinding.symmetricKey);
+        byte[] encryptData = check crypto:encryptRsaEcb((envelope/<soap:Body>/*).toString().toBytes(),
+                                                         symmetricBinding.symmetricKey);
         Encryption encryptionResult = check addEncryption(encryption, encryptionAlgorithm, encryptData);
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applyEncryptionOnlyPolicy(wsSecurityHeader, encryptionResult);
@@ -169,7 +170,7 @@ public isolated function applySymmetricBinding(xml envelope, *SymmetricBindingCo
 # + envelope - The SOAP envelope
 # + asymmetricBinding - The `AsymmetricBindingConfig` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
-public isolated function applyAsymmetricBinding(xml envelope, *AsymmetricBindingConfig asymmetricBinding) returns xml|Error {
+public isolated function applyAsymmetricBinding(xml envelope, *AsymmetricBindingConfig asymmetricBinding) returns xml|crypto:Error|Error {
     Document document = check new (envelope);
     WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
     string securedEnvelope = envelope.toBalString();
@@ -194,8 +195,7 @@ public isolated function applyAsymmetricBinding(xml envelope, *AsymmetricBinding
         if encryptionKey !is crypto:PublicKey {
             return error Error("Encryption key cannot be nil");
         }
-        byte[] encryptData = check encryption.encryptData((envelope/<soap:Body>/*).toString(), encryptionAlgorithm,
-                                                          encryptionKey);
+        byte[] encryptData = check crypto:encryptRsaEcb((envelope/<soap:Body>/*).toString().toBytes(), encryptionKey);
         Encryption encryptionResult = check addEncryption(encryption, encryptionAlgorithm, encryptData);
         WsSecurity wsSecurity = new;
         securedEnvelope = check wsSecurity.applyEncryptionOnlyPolicy(wsSecurityHeader, encryptionResult);

@@ -42,7 +42,7 @@ public isolated function getReadOnlyClientConfig(ClientConfig original) returns 
 } external;
 
 public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] security,
-                                               xml envelope) returns xml|wssec:Error {
+                                               xml envelope) returns xml|crypto:Error|wssec:Error {
     if security is wssec:TimestampTokenConfig {
         return wssec:applyTimestampToken(envelope, security);
     } else if security is wssec:UsernameTokenConfig {

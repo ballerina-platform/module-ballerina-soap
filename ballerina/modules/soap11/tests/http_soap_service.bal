@@ -22,7 +22,7 @@ const crypto:KeyStore serverKeyStore = {
     password: KEY_PASSWORD
 };
 crypto:PrivateKey serverPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(serverKeyStore, KEY_ALIAS,
-                                                                                KEY_PASSWORD);
+                                                                                  KEY_PASSWORD);
 crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
 
 service / on new http:Listener(9090) {
@@ -34,27 +34,29 @@ service / on new http:Listener(9090) {
     }
 
     resource function post getSamePayload(http:Request request) returns http:Response|error {
-        http:Response response = new;
         xml payload = check request.getXmlPayload();
+        http:Response response = new;
         response.setPayload(payload);
         return response;
     }
 
     resource function post getSecuredPayload(http:Request request) returns http:Response|error {
-        http:Response response = new;
         xml payload = check request.getXmlPayload();
-        xml applyOutboundConfig = check soap:applyOutboundConfig({
-            verificationKey: clientPublicKey,
-            signatureAlgorithm: soap:RSA_SHA256,
-            decryptionAlgorithm: soap:RSA_ECB,
-            decryptionKey: serverPrivateKey
-        }, payload);
-        xml securedEnv = check soap:applySecurityPolicies({
-            signatureAlgorithm: soap:RSA_SHA256,
-            encryptionAlgorithm: soap:RSA_ECB,
-            signatureKey: serverPrivateKey,
-            encryptionKey: clientPublicKey
-        }, applyOutboundConfig);
+        xml applyOutboundConfig = check soap:applyOutboundConfig(
+            {
+                verificationKey: clientPublicKey,
+                signatureAlgorithm: soap:RSA_SHA256,
+                decryptionAlgorithm: soap:RSA_ECB,
+                decryptionKey: serverPrivateKey
+            }, payload);
+        xml securedEnv = check soap:applySecurityPolicies(
+            {
+                signatureAlgorithm: soap:RSA_SHA256,
+                encryptionAlgorithm: soap:RSA_ECB,
+                signatureKey: serverPrivateKey,
+                encryptionKey: clientPublicKey
+            }, applyOutboundConfig);
+        http:Response response = new;
         response.setPayload(securedEnv);
         return response;
     }

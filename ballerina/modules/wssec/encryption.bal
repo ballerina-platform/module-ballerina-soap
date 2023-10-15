@@ -24,18 +24,8 @@ isolated class Encryption {
         self.nativeEncryption = newEncryption();
     }
 
-    isolated function encryptData(string dataString, EncryptionAlgorithm encryptionAlgorithm,
-                         crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
-        byte[] data = dataString.toBytes();
-        do {
-            return check crypto:encryptRsaEcb(data, key);
-        } on fail var e {
-            return error(e.message());
-        }
-    }
-
     public isolated function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
-                                crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
+                                         crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
         do {
             return check crypto:decryptRsaEcb(cipherText, key);
         } on fail var e {

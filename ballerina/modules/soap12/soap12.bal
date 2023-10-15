@@ -53,15 +53,16 @@ public isolated client class Client {
     # + path - The resource path
     # + return - If successful, returns the response. Else, returns an error
     remote isolated function sendReceive(xml|mime:Entity[] body, string? action = (),
-                                         map<string|string[]> headers = {}, string path = "") returns xml|mime:Entity[]|Error {
+                                         map<string|string[]> headers = {}, string path = "")
+        returns xml|mime:Entity[]|Error {
         do {
             xml securedBody;
-            xml response;
             xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
                 securedBody = body is xml ? check soap:applySecurityPolicies(self.inboundSecurity.clone(), body.clone())
                     : check soap:applySecurityPolicies(self.inboundSecurity.clone(), mimeEntity.clone());
             }
+            xml response;
             if body is mime:Entity[] {
                 body[0].setXml(securedBody);
                 response = check soap:sendReceive(body, self.soapClient, action, headers, path);
