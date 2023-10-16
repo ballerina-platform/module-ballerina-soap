@@ -19,23 +19,23 @@ graalvmCompatible = true
 [[platform.java17.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "soap-native"
-version = "0.2.0-SNAPSHOT"
+version = "0.2.0"
 path = "../native/build/libs/soap-native-0.2.0-SNAPSHOT.jar"
 
 [[platform.java17.dependency]]
 groupId = "org.apache.wss4j"
 artifactId = "wss4j-ws-security-dom"
-version = "@wsSecurityDomVersion@"
-path = "./lib/wss4j-ws-security-dom-@wsSecurityDomVersion@.jar"
+version = "@wssecuritydom.version@"
+path = "./lib/wss4j-ws-security-dom-@wssecuritydom.version@.jar"
 
 [[platform.java17.dependency]]
 groupId = "org.apache.wss4j"
 artifactId = "wss4j-ws-security-common"
-version = "@wsSecurityCommonVersion@"
-path = "./lib/wss4j-ws-security-common-@wsSecurityCommonVersion@.jar"
+version = "@wssecuritycommon.version@"
+path = "./lib/wss4j-ws-security-common-@wssecuritycommon.version@.jar"
 
 [[platform.java17.dependency]]
 groupId = "org.apache.santuario"
 artifactId = "xmlsec"
-version = "@xmlSecVersion@"
-path = "./lib/xmlsec-@xmlSecVersion@.jar"
+version = "@xmlsec.version@"
+path = "./lib/xmlsec-@xmlsec.version@.jar"
