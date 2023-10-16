@@ -66,7 +66,13 @@ ballerina {
 
 task updateTomlFiles {
     doLast {
+        def wsSecurityDomVersion = project.wsSecurityDomVersion
+        def wsSecurityCommonVersion = project.wsSecurityCommonVersion
+        def xmlSecVersion = project.xmlSecVersion
         def newConfig = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
+        newConfig = newConfig.replace("@wssecuritydom.version@", wsSecurityDomVersion)
+        newConfig = newConfig.replace("@wssecuritycommon.version@", wsSecurityCommonVersion)
+        newConfig = newConfig.replace("@xmlsec.version@", xmlSecVersion)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
         ballerinaTomlFile.text = newConfig
     }
