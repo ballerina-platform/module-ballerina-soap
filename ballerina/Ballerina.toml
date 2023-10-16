@@ -25,17 +25,17 @@ path = "../native/build/libs/soap-native-0.2.0-SNAPSHOT.jar"
 [[platform.java17.dependency]]
 groupId = "org.apache.wss4j"
 artifactId = "wss4j-ws-security-dom"
-version = "@wssecuritydom.version@"
-path = "./lib/wss4j-ws-security-dom-@wssecuritydom.version@.jar"
+version = "3.0.1"
+path = "./lib/wss4j-ws-security-dom-3.0.1.jar"
 
 [[platform.java17.dependency]]
 groupId = "org.apache.wss4j"
 artifactId = "wss4j-ws-security-common"
-version = "@wssecuritycommon.version@"
-path = "./lib/wss4j-ws-security-common-@wssecuritycommon.version@.jar"
+version = "3.0.1"
+path = "./lib/wss4j-ws-security-common-3.0.1.jar"
 
 [[platform.java17.dependency]]
 groupId = "org.apache.santuario"
 artifactId = "xmlsec"
-version = "@xmlsec.version@"
-path = "./lib/xmlsec-@xmlsec.version@.jar"
+version = "3.0.2"
+path = "./lib/xmlsec-3.0.2.jar"
