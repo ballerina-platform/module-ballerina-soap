@@ -82,7 +82,7 @@ public isolated client class Client {
                 return response.clone();
             }
         } on fail var e {
-            return error Error(e.message());
+            return error Error(SOAP_ERROR, e.cause());
         }
     }
 
@@ -112,7 +112,7 @@ public isolated client class Client {
             }
             return check soap:sendOnly(securedBody, self.soapClient, action, headers, path);
         } on fail var e {
-            return error Error(e.message());
+            return error Error(SOAP_ERROR, e.cause());
         }
     }
 }

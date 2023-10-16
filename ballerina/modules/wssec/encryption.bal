@@ -30,7 +30,7 @@ isolated class Encryption {
         do {
             return check crypto:decryptRsaEcb(cipherText, key);
         } on fail var e {
-            return error Error(e.message());
+            return error Error("Error occurred while decrypting the data", e.cause());
         }
     }
 

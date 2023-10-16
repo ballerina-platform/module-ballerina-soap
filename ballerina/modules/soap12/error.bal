@@ -19,4 +19,5 @@ public type Error distinct error;
 
 const SOAP_RESPONSE_ERROR = "Failed to create SOAP response.";
 const SOAP_CLIENT_ERROR = "Failed to initialize SOAP 1.2 client.";
+const SOAP_ERROR = "Failed to generate a response";
 const INVALID_OUTBOUND_SECURITY_ERROR = "Outbound security configurations do not match with the SOAP response.";

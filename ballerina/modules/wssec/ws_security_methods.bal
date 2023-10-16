@@ -71,7 +71,7 @@ isolated function applyEncryptedKey(string envelopeString, crypto:PrivateKey sym
         }
         return securedEnvelope;
     } on fail var e {
-        return error Error(e.message());
+        return error Error("Error occurred while applying the encrypted key to the envelope", e.cause());
     }
 }
 

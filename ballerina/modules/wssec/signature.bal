@@ -44,7 +44,7 @@ isolated class Signature {
                 }
             }
         } on fail var e {
-            return error Error(e.message());
+            return error Error("Error occurred while signing the data", e.cause());
         }
     }
 
@@ -66,7 +66,7 @@ isolated class Signature {
                 }
             }
         } on fail var e {
-            return error Error(e.message());
+            return error Error("Error occurred while verifying the signature", e.cause());
         }
     }
 

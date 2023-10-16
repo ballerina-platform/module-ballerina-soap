@@ -195,7 +195,7 @@ function testSendReceiveError() returns error? {
                     </soap:Envelope>`;
     xml|mime:Entity[]|Error response = soapClient->sendReceive(body, "http://tempuri.org/Add");
     test:assertTrue(response is Error);
-    test:assertEquals((<Error>response).message(), SOAP_RESPONSE_ERROR);
+    test:assertEquals((<Error>response).message(), SOAP_ERROR);
 }
 
 @test:Config {
