@@ -5,7 +5,7 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.8.0-20230726-145300-b2bdf796"
+distribution-version = "2201.8.0"
 
 [[package]]
 org = "ballerina"
@@ -22,7 +22,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "cache"
-version = "3.7.0"
+version = "3.7.1"
 dependencies = [
 	{org = "ballerina", name = "constraint"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -46,6 +46,9 @@ dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
 ]
+modules = [
+	{org = "ballerina", packageName = "crypto", moduleName = "crypto"}
+]
 
 [[package]]
 org = "ballerina"
@@ -61,7 +64,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "http"
-version = "2.10.0"
+version = "2.10.3"
 dependencies = [
 	{org = "ballerina", name = "auth"},
 	{org = "ballerina", name = "cache"},
@@ -98,11 +101,17 @@ dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.value"}
 ]
+modules = [
+	{org = "ballerina", packageName = "io", moduleName = "io"}
+]
 
 [[package]]
 org = "ballerina"
 name = "jballerina.java"
 version = "0.0.0"
+modules = [
+	{org = "ballerina", packageName = "jballerina.java", moduleName = "jballerina.java"}
+]
 
 [[package]]
 org = "ballerina"
@@ -148,7 +157,6 @@ dependencies = [
 org = "ballerina"
 name = "lang.error"
 version = "0.0.0"
-scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -174,6 +182,9 @@ name = "lang.regexp"
 version = "0.0.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
+]
+modules = [
+	{org = "ballerina", packageName = "lang.regexp", moduleName = "lang.regexp"}
 ]
 
 [[package]]
@@ -260,12 +271,20 @@ org = "ballerina"
 name = "soap"
 version = "0.2.0"
 dependencies = [
+	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "io"},
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.regexp"},
 	{org = "ballerina", name = "mime"},
-	{org = "ballerina", name = "test"}
+	{org = "ballerina", name = "test"},
+	{org = "ballerinai", name = "observe"}
 ]
 modules = [
-	{org = "ballerina", packageName = "soap", moduleName = "soap"}
+	{org = "ballerina", packageName = "soap", moduleName = "soap"},
+	{org = "ballerina", packageName = "soap", moduleName = "soap.soap11"},
+	{org = "ballerina", packageName = "soap", moduleName = "soap.soap12"},
+	{org = "ballerina", packageName = "soap", moduleName = "soap.wssec"}
 ]
 
 [[package]]
@@ -281,7 +300,6 @@ dependencies = [
 org = "ballerina"
 name = "test"
 version = "0.0.0"
-scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.error"}
@@ -304,5 +322,17 @@ name = "url"
 version = "2.4.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
+]
+
+[[package]]
+org = "ballerinai"
+name = "observe"
+version = "0.0.0"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "observe"}
+]
+modules = [
+	{org = "ballerinai", packageName = "observe", moduleName = "observe"}
 ]
 

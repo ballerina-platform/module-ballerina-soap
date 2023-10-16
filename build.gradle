@@ -63,10 +63,15 @@ allprojects {
 subprojects {
 
     configurations {
+        externalJars
         ballerinaStdLibs
+        jbalTools
     }
 
     dependencies {
+        jbalTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
+            transitive = false
+        }
         /* Standard libraries */
         ballerinaStdLibs "io.ballerina.stdlib:http-ballerina:${project.stdlibHttpVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:mime-ballerina:${project.stdlibMimeVersion}"
@@ -74,7 +79,6 @@ subprojects {
         ballerinaStdLibs "io.ballerina.stdlib:crypto-ballerina:${project.stdlibCryptoVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:time-ballerina:${project.stdlibTimeVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:uuid-ballerina:${project.stdlibUuidVersion}"
-
         ballerinaStdLibs "io.ballerina.stdlib:auth-ballerina:${project.stdlibAuthVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:jwt-ballerina:${project.stdlibJwtVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:oauth2-ballerina:${project.stdlibOAuth2Version}"
@@ -87,6 +91,16 @@ subprojects {
         ballerinaStdLibs "io.ballerina.stdlib:os-ballerina:${project.stdlibOsVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:url-ballerina:${project.stdlibUrlVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:io-ballerina:${project.stdlibIoVersion}"
+
+        externalJars (group: 'org.apache.wss4j', name: 'wss4j-ws-security-dom', version: "${wsSecurityDomVersion}") {
+            transitive = false
+        }
+        externalJars (group: 'org.apache.wss4j', name: 'wss4j-ws-security-common', version: "${wsSecurityDomVersion}") {
+            transitive = false
+        }
+        externalJars (group: 'org.apache.santuario', name: 'xmlsec', version: "${xmlSecVersion}") {
+            transitive = false
+        }
     }
 }
 
@@ -107,5 +121,6 @@ release {
 }
 
 task build {
+    dependsOn('soap-native:build')
     dependsOn('soap-ballerina:build')
 }

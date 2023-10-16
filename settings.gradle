@@ -21,9 +21,11 @@ plugins {
 }
 
 include ':checkstyle'
+include ':soap-native'
 include ':soap-ballerina'
 
 project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
+project(':soap-native').projectDir = file('native')
 project(':soap-ballerina').projectDir = file('ballerina')
 
 gradleEnterprise {

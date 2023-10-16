@@ -1,4 +1,4 @@
-// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com) All Rights Reserved.
 //
 // WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -16,3 +16,6 @@
 
 # Defines the common error type for the module.
 public type Error distinct error;
+
+const SOAP_RESPONSE_ERROR = "Failed to create SOAP response.";
+const INVALID_PROTOCOL_ERROR = "Invalid protocol detected: Please use the `https` protocol instead of `http`.";

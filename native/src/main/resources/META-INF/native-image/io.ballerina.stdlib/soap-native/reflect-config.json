@@ -1,0 +1,17 @@
+[
+{
+  "name":"org.apache.commons.pool.impl.EvictionTimer"
+},
+{
+  "name":"org.apache.wss4j.dom.transform.AttachmentCiphertextTransform",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xml.security.c14n.implementations.CanonicalizerPhysical",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xml.security.utils.XMLUtils",
+  "fields":[{"name":"ignoreLineBreaks"}]
+}
+]

@@ -38,3 +38,6 @@ target
 # Ballerina
 velocity.log*
 *Ballerina.lock
+
+.vscode
+config-dir
