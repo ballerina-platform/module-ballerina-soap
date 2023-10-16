@@ -19,7 +19,7 @@ graalvmCompatible = true
 [[platform.java17.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "soap-native"
-version = "0.2.0-SNAPSHOT"
+version = "@moduleVersion@"
 path = "../native/build/libs/soap-native-0.2.0-SNAPSHOT.jar"
 
 [[platform.java17.dependency]]
