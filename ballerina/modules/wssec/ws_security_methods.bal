@@ -26,12 +26,6 @@ isolated function addSecurityHeader(Document document) returns WSSecurityHeader|
     return insertHeader ?: wsSecHeader;
 }
 
-public isolated function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
-                            crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
-    Encryption encrypt = check new ();
-    return encrypt.decryptData(cipherText, encryptionAlgorithm, key);
-}
-
 public isolated function verifyData(byte[] data, byte[] signature, crypto:PublicKey publicKey,
                                     SignatureAlgorithm signatureAlgorithm) returns Error? {
     Signature sign = check new ();

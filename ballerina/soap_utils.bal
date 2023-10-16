@@ -73,7 +73,7 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
             crypto:PrivateKey|crypto:PublicKey? clientPrivateKey = outboundSecurity.decryptionKey;
             if clientPrivateKey is crypto:PrivateKey|crypto:PublicKey {
                 byte[] encData = check wssec:getEncryptedData(soapEnvelope);
-                byte[] decryptDataResult = check wssec:decryptData(encData, encryptionAlgorithm, clientPrivateKey);
+                byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, clientPrivateKey);
                 string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
                 string decryptedEnv = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, soapEnvelope.toString(),
                                                      decryptedBody);

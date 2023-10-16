@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/crypto;
 import ballerina/jballerina.java;
 
 isolated class Encryption {
@@ -23,15 +22,6 @@ isolated class Encryption {
 
     isolated function init() returns Error? {
         self.nativeEncryption = newEncryption();
-    }
-
-    public isolated function decryptData(byte[] cipherText, EncryptionAlgorithm encryptionAlgorithm,
-                                         crypto:PublicKey|crypto:PrivateKey key) returns byte[]|Error {
-        do {
-            return check crypto:decryptRsaEcb(cipherText, key);
-        } on fail var e {
-            return error Error("Error occurred while decrypting the data", e.cause());
-        }
     }
 
     public isolated function setEncryptionAlgorithm(string encryptionAlgorithm) = @java:Method {

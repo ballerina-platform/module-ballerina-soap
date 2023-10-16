@@ -243,7 +243,7 @@ function testSymmetricBindingPolicyEncryptionOnly() returns error? {
     string envelopeString = securedEnvelope.toString();
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, publicKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, publicKey);
     test:assertEquals((envelope/<soap:Body>/*).toString(), check string:fromBytes(decryptDataResult));
 
     assertEncryptedSymmetricKey(envelopeString);
@@ -276,7 +276,7 @@ function testSymmetricBindingWithSignatureAndEncryption() returns error? {
     test:assertTrue(validity);
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, publicKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, publicKey);
     test:assertEquals((envelope/<soap:Body>/*).toString(), check string:fromBytes(decryptDataResult));
 
     assertEncryptedSymmetricKey(envelopeString);
@@ -312,7 +312,7 @@ function testSymmetricBindingPolicyWithX509SignatureAndEncryption() returns erro
     test:assertTrue(validity);
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, publicKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, publicKey);
     test:assertEquals((envelope/<soap:Body>/*).toString(), check string:fromBytes(decryptDataResult));
 
     assertEncryptedSymmetricKey(envelopeString);
@@ -354,7 +354,7 @@ function testUsernameTokenWithSymmetricBinding() returns error? {
     test:assertTrue(validity);
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, publicKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, publicKey);
     test:assertEquals((envelope/<soap:Body>/*).toString(), check string:fromBytes(decryptDataResult));
 
     assertEncryptedSymmetricKey(envelopeString);
@@ -412,7 +412,7 @@ function testUsernameTokenTimestampWithSymmetricBindingAndX509Token() returns er
     test:assertTrue(validity);
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, publicKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, publicKey);
     test:assertEquals((envelope/<soap:Body>/*).toString(), check string:fromBytes(decryptDataResult));
 
     assertEncryptedSymmetricKey(envelopeString);
@@ -465,7 +465,7 @@ function testSymmetricBindingWithOutboundConfig() returns error? {
     crypto:PrivateKey|crypto:PublicKey? privateKey = outboundConfig.decryptionKey;
     if privateKey is crypto:PrivateKey|crypto:PublicKey {
         byte[] encData = check getEncryptedData(securedEnvelope);
-        byte[] decryptDataResult = check decryptData(encData, RSA_ECB, privateKey);
+        byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, privateKey);
         string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
         envelopeString = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, envelopeString, decryptedBody);
         securedEnvelope = check xml:fromString(envelopeString);
@@ -548,7 +548,7 @@ function testAsymmetricBindingWithEncryption() returns error? {
     string envelopeString = securedEnvelope.toString();
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, serverPrivateKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, serverPrivateKey);
     test:assertEquals(check string:fromBytes(decryptDataResult), (envelope/<soap:Body>/*).toString());
 
     assertEncryptedPart(envelopeString);
@@ -580,7 +580,7 @@ function testAsymmetricBindingWithSignatureAndEncryption() returns error? {
     test:assertTrue(validity);
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, serverPrivateKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, serverPrivateKey);
     test:assertEquals(check string:fromBytes(decryptDataResult), (envelope/<soap:Body>/*).toString());
 
     assertSignatureWithoutX509(envelopeString);
@@ -613,7 +613,7 @@ function testAsymmetricBindingWithX509SignatureAndEncryption() returns error? {
     test:assertTrue(validity);
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, serverPrivateKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, serverPrivateKey);
     test:assertEquals((envelope/<soap:Body>/*).toString(), check string:fromBytes(decryptDataResult));
 
     assertSignatureWithX509(envelopeString);
@@ -653,7 +653,7 @@ function testUsernameTokenWithAsymmetricBindingAndX509() returns error? {
     test:assertTrue(validity);
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, serverPrivateKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, serverPrivateKey);
     test:assertEquals((envelope/<soap:Body>/*).toString(), check string:fromBytes(decryptDataResult));
 
     assertUsernameToken(envelopeString, DIGEST);
@@ -695,7 +695,7 @@ function testUsernameTokenTimestampWithAsymmetricBindingAndX509() returns error?
     test:assertTrue(validity);
 
     byte[] encData = check getEncryptedData(securedEnvelope);
-    byte[] decryptDataResult = check decryptData(encData, RSA_ECB, serverPrivateKey);
+    byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, serverPrivateKey);
     test:assertEquals((envelope/<soap:Body>/*).toString(), check string:fromBytes(decryptDataResult));
 
     assertUsernameToken(envelopeString, DIGEST);
@@ -734,7 +734,7 @@ function testAsymmetricBindingWithOutboundConfig() returns error? {
     crypto:PrivateKey|crypto:PublicKey? privateKey = outboundConfig.decryptionKey;
     if privateKey is crypto:PrivateKey|crypto:PublicKey {
         byte[] encData = check getEncryptedData(securedEnvelope);
-        byte[] decryptDataResult = check decryptData(encData, RSA_ECB, privateKey);
+        byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, privateKey);
         string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
         envelopeString = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, envelopeString, decryptedBody);
         securedEnvelope = check xml:fromString(envelopeString);
