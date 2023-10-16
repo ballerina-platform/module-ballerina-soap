@@ -6,7 +6,7 @@ Ballerina SOAP Library
 [![Trivy](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/trivy-scan.yml)
 [![GraalVM Check](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/build-with-bal-test-graalvm.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/build-with-bal-test-graalvm.yml)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-soap.svg)](https://github.com/ballerina-platform/module-ballerina-soap/commits/master)
-[![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/soap.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fyaml)
+[![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/soap.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fsoap)
 [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-soap/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-soap)
 
 This module offers a set of APIs that facilitate the transmission of XML requests to a SOAP backend. It excels in managing security policies within SOAP requests, ensuring the transmission of secured SOAP envelopes. Moreover, it possesses the capability to efficiently extract data from security-applied SOAP responses.
