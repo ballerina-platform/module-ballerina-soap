@@ -20,7 +20,7 @@ The `Client` is used to connect to and interact with `SOAP` endpoints.
 ### SOAP 1.1 Client
 
 ```ballerina
-import ballerina/soap:soap11;
+import ballerina/soap.soap11;
 
 soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 ```
@@ -28,7 +28,7 @@ soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?
 ### SOAP 1.2 Client
 
 ```ballerina
-import ballerina/soap:soap12;
+import ballerina/soap.soap12;
 
 soap12:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 ```
@@ -43,7 +43,7 @@ The SOAP 1.1 specification requires the inclusion of the `action` parameter as a
 ### Example: Send & Receive
 
 ```ballerina
-import ballerina/soap:soap11;
+import ballerina/soap.soap11;
 
 public function main() returns error? {
     soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
@@ -63,7 +63,7 @@ public function main() returns error? {
 ### Example: Send Only
 
 ```ballerina
-import ballerina/soap:soap11;
+import ballerina/soap.soap11;
 
 public function main() returns error? {
     soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
@@ -149,10 +149,10 @@ These policies empower SOAP clients to enhance the security of their web service
 import ballerina/crypto;
 import ballerina/mime;
 import ballerina/soap;
-import ballerina/soap:soap11;
+import ballerina/soap.soap11;
 
 public function main() returns error? {
-    soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL", 
+    soap11:Client soapClient = check new ("https://www.secured-soap-endpoint.com", 
         {
             inboundSecurity: [
             {
@@ -182,14 +182,14 @@ public function main() returns error? {
 import ballerina/crypto;
 import ballerina/mime;
 import ballerina/soap;
-import ballerina/soap:soap12;
+import ballerina/soap.soap12;
 
 public function main() returns error? {
     configurable crypto:PrivateKey clientPrivateKey = ?;
     configurable crypto:PublicKey clientPublicKey = ?;
     configurable ​crypto:PublicKey serverPublicKey = ?;
 
-    soap12:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    soap12:Client soapClient = check new ("https://www.secured-soap-endpoint.com",
     {
         inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,

@@ -11,7 +11,7 @@ The `Client` is used to connect to and interact with `SOAP` 1.1 endpoints.
 ### SOAP 1.1 Client
 
 ```ballerina
-import ballerina/soap:soap11;
+import ballerina/soap.soap11;
 
 soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 ```
@@ -26,7 +26,7 @@ The SOAP 1.1 specification requires the inclusion of the `action` parameter as a
 ### Example: Send & Receive
 
 ```ballerina
-import ballerina/soap:soap11;
+import ballerina/soap.soap11;
 
 public function main() returns error? {
     soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
@@ -46,7 +46,7 @@ public function main() returns error? {
 ### Example: Send Only
 
 ```ballerina
-import ballerina/soap:soap11;
+import ballerina/soap.soap11;
 
 public function main() returns error? {
     soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
@@ -131,14 +131,14 @@ These policies empower SOAP clients to enhance the security of their web service
 import ballerina/crypto;
 import ballerina/mime;
 import ballerina/soap;
-import ballerina/soap:soap11;
+import ballerina/soap.soap11;
 
 public function main() returns error? {
     crypto:PrivateKey clientPrivateKey = ...//
     crypto:PublicKey clientPublicKey = ...//
     ​​crypto:PublicKey serverPublicKey = ...//
 
-    soap11:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    soap11:Client soapClient = check new ("http://www.secured-soap-endpoint.com",
     {
         inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
