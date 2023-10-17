@@ -142,7 +142,7 @@ import ballerina/soap;
 import ballerina/soap.soap11;
 
 public function main() returns error? {
-    soap11:Client soapClient = check new ("https://secured-soap-endpoint.com", 
+    soap11:Client soapClient = check new ("https://www.secured-soap-endpoint.com", 
         {
             inboundSecurity: [
             {
@@ -166,8 +166,6 @@ public function main() returns error? {
 }
 ```
 
-**Note**: The `https://secured-soap-endpoint.com` URL represents an endpoint for a SOAP server equipped to handle web service security. Please be aware that this URL is provided for illustrative purposes and does not correspond to an actual live server.
-
 #### SOAP 1.2 Client with Asymmetric Binding and Outbound Security Configuration
 
 ```ballerina
@@ -181,7 +179,7 @@ public function main() returns error? {
     configurable crypto:PublicKey clientPublicKey = ?;
     configurable ​crypto:PublicKey serverPublicKey = ?;
 
-    soap12:Client soapClient = check new ("https://secured-soap-endpoint.com",
+    soap12:Client soapClient = check new ("https://www.secured-soap-endpoint.com",
     {
         inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,

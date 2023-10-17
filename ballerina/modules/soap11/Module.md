@@ -138,7 +138,7 @@ public function main() returns error? {
     crypto:PublicKey clientPublicKey = ...//
     ​​crypto:PublicKey serverPublicKey = ...//
 
-    soap11:Client soapClient = check new ("http://secured-soap-endpoint.com",
+    soap11:Client soapClient = check new ("http://www.secured-soap-endpoint.com",
     {
         inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
@@ -155,8 +155,6 @@ public function main() returns error? {
     });
 }
 ```
-
-**Note**: The `http://secured-soap-endpoint.com` URL represents an endpoint for a SOAP server equipped to handle web service security. Please be aware that this URL is provided for illustrative purposes and does not correspond to an actual live server.
 
 ## Report issues
 
