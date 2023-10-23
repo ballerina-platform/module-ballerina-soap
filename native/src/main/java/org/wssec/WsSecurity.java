@@ -56,7 +56,9 @@ import static org.wssec.Utils.createError;
 import static org.wssec.WsSecurityUtils.convertDocumentToString;
 import static org.wssec.WsSecurityUtils.setUTChildElements;
 
-public class WsSecurity {
+public final class WsSecurity {
+
+    private WsSecurity() {}
 
     public static Object applyUsernameTokenPolicy(BObject wsSecHeader, BString username,
                                                   BString password, BString passwordType) {

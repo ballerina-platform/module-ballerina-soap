@@ -59,7 +59,9 @@ import static org.wssec.Constants.SIGNATURE_VALUE_TAG;
 import static org.wssec.Constants.XML_DS_NS;
 import static org.wssec.Constants.XML_ENC_NS;
 
-public class WsSecurityUtils {
+public final class WsSecurityUtils {
+
+    private WsSecurityUtils() {}
 
     public static void buildSignature(RequestData reqData, WSSecSignature sign) throws Exception {
         List<WSEncryptionPart> parts = new ArrayList<>(1);
