@@ -63,7 +63,7 @@ public isolated client class Client {
                 securedBody = body is xml ? check soap:applySecurityPolicies(self.inboundSecurity.clone(), body.clone())
                     : check soap:applySecurityPolicies(self.inboundSecurity.clone(), mimeEntity.clone());
             }
-            xml response;
+            xml|mime:Entity[] response;
             if body is mime:Entity[] {
                 body[0].setXml(securedBody);
                 response = check soap:sendReceive(body, self.soapClient, action, headers, path);
@@ -74,12 +74,16 @@ public isolated client class Client {
                 wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity.clone();
                 do {
                     if outboundSecurity is wssec:OutboundSecurityConfig {
-                        return check soap:applyOutboundConfig(outboundSecurity.clone(), response.clone());
+                        if response is xml {
+                            return check soap:applyOutboundConfig(outboundSecurity.clone(), response.clone());
+                        } else {
+                            return check soap:applyOutboundConfig(outboundSecurity.clone(), check response[0].getXml().clone());
+                        }
                     }
                 } on fail var e {
                     return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
                 }
-                return response.clone();
+                return response;
             }
         } on fail var e {
             return error Error(SOAP_ERROR, e.cause());
