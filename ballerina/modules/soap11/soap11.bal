@@ -71,7 +71,7 @@ public isolated client class Client {
             xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
                 xml envelope = body is xml ? body.clone() : mimeEntity.clone();
-                securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone());
+                securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone(), false);
             }
             xml|mime:Entity[] response;
             if body is mime:Entity[] {
@@ -85,10 +85,10 @@ public isolated client class Client {
                 do {
                     if outboundSecurity is wssec:OutboundSecurityConfig && outboundSecurity != {} {
                         if response is xml {
-                            return check soap:applyOutboundConfig(outboundSecurity.clone(), response.clone());
+                            return check soap:applyOutboundConfig(outboundSecurity.clone(), response.clone(), false);
                         } else {
                             return check soap:applyOutboundConfig(outboundSecurity.clone(), 
-                                                                  check response[0].getXml().clone());
+                                                                  check response[0].getXml().clone(), false);
                         }
                     }
                 } on fail var e {
@@ -119,7 +119,7 @@ public isolated client class Client {
             xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
                 xml envelope = body is xml ? body.clone() : mimeEntity.clone();
-                securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone());
+                securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone(), false);
             }
             return check soap:sendOnly(securedBody, self.soapClient, action, headers, path, false);
         } on fail var e {

@@ -18,9 +18,9 @@ import soap.wssec;
 
 import ballerina/crypto;
 import ballerina/http;
-import ballerina/mime;
-import ballerina/lang.regexp;
 import ballerina/jballerina.java;
+import ballerina/lang.regexp;
+import ballerina/mime;
 import ballerina/test;
 
 public isolated function validateTransportBindingPolicy(ClientConfig config) returns Error? {
@@ -39,19 +39,20 @@ public isolated function validateTransportBindingPolicy(ClientConfig config) ret
 }
 
 public isolated function getReadOnlyClientConfig(ClientConfig original) returns readonly & ClientConfig = @java:Method {
-        'class: "org.wssec.WsSecurity"
+    'class: "org.wssec.WsSecurity"
 } external;
 
 public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] security,
-                                               xml envelope) returns xml|crypto:Error|wssec:Error {
+        xml envelope, boolean soap12 = true)
+    returns xml|crypto:Error|wssec:Error {
     if security is wssec:TimestampTokenConfig {
         return wssec:applyTimestampToken(envelope, security);
     } else if security is wssec:UsernameTokenConfig {
         return wssec:applyUsernameToken(envelope, security);
     } else if security is wssec:SymmetricBindingConfig {
-        return wssec:applySymmetricBinding(envelope, security);
+        return wssec:applySymmetricBinding(envelope, soap12, security);
     } else if security is wssec:AsymmetricBindingConfig {
-        return wssec:applyAsymmetricBinding(envelope, security);
+        return wssec:applyAsymmetricBinding(envelope, soap12, security);
     } else if security is wssec:InboundSecurityConfig {
         return envelope;
     } else {
@@ -63,9 +64,10 @@ public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec
     }
 }
 
-public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope)
-    returns xml|Error {
-    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
+public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope,
+                                             boolean soap12 = true) returns xml|Error {
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
+    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
     xml soapEnvelope = envelope;
     do {
         wssec:EncryptionAlgorithm? encryptionAlgorithm = outboundSecurity.decryptionAlgorithm;
@@ -76,7 +78,7 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
                 byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, clientPrivateKey);
                 string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
                 string decryptedEnv = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, soapEnvelope.toString(),
-                                                     decryptedBody);
+                                                    decryptedBody);
                 soapEnvelope = check xml:fromString(decryptedEnv);
             }
         }
@@ -85,8 +87,14 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
             crypto:PublicKey? serverPublicKey = outboundSecurity.verificationKey;
             if serverPublicKey is crypto:PublicKey {
                 byte[] signatureData = check wssec:getSignatureData(soapEnvelope);
-                check wssec:verifyData((soapEnvelope/<soap:Body>/*).toString().toBytes(),
-                                       signatureData, serverPublicKey, signatureAlgorithm);
+                if soap12 {
+                    check wssec:verifyData((soapEnvelope/<soap12:Body>/*).toString().toBytes(),
+                                            signatureData, serverPublicKey, signatureAlgorithm);
+                } else {
+                    check wssec:verifyData((soapEnvelope/<soap11:Body>/*).toString().toBytes(),
+                                            signatureData, serverPublicKey, signatureAlgorithm);
+                }
+
             }
         }
         return soapEnvelope;
@@ -96,7 +104,7 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
 }
 
 public isolated function sendReceive(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-                                     map<string|string[]> headers = {}, string path = "", boolean soap12 = true)
+        map<string|string[]> headers = {}, string path = "", boolean soap12 = true)
     returns xml|mime:Entity[]|Error {
     http:Request req = soap12 ? createSoap12HttpRequest(body, soapAction, headers)
         : createSoap11HttpRequest(body, <string>soapAction, headers);
@@ -112,7 +120,7 @@ public isolated function sendReceive(xml|mime:Entity[] body, http:Client httpCli
 }
 
 public isolated function sendOnly(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-                                  map<string|string[]> headers = {}, string path = "", boolean soap12 = true) returns Error? {
+        map<string|string[]> headers = {}, string path = "", boolean soap12 = true) returns Error? {
     http:Request req = soap12 ? createSoap12HttpRequest(body, soapAction, headers)
         : createSoap11HttpRequest(body, <string>soapAction, headers);
     http:Response|http:ClientError response = httpClient->post(path, req);
@@ -122,7 +130,7 @@ public isolated function sendOnly(xml|mime:Entity[] body, http:Client httpClient
 }
 
 isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAction,
-                                          map<string|string[]> headers = {}) returns http:Request {
+        map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
     if body is xml {
         req.setXmlPayload(body);
@@ -139,7 +147,7 @@ isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAct
 }
 
 isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAction,
-                                          map<string|string[]> headers = {}) returns http:Request {
+        map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
     if body is xml {
         req.setXmlPayload(body);
@@ -176,8 +184,8 @@ isolated function createSoap11Response(http:Response response) returns xml|mime:
 }
 
 public function assertUsernameToken(string envelopeString, string username, string password,
-                             wssec:PasswordType passwordType, string body) returns error? {
-    string:RegExp bodyData = check regexp:fromString(body);           
+        wssec:PasswordType passwordType, string body) returns error? {
+    string:RegExp bodyData = check regexp:fromString(body);
     test:assertTrue(envelopeString.includesMatch(bodyData));
     string:RegExp usernameTokenTag = re `<wsse:UsernameToken .*>.*</wsse:UsernameToken>`;
     string:RegExp usernameTag = re `<wsse:Username>${username}</wsse:Username>`;
@@ -188,7 +196,7 @@ public function assertUsernameToken(string envelopeString, string username, stri
 }
 
 public function assertSymmetricBinding(string envelopeString, string body) returns error? {
-    string:RegExp bodyData = check regexp:fromString(body);           
+    string:RegExp bodyData = check regexp:fromString(body);
     test:assertTrue(envelopeString.includesMatch(bodyData));
     assertSignatureWithoutX509(envelopeString);
 }
