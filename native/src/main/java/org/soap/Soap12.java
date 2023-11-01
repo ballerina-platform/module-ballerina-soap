@@ -42,10 +42,10 @@ public class Soap12 {
         Future future = env.markAsync();
         ExecutionCallback executionCallback = new ExecutionCallback(future);
         UnionType typeUnion = TypeCreator.createUnionType(PredefinedTypes.TYPE_XML, PredefinedTypes.TYPE_JSON_ARRAY,
-                PredefinedTypes.TYPE_ERROR);
+                                                          PredefinedTypes.TYPE_ERROR);
         Object[] arguments = new Object[]{body, true, action, true, headers, true, path, true};
         env.getRuntime().invokeMethodAsyncConcurrently(soap12, REMOTE_FUNCTION, null, REMOTE_EXECUTION_STRAND,
-                executionCallback, null, typeUnion, arguments);
+                                                       executionCallback, null, typeUnion, arguments);
         return null;
     }
 }
