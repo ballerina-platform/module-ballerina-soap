@@ -59,17 +59,17 @@ service / on new http:Listener(9090) {
         xml payload = check request.getXmlPayload();
         xml applyOutboundConfig = check soap:applyOutboundConfig(
             {
-            verificationKey: clientPublicKey,
-            signatureAlgorithm: soap:RSA_SHA256,
-            decryptionAlgorithm: soap:RSA_ECB,
-            decryptionKey: serverPrivateKey
+                verificationKey: clientPublicKey,
+                signatureAlgorithm: soap:RSA_SHA256,
+                decryptionAlgorithm: soap:RSA_ECB,
+                decryptionKey: serverPrivateKey
         }, payload);
         xml securedEnv = check soap:applySecurityPolicies(
             {
-            signatureAlgorithm: soap:RSA_SHA256,
-            encryptionAlgorithm: soap:RSA_ECB,
-            signatureKey: serverPrivateKey,
-            encryptionKey: clientPublicKey
+                signatureAlgorithm: soap:RSA_SHA256,
+                encryptionAlgorithm: soap:RSA_ECB,
+                signatureKey: serverPrivateKey,
+                encryptionKey: clientPublicKey
         }, applyOutboundConfig);
         http:Response response = new;
         response.setPayload(securedEnv);
