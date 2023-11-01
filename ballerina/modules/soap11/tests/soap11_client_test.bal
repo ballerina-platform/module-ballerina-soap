@@ -184,6 +184,26 @@ function testSendOnly() returns error? {
 }
 
 @test:Config {
+    groups: ["soap11", "send_only"]
+}
+function testSendOnlyError() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("error-url");
+    Error? response = soapClient->sendOnly(body, "http://tempuri.org/Add", path = "/error");
+    test:assertTrue(response is Error);
+}
+
+@test:Config {
     groups: ["soap11", "send_receive"]
 }
 function testsendReceive() returns error? {
@@ -560,7 +580,7 @@ function testOutboundConfigWithMime2() returns error? {
 @test:Config {
     groups: ["soap11", "send_receive", "mime"]
 }
-function testInvalidOutboundConfigWithMime2() returns error? {
+function testInvalidOutboundConfigWithMime() returns error? {
     Client soapClient = check new ("http://localhost:9090",
         {
             inboundSecurity: {

@@ -68,6 +68,26 @@ function testSendOnly12() returns error? {
 }
 
 @test:Config {
+    groups: ["soap12", "send_only"]
+}
+function testSendOnlyError12() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("error-url");
+    Error? response = soapClient->sendOnly(body, "http://tempuri.org/Add", path = "/error");
+    test:assertTrue(response is Error);
+}
+
+@test:Config {
     groups: ["soap12", "send_receive"]
 }
 function testSendReceive12() returns error? {
@@ -525,4 +545,59 @@ function testSendReceiveWithAsymmetricBindingAndOutboundConfig() returns error? 
     xml body = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
     xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSecuredPayload");
     return soap:assertSymmetricBinding(response.toString(), string `<soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body>`);
+}
+
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
+function testInvalidOutboundConfigWithMime12() returns error? {
+    Client soapClient = check new ("http://localhost:9090",
+        {
+            inboundSecurity: {
+                signatureAlgorithm: soap:RSA_SHA256,
+                encryptionAlgorithm: soap:RSA_ECB,
+                signatureKey: clientPrivateKey,
+                encryptionKey: serverPublicKey
+            },
+            outboundSecurity: {
+                verificationKey: clientPublicKey,
+                signatureAlgorithm: soap:RSA_SHA256,
+                decryptionAlgorithm: soap:RSA_ECB,
+                decryptionKey: serverPrivateKey
+            }
+        }
+    );
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    mime:Entity[] mtomMessage = [];
+    mime:Entity envelope = new;
+    check envelope.setContentType("application/xop+xml");
+    envelope.setContentId("<soap@envelope>");
+    envelope.setBody(body);
+    mtomMessage.push(envelope);
+
+    mime:Entity bytesPart = new;
+    string readContent = check io:fileReadString(FILE_PATH);
+    bytesPart.setFileAsEntityBody(FILE_PATH);
+    string|byte[]|io:ReadableByteChannel|mime:EncodeError bytes = mime:base64Encode(readContent.toBytes());
+    if bytes !is byte[] {
+        return error("error");
+    }
+    bytesPart.setBody(bytes);
+    check bytesPart.setContentType("image/jpeg");
+    bytesPart.setContentId("<image1>");
+    mtomMessage.push(bytesPart);
+
+    mime:Entity[]|Error response = soapClient->sendReceive(mtomMessage, "http://tempuri.org/Add", path = "/getSecuredMimePayload");
+    test:assertTrue(response is Error);
+    test:assertEquals((<Error>response).message(), "Outbound security configurations do not match with the SOAP response.");
 }

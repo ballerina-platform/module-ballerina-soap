@@ -75,4 +75,32 @@ service / on new http:Listener(9090) {
         response.setPayload(securedEnv);
         return response;
     }
+
+    resource function post getSecuredMimePayload(http:Request request) returns http:Response|error {
+        xml payload = check (check request.getBodyParts())[0].getXml();
+        xml applyOutboundConfig = check soap:applyOutboundConfig(
+            {
+            verificationKey: clientPublicKey,
+            signatureAlgorithm: soap:RSA_SHA256,
+            decryptionAlgorithm: soap:RSA_ECB,
+            decryptionKey: serverPrivateKey
+        }, payload);
+        xml securedEnv = check soap:applySecurityPolicies(
+            {
+            signatureAlgorithm: soap:RSA_SHA256,
+            encryptionAlgorithm: soap:RSA_ECB,
+            signatureKey: serverPrivateKey,
+            encryptionKey: clientPublicKey
+        }, applyOutboundConfig);
+        http:Response response = new;
+        mime:Entity[] mtomMessage = [];
+        mime:Entity envelope = new;
+        check envelope.setContentType("application/xop+xml");
+        envelope.setContentId("<soap@envelope>");
+        envelope.setBody(securedEnv);
+        mtomMessage.push(envelope);
+        response.setBodyParts(mtomMessage);
+        response.setPayload(mtomMessage);
+        return response;
+    }
 }

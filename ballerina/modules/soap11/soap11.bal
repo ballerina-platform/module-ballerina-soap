@@ -63,7 +63,6 @@ public isolated client class Client {
             'class: "org.soap.Soap11"
     } external;
 
-
     isolated function generateResponse(xml|mime:Entity[] body, string action,
                                        map<string|string[]> headers = {}, string path = "")
         returns xml|mime:Entity[]|Error {
@@ -88,7 +87,8 @@ public isolated client class Client {
                         if response is xml {
                             return check soap:applyOutboundConfig(outboundSecurity.clone(), response.clone());
                         } else {
-                            return check soap:applyOutboundConfig(outboundSecurity.clone(), check response[0].getXml().clone());
+                            return check soap:applyOutboundConfig(outboundSecurity.clone(), 
+                                                                  check response[0].getXml().clone());
                         }
                     }
                 } on fail var e {
