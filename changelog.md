@@ -3,6 +3,8 @@ This file contains all the notable changes done to the Ballerina SOAP package th
 
 ## [Unreleased]
 
+## [0.8.0] - 2023-10-16
+
 ### Added
 - [Introduce soap standard library module](https://github.com/ballerina-platform/ballerina-standard-library/issues/4500)
 - [Introduce basic soap client](https://github.com/ballerina-platform/ballerina-standard-library/issues/4618)
