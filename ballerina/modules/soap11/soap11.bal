@@ -19,6 +19,7 @@ import soap.wssec;
 
 import ballerina/http;
 import ballerina/mime;
+import ballerina/jballerina.java;
 
 # Object for the basic SOAP client endpoint.
 public isolated client class Client {
@@ -45,16 +46,26 @@ public isolated client class Client {
 
     # Sends SOAP request and expects a response.
     # ```ballerina
-    # xml|mime:Entity[] response = check soapClient->sendReceive(body, action);
+    # xml response = check soapClient->sendReceive(body, action);
+    #      -- OR --
+    # mime:Entity[] response = check soapClient->sendReceive(body, action);
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + path - The resource path
+    # + typeParam - Default parameter use to infer the user specified type.
     # + return - If successful, returns the response. Else, returns an error
-    remote isolated function sendReceive(xml|mime:Entity[] body, string action,
-                                         map<string|string[]> headers = {}, string path = "")
+    remote isolated function sendReceive(xml|mime:Entity[] body, string action, map<string|string[]> headers = {},
+                                               string path = "", typedesc<any> typeParam = <>)
+        returns typeParam|Error = @java:Method {
+            'class: "org.soap.Soap11"
+    } external;
+
+
+    isolated function generateResponse(xml|mime:Entity[] body, string action,
+                                       map<string|string[]> headers = {}, string path = "")
         returns xml|mime:Entity[]|Error {
         do {
             xml securedBody;
