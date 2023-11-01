@@ -60,8 +60,8 @@ public isolated client class Client {
             xml securedBody;
             xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
-                securedBody = body is xml ? check soap:applySecurityPolicies(self.inboundSecurity.clone(), body.clone())
-                    : check soap:applySecurityPolicies(self.inboundSecurity.clone(), mimeEntity.clone());
+                xml envelope = body is xml ? body.clone() : mimeEntity.clone();
+                securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone());
             }
             xml|mime:Entity[] response;
             if body is mime:Entity[] {
@@ -107,12 +107,8 @@ public isolated client class Client {
             xml securedBody;
             xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
-                securedBody = body is xml ? check soap:applySecurityPolicies(self.inboundSecurity.clone(), body.clone())
-                    : check soap:applySecurityPolicies(self.inboundSecurity.clone(), mimeEntity.clone());
-            }
-            if body is mime:Entity[] {
-                body[0].setXml(securedBody);
-                return check soap:sendOnly(body, self.soapClient, action, headers, path);
+                xml envelope = body is xml ? body.clone() : mimeEntity.clone();
+                securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone());
             }
             return check soap:sendOnly(securedBody, self.soapClient, action, headers, path);
         } on fail var e {

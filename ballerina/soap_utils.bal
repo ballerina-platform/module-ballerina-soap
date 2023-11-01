@@ -143,17 +143,13 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
     http:Request req = new;
     if body is xml {
         req.setXmlPayload(body);
+        req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
     } else {
         req.setBodyParts(body);
+        req.setHeader(mime:CONTENT_TYPE, mime:MULTIPART_MIXED);
     }
     if soapAction is string {
-        var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
-        if mediaType is mime:MediaType {
-            mediaType.parameters = {[ACTION]: soapAction};
-            req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
-        }
-    } else {
-        req.setHeader(mime:CONTENT_TYPE, mime:APPLICATION_SOAP_XML);
+        req.addHeader(SOAP_ACTION, soapAction);
     }
     foreach string key in headers.keys() {
         req.addHeader(key, headers[key].toBalString());
