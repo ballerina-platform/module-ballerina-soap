@@ -94,8 +94,8 @@ function testSendReceive12() returns error? {
 function testSendReceive12Mime() returns error? {
     Client soapClient = check new ("http://localhost:9090");
     xml body = xml `<soap:Envelope
-                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
                         <soap:Body>
                           <quer:Add xmlns:quer="http://tempuri.org/">
                             <quer:intA>2</quer:intA>
@@ -133,8 +133,8 @@ function testSendReceive12Mime() returns error? {
 function testSendReceive12WithMime2() returns error? {
     Client soapClient = check new ("http://localhost:9090");
     xml body = xml `<soap:Envelope
-                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope/"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/">
                         <soap:Body>
                           <quer:Add xmlns:quer="http://tempuri.org/">
                             <quer:intA>2</quer:intA>
@@ -183,7 +183,7 @@ function testSendReceive12WithHeaders() returns error? {
 
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add",
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add",
                                                                     {foo: ["bar1", "bar2"]});
 
     xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body></soap:Envelope>`;
@@ -207,7 +207,7 @@ function testSendReceive12WithoutSoapAction() returns error? {
 
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    xml|mime:Entity[] response = check soapClient->sendReceive(body);
+    xml response = check soapClient->sendReceive(body);
 
     xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body></soap:Envelope>`;
     test:assertEquals(response, expected);
@@ -250,7 +250,7 @@ function testSendReceive12IncludingHeadersWithoutSoapAction() returns error? {
 
     Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
 
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, (), {foo: ["bar1", "bar2"]});
+    xml response = check soapClient->sendReceive(body, (), {foo: ["bar1", "bar2"]});
     xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body></soap:Envelope>`;
     test:assertEquals(response, expected);
 }
@@ -292,7 +292,7 @@ function testSendReceiveError() returns error? {
                       </quer:Add>
                     </soap:Body>
                 </soap:Envelope>`;
-    xml|mime:Entity[]|Error response = soapClient->sendReceive(body, "http://tempuri.org/Add");
+    xml|Error response = soapClient->sendReceive(body, "http://tempuri.org/Add");
     test:assertTrue(response is Error);
     test:assertEquals((<Error>response).message(), SOAP_ERROR);
 }
@@ -320,7 +320,7 @@ function testSendReceiveWithTimestampTokenSecurity() returns error? {
                           </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
     xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:MustUnderstand</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
@@ -354,7 +354,7 @@ function testSendReceiveWithUsernameTokenSecurity() returns error? {
                           </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
     xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:MustUnderstand</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
@@ -401,7 +401,7 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
                           </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
     xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:MustUnderstand</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
@@ -447,7 +447,7 @@ function testSendReceiveWithSymmetricBindingSecurity() returns error? {
                           </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
     xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:MustUnderstand</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
@@ -471,8 +471,8 @@ function testSoapEndpoint() returns error? {
             }
         }
     );
-    xml body = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSamePayload");
+    xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSamePayload");
     return soap:assertUsernameToken(response.toString(), username, password, wssec:TEXT, string `<soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body>`);
 }
 
