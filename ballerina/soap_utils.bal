@@ -159,18 +159,18 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
 
 isolated function createSoap12Response(http:Response response) returns xml|mime:Entity[]|error {
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
-    xml|http:ClientError payload = response.getXmlPayload();
-    if payload !is xml {
-        return check response.getBodyParts();
+    mime:Entity[]|http:ClientError payload = response.getBodyParts();
+    if payload !is mime:Entity[] {
+        return check response.getXmlPayload();
     }
     return payload;
 }
 
 isolated function createSoap11Response(http:Response response) returns xml|mime:Entity[]|error {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
-    xml|http:ClientError payload = response.getXmlPayload();
-    if payload !is xml {
-        return check response.getBodyParts();
+    mime:Entity[]|http:ClientError payload = response.getBodyParts();
+    if payload !is mime:Entity[] {
+        return check response.getXmlPayload();
     }
     return payload;
 }
