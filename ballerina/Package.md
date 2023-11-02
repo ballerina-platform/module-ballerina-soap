@@ -162,7 +162,7 @@ public function main() returns error? {
                             </quer:Add>
                             </soap:Body>
                         </soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(envelope, "http://tempuri.org/Add");
+    xml response = check soapClient->sendReceive(envelope, "http://tempuri.org/Add");
 }
 ```
 
