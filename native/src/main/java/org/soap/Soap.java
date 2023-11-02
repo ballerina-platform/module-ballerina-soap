@@ -29,7 +29,7 @@ import io.ballerina.runtime.api.values.BTypedesc;
 
 import static org.wssec.ModuleUtils.getModule;
 
-public class Soap12 {
+public class Soap {
     private static final String REMOTE_FUNCTION = "generateResponse";
     public static final StrandMetadata REMOTE_EXECUTION_STRAND = new StrandMetadata(
             getModule().getOrg(),
@@ -37,11 +37,23 @@ public class Soap12 {
             getModule().getMajorVersion(),
             REMOTE_FUNCTION);
 
-    public static Object sendReceive(Environment env, BObject soap12, Object body, Object action,
-                                     BMap<BString, BString[]> headers, BString path, BTypedesc typeParam) {
+    public static Object sendReceive11(Environment env, BObject soap11, Object body, BString action,
+                                       BMap<BString, BString[]> headers, BString path, BTypedesc typeDesc) {
         Future future = env.markAsync();
         ExecutionCallback executionCallback = new ExecutionCallback(future);
-        UnionType typeUnion = TypeCreator.createUnionType(PredefinedTypes.TYPE_XML, PredefinedTypes.TYPE_JSON_ARRAY,
+        UnionType typeUnion = TypeCreator.createUnionType(PredefinedTypes.TYPE_XML, PredefinedTypes.TYPE_ANYDATA_ARRAY,
+                PredefinedTypes.TYPE_ERROR);
+        Object[] arguments = new Object[]{body, true, action, true, headers, true, path, true};
+        env.getRuntime().invokeMethodAsyncConcurrently(soap11, REMOTE_FUNCTION, null, REMOTE_EXECUTION_STRAND,
+                executionCallback, null, typeUnion, arguments);
+        return null;
+    }
+
+    public static Object sendReceive12(Environment env, BObject soap12, Object body, Object action,
+                                       BMap<BString, BString[]> headers, BString path, BTypedesc typeDesc) {
+        Future future = env.markAsync();
+        ExecutionCallback executionCallback = new ExecutionCallback(future);
+        UnionType typeUnion = TypeCreator.createUnionType(PredefinedTypes.TYPE_XML, PredefinedTypes.TYPE_ANYDATA_ARRAY,
                                                           PredefinedTypes.TYPE_ERROR);
         Object[] arguments = new Object[]{body, true, action, true, headers, true, path, true};
         env.getRuntime().invokeMethodAsyncConcurrently(soap12, REMOTE_FUNCTION, null, REMOTE_EXECUTION_STRAND,

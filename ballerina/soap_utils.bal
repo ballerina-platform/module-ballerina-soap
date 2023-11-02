@@ -104,23 +104,24 @@ public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outbou
 }
 
 public isolated function sendReceive(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-        map<string|string[]> headers = {}, string path = "", boolean soap12 = true)
+                                     map<string|string[]> headers = {}, string path = "", boolean soap12 = true)
     returns xml|mime:Entity[]|Error {
     http:Request req = soap12 ? createSoap12HttpRequest(body, soapAction, headers)
         : createSoap11HttpRequest(body, <string>soapAction, headers);
     do {
         http:Response response = check httpClient->post(path, req);
         if soap12 {
-            return check createSoap12Response(response);
+            return check createSoapResponse(response);
         }
-        return check createSoap11Response(response);
+        return check createSoapResponse(response);
     } on fail var err {
         return error Error(SOAP_RESPONSE_ERROR, err);
     }
 }
 
 public isolated function sendOnly(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
-        map<string|string[]> headers = {}, string path = "", boolean soap12 = true) returns Error? {
+                                  map<string|string[]> headers = {}, string path = "", boolean soap12 = true)
+    returns Error? {
     http:Request req = soap12 ? createSoap12HttpRequest(body, soapAction, headers)
         : createSoap11HttpRequest(body, <string>soapAction, headers);
     http:Response|http:ClientError response = httpClient->post(path, req);
@@ -130,7 +131,7 @@ public isolated function sendOnly(xml|mime:Entity[] body, http:Client httpClient
 }
 
 isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAction,
-        map<string|string[]> headers = {}) returns http:Request {
+                                          map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
     if body is xml {
         req.setXmlPayload(body);
@@ -147,7 +148,7 @@ isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAct
 }
 
 isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAction,
-        map<string|string[]> headers = {}) returns http:Request {
+                                          map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
     if body is xml {
         req.setXmlPayload(body);
@@ -165,20 +166,10 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
     return req;
 }
 
-isolated function createSoap12Response(http:Response response) returns xml|mime:Entity[]|error {
-    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
+isolated function createSoapResponse(http:Response response) returns xml|mime:Entity[]|error {
     mime:Entity[]|http:ClientError payload = response.getBodyParts();
     if payload !is mime:Entity[] {
-        return check response.getXmlPayload();
-    }
-    return payload;
-}
-
-isolated function createSoap11Response(http:Response response) returns xml|mime:Entity[]|error {
-    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
-    mime:Entity[]|http:ClientError payload = response.getBodyParts();
-    if payload !is mime:Entity[] {
-        return check response.getXmlPayload();
+        return response.getXmlPayload();
     }
     return payload;
 }

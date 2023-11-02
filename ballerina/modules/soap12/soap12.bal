@@ -21,7 +21,7 @@ import ballerina/http;
 import ballerina/mime;
 import ballerina/jballerina.java;
 
-# Object for the basic SOAP client endpoint.
+# Object for the basic SOAP 1.2 client endpoint.
 public isolated client class Client {
     private final http:Client soapClient;
     private final readonly & wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity;
@@ -55,12 +55,13 @@ public isolated client class Client {
     # + action - SOAP action as a `string`
     # + headers - SOAP headers as a `map<string|string[]>`
     # + path - The resource path
-    # + typeParam - Default parameter use to infer the user specified type.
+    # + T - Default parameter use to infer the user specified type (`xml` or `mime:Entity[]`)
     # + return - If successful, returns the response. Else, returns an error
     remote isolated function sendReceive(xml|mime:Entity[] body, string? action = (), map<string|string[]> headers = {},
-                                         string path = "", typedesc<any> typeParam = <>)
-        returns typeParam|Error = @java:Method {
-            'class: "org.soap.Soap12"
+                                         string path = "", typedesc<xml|mime:Entity[]> T = <>)
+        returns T|Error = @java:Method {
+            'class: "org.soap.Soap",
+            name: "sendReceive12"
     } external;
 
     isolated function generateResponse(xml|mime:Entity[] body, string? action = (),
