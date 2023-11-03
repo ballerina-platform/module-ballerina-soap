@@ -3,6 +3,9 @@ This file contains all the notable changes done to the Ballerina SOAP package th
 
 ## [Unreleased]
 
+### Changed
+- [Make some of the Java classes proper utility classes](https://github.com/ballerina-platform/ballerina-standard-library/issues/5075)
+
 ## [0.8.0] - 2023-10-16
 
 ### Added
