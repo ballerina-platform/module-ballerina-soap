@@ -60,7 +60,7 @@ public isolated client class Client {
     remote isolated function sendReceive(xml|mime:Entity[] body, string? action = (), map<string|string[]> headers = {},
                                          string path = "", typedesc<xml|mime:Entity[]> T = <>)
         returns T|Error = @java:Method {
-            'class: "org.soap.Soap",
+            'class: "io.ballerina.lib.soap.Soap",
             name: "sendReceive12"
     } external;
 

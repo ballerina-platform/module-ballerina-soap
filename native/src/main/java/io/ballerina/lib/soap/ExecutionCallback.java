@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package org.soap;
+package io.ballerina.lib.soap;
 
 import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.async.Callback;
