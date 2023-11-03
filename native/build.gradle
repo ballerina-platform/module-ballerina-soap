@@ -28,6 +28,7 @@ dependencies {
     checkstyle "com.puppycrawl.tools:checkstyle:${checkstylePluginVersion}"
     
     implementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
+    implementation group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
     implementation group: 'org.apache.wss4j', name: 'wss4j-ws-security-dom', version: "${wsSecurityDomVersion}"
     implementation group: 'org.apache.wss4j', name: 'wss4j-ws-security-common', version: "${wsSecurityCommonVersion}"
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: "${xmlSecVersion}"
