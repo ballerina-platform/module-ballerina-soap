@@ -30,7 +30,7 @@ dependencies {
     implementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
     implementation 'com.google.guava:guava:32.1.1-jre'
     implementation 'org.apache.wss4j:wss4j-ws-security-dom:3.0.1'
-    implementation 'org.apache.santuario:xmlsec:3.0.2'
+    implementation 'org.apache.santuario:xmlsec:3.0.3'
     implementation 'org.apache.wss4j:wss4j-ws-security-common:3.0.1'
     compileOnly group: 'org.graalvm.nativeimage', name: 'svm', version: '22.2.0'
 }
