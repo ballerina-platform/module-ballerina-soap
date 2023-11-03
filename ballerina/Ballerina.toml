@@ -37,5 +37,5 @@ path = "./lib/wss4j-ws-security-common-3.0.1.jar"
 [[platform.java17.dependency]]
 groupId = "org.apache.santuario"
 artifactId = "xmlsec"
-version = "3.0.2"
-path = "./lib/xmlsec-3.0.2.jar"
+version = "3.0.3"
+path = "./lib/xmlsec-3.0.3.jar"
