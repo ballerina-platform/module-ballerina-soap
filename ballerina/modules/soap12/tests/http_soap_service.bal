@@ -63,14 +63,18 @@ service / on new http:Listener(9090) {
                 signatureAlgorithm: soap:RSA_SHA256,
                 decryptionAlgorithm: soap:RSA_ECB,
                 decryptionKey: serverPrivateKey
-        }, payload);
+            },
+            payload
+        );
         xml securedEnv = check soap:applySecurityPolicies(
             {
                 signatureAlgorithm: soap:RSA_SHA256,
                 encryptionAlgorithm: soap:RSA_ECB,
                 signatureKey: serverPrivateKey,
                 encryptionKey: clientPublicKey
-        }, applyOutboundConfig);
+            },
+            applyOutboundConfig
+        );
         http:Response response = new;
         response.setPayload(securedEnv);
         return response;
@@ -80,18 +84,22 @@ service / on new http:Listener(9090) {
         xml payload = check (check request.getBodyParts())[0].getXml();
         xml applyOutboundConfig = check soap:applyOutboundConfig(
             {
-            verificationKey: clientPublicKey,
-            signatureAlgorithm: soap:RSA_SHA256,
-            decryptionAlgorithm: soap:RSA_ECB,
-            decryptionKey: serverPrivateKey
-        }, payload);
+                verificationKey: clientPublicKey,
+                signatureAlgorithm: soap:RSA_SHA256,
+                decryptionAlgorithm: soap:RSA_ECB,
+                decryptionKey: serverPrivateKey
+            },
+            payload
+        );
         xml securedEnv = check soap:applySecurityPolicies(
             {
-            signatureAlgorithm: soap:RSA_SHA256,
-            encryptionAlgorithm: soap:RSA_ECB,
-            signatureKey: serverPrivateKey,
-            encryptionKey: clientPublicKey
-        }, applyOutboundConfig);
+                signatureAlgorithm: soap:RSA_SHA256,
+                encryptionAlgorithm: soap:RSA_ECB,
+                signatureKey: serverPrivateKey,
+                encryptionKey: clientPublicKey
+            },
+            applyOutboundConfig
+        );
         http:Response response = new;
         mime:Entity[] mtomMessage = [];
         mime:Entity envelope = new;
