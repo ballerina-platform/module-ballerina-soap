@@ -150,15 +150,19 @@ isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAct
 isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAction,
                                           map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
-    if body is xml {
-        req.setXmlPayload(body);
+    _ = body is xml ? req.setXmlPayload(body) : req.setBodyParts(body);
+    if soapAction is string {
+        map<string> stringMap = {};
+        stringMap["action"] = "\"" + soapAction + "\"";
+        var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
+        if mediaType is mime:MediaType {
+            mediaType.parameters = stringMap;
+            req.addHeader(mime:CONTENT_TYPE, mediaType.toString());
+        }
+    } else if body is xml {
         req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
     } else {
-        req.setBodyParts(body);
         req.setHeader(mime:CONTENT_TYPE, mime:MULTIPART_MIXED);
-    }
-    if soapAction is string {
-        req.addHeader(SOAP_ACTION, soapAction);
     }
     foreach string key in headers.keys() {
         req.addHeader(key, headers[key].toBalString());
