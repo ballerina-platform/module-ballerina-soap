@@ -48,6 +48,20 @@ service / on new http:Listener(9090) {
         return response;
     }
 
+    resource function post getActionPayload(http:Request request) returns http:Response|error {
+        string[] headers = check request.getHeaders(mime:CONTENT_TYPE);
+        mime:MediaType mediaHeader = check mime:getMediaType(headers[1]);
+        map<string> actionMap = mediaHeader.parameters;
+        string action = actionMap.get("action");
+        if action == "http://tempuri.org/Add" {
+            xml payload = check request.getXmlPayload();
+            http:Response response = new;
+            response.setPayload(payload);
+            return response;
+        }
+        return error("Invalid action is found");
+    }
+
     resource function post getSamePayload(http:Request request) returns http:Response|error {
         xml payload = check request.getXmlPayload();
         http:Response response = new;
