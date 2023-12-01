@@ -50,7 +50,7 @@ service / on new http:Listener(9090) {
 
     resource function post getActionPayload(http:Request request) returns http:Response|error {
         string[] headers = check request.getHeaders(mime:CONTENT_TYPE);
-        mime:MediaType mediaHeader = check mime:getMediaType(headers[1]);
+        mime:MediaType mediaHeader = check mime:getMediaType(headers[0]);
         map<string> actionMap = mediaHeader.parameters;
         string action = actionMap.get("action");
         if action == "http://tempuri.org/Add" {
