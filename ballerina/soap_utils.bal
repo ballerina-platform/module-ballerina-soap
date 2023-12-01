@@ -152,12 +152,10 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
     http:Request req = new;
     _ = body is xml ? req.setXmlPayload(body) : req.setBodyParts(body);
     if soapAction is string {
-        map<string> stringMap = {};
-        stringMap["action"] = "\"" + soapAction + "\"";
         var mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
         if mediaType is mime:MediaType {
-            mediaType.parameters = stringMap;
-            req.addHeader(mime:CONTENT_TYPE, mediaType.toString());
+            mediaType.parameters = {"action": string`"${soapAction}"`};
+            req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
         }
     } else if body is xml {
         req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);

@@ -24,7 +24,7 @@ const crypto:KeyStore serverKeyStore = {
     password: KEY_PASSWORD
 };
 crypto:PrivateKey serverPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(serverKeyStore, KEY_ALIAS,
-                                                                                KEY_PASSWORD);
+                                                                                  KEY_PASSWORD);
 crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
 
 service / on new http:Listener(9090) {
@@ -50,7 +50,7 @@ service / on new http:Listener(9090) {
 
     resource function post getActionPayload(http:Request request) returns http:Response|error {
         string[] headers = check request.getHeaders(mime:CONTENT_TYPE);
-        mime:MediaType mediaHeader = check mime:getMediaType(headers[1]);
+        mime:MediaType mediaHeader = check mime:getMediaType(headers[0]);
         map<string> actionMap = mediaHeader.parameters;
         string action = actionMap.get("action");
         if action == "http://tempuri.org/Add" {
