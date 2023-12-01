@@ -517,7 +517,7 @@ function testSoapReceiveWithSymmetricBindingAndOutboundConfig() returns error? {
         }
     );
     xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSamePayload");
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSamePayload");
     return soap:assertSymmetricBinding(response.toString(), string `<soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body>`);
 }
 
@@ -543,7 +543,7 @@ function testSendReceiveWithAsymmetricBindingAndOutboundConfig() returns error? 
     );
 
     xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSecuredPayload");
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSecuredPayload");
     return soap:assertSymmetricBinding(response.toString(), string `<soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body>`);
 }
 
