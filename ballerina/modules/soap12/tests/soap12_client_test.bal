@@ -199,6 +199,45 @@ function testSendReceive12WithMime2() returns error? {
 }
 
 @test:Config {
+    groups: ["soap12", "send_receive", "mime", "h"]
+}
+function testSendReceive12MimeWithoutAction() returns error? {
+    Client soapClient = check new ("http://localhost:9090");
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    mime:Entity[] mtomMessage = [];
+    mime:Entity envelope = new;
+    check envelope.setContentType("application/xop+xml");
+    envelope.setContentId("<soap@envelope>");
+    envelope.setBody(body);
+    mtomMessage.push(envelope);
+
+    mime:Entity bytesPart = new;
+    string readContent = check io:fileReadString(FILE_PATH);
+    bytesPart.setFileAsEntityBody(FILE_PATH);
+    string|byte[]|io:ReadableByteChannel|mime:EncodeError bytes = mime:base64Encode(readContent.toBytes());
+    if bytes !is byte[] {
+        return error("error");
+    }
+    bytesPart.setBody(bytes);
+    check bytesPart.setContentType("image/jpeg");
+    bytesPart.setContentId("<image1>");
+    mtomMessage.push(bytesPart);
+
+    mime:Entity[] response = check soapClient->sendReceive(mtomMessage, path = "/getMimePayload");
+    test:assertEquals(response[0].getXml(), check mtomMessage[0].getXml());
+}
+
+@test:Config {
     groups: ["soap12", "send_receive"]
 }
 function testSendReceive12WithHeaders() returns error? {
