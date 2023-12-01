@@ -88,7 +88,7 @@ function testSendOnlyError12() returns error? {
 }
 
 @test:Config {
-    groups: ["soap12", "send_receive", "ww"]
+    groups: ["soap12", "send_receive"]
 }
 function testSendReceive12WithAction() returns error? {
     Client soapClient = check new ("http://localhost:9090");
