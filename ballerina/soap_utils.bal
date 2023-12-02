@@ -150,20 +150,28 @@ isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAct
 isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAction,
                                           map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
-    _ = body is xml ? req.setXmlPayload(body) : req.setBodyParts(body);
+    if body is xml {
+        req.setXmlPayload(body);
+    } else {
+        req.setBodyParts(body);
+    }
     if soapAction is string {
         map<string> stringMap = {};
         stringMap["action"] = "\"" + soapAction + "\"";
-        mime:MediaType|mime:InvalidContentTypeError mediaType = body is xml
-            ? mime:getMediaType(mime:APPLICATION_SOAP_XML)
-            : mime:getMediaType(mime:MULTIPART_MIXED);
+        mime:MediaType|mime:InvalidContentTypeError mediaType;
+        if body is xml {
+            mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
+        } else {
+            mediaType = mime:getMediaType(mime:MULTIPART_MIXED);
+        }
         if mediaType is mime:MediaType {
             mediaType.parameters = {"action": string `"${soapAction}"`};
             req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
         }
+    } else if body is xml {
+        req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
     } else {
-        _ = body is xml ? req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML)
-            : req.setHeader(mime:CONTENT_TYPE, mime:MULTIPART_MIXED);
+        req.setHeader(mime:CONTENT_TYPE, mime:MULTIPART_MIXED);
     }
     foreach string key in headers.keys() {
         req.addHeader(key, headers[key].toBalString());
