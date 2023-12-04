@@ -156,8 +156,6 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
         req.setBodyParts(body);
     }
     if soapAction is string {
-        map<string> stringMap = {};
-        stringMap["action"] = "\"" + soapAction + "\"";
         mime:MediaType|mime:InvalidContentTypeError mediaType;
         if body is xml {
             mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
