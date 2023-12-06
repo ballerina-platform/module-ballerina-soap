@@ -1,18 +1,18 @@
 # Specification: Ballerina SOAP Library
 
-_Owners_: @shafreenAnfar @MadhukaHarith92  
-_Reviewers_: @shafreenAnfar  
-_Created_: 2023/06/07  
-_Updated_: 2023/12/01
+_Owners_: @shafreenAnfar @MadhukaHarith92 @Nuvindu \
+_Reviewers_: @shafreenAnfar \
+_Created_: 2023/06/07 \
+_Updated_: 2023/12/01 \
 _Edition_: Swan Lake
 
 ## Introduction
 
-This is the specification for the SOAP standard library of [Ballerina language](https://ballerina.io/), which provides APIs to send an ordinary XML request to a SOAP backend by specifying the necessary details to construct a SOAP envelope.
+This is the specification for the SOAP package of [Ballerina language](https://ballerina.io/), which provides APIs to send an ordinary XML request to a SOAP backend by specifying the necessary details to construct a SOAP envelope.
 
-The SOAP library specification has evolved and may continue to evolve in the future. The released versions of the specification can be found under the relevant GitHub tag.
+The SOAP package specification has evolved and may continue to evolve in the future. The released versions of the specification can be found under the relevant GitHub tag.
 
-If you have any feedback or suggestions about the library, start a discussion via a [GitHub issue](https://github.com/ballerina-platform/ballerina-library/issues) or in the [Discord server](https://discord.gg/ballerinalang). Based on the outcome of the discussion, the specification and implementation can be updated. Community feedback is always welcome. Any accepted proposal, which affects the specification is stored under `/docs/proposals`. Proposals under discussion can be found with the label `type/proposal` in GitHub.
+If you have any feedback or suggestions about the package, start a discussion via a [GitHub issue](https://github.com/ballerina-platform/ballerina-library/issues) or in the [Discord server](https://discord.gg/ballerinalang). Based on the outcome of the discussion, the specification and implementation can be updated. Community feedback is always welcome. Any accepted proposal, which affects the specification is stored under `/docs/proposals`. Proposals under discussion can be found with the label `type/proposal` in GitHub.
 
 The conforming implementation of the specification is released and included in the distribution. Any deviation from the specification is considered a bug.
 
@@ -44,7 +44,7 @@ The conforming implementation of the specification is released and included in t
 
 ## 1. Overview
 
-This specification elaborates on the functions available in the SOAP library.
+This specification elaborates on the functions available in the SOAP package.
 
 The soap module abstracts out the details of the creation of a SOAP envelope, headers, and the body in a SOAP message.
 
@@ -89,7 +89,7 @@ soap12:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?
 
 ## 2.2 Supported APIs
 
-This section outlines the APIs supported by the Ballerina SOAP library, providing an overview of their functionalities.
+This section outlines the APIs supported by the Ballerina SOAP package, providing an overview of their functionalities.
 
 ### 2.2.1 Send & Receive
 
@@ -285,7 +285,7 @@ There are two primary security configurations available for SOAP clients:
 
 ### 3.1 Policies
 
-This library currently supports the following WS Security policies:
+This package currently supports the following WS Security policies:
 
 * **Username Token**: Provides authentication through username and password credentials.
 * **Timestamp Token**: Enhances message integrity by incorporating timestamp information.
