@@ -1,5 +1,4 @@
-Ballerina SOAP Library
-===================
+# Ballerina SOAP Library
 
 [![Build](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-soap/actions/workflows/build-timestamped-master.yml)
 [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-soap/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-soap)
@@ -106,40 +105,40 @@ These policies empower SOAP clients to enhance the security of their web service
 
 #### Inbound Security Configurations
 
--  `TimestampTokenConfig`: Represents the record for Timestamp Token policy.
-	- Fields:
-	    - `int` timeToLive : The time to get expired
+- `TimestampTokenConfig`: Represents the record for Timestamp Token policy.
+  - Fields:
+    - `int` timeToLive : The time to get expired
 
 - `UsernameTokenConfig`: Represents the record for Username Token policy.
-    - Fields:
-        -  `string` username : The name of the user
-        -  `string` password : The password of the user
-        -  `PasswordType` passwordType : The password type of the username token
+  - Fields:
+    - `string` username : The name of the user
+    - `string` password : The password of the user
+    - `PasswordType` passwordType : The password type of the username token
 
 - `SymmetricBindingConfig`: Represents the record for Symmetric Binding policy.
-    - Fields:
-        - `crypto:PrivateKey` symmetricKey : The key to sign and encrypt the SOAP envelope
-        - `crypto:PublicKey` servicePublicKey : The key to encrypt the symmetric key
-        - `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
-        - `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP envelope
-        - `string` x509Token : The path or token of the X509 certificate
+  - Fields:
+    - `crypto:PrivateKey` symmetricKey : The key to sign and encrypt the SOAP envelope
+    - `crypto:PublicKey` servicePublicKey : The key to encrypt the symmetric key
+    - `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
+    - `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP envelope
+    - `string` x509Token : The path or token of the X509 certificate
 
 - `AsymmetricBindingConfig`: Represents the record for Username Token with Asymmetric Binding policy.
-    - Fields:
-        - `crypto:PrivateKey` signatureKey : The private key to sign the SOAP envelope
-        - `crypto:PublicKey` encryptionKey : The public key to encrypt the SOAP body
-        - `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
-        - `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP body
-        - `string` x509Token : field description
+  - Fields:
+    - `crypto:PrivateKey` signatureKey : The private key to sign the SOAP envelope
+    - `crypto:PublicKey` encryptionKey : The public key to encrypt the SOAP body
+    - `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
+    - `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP body
+    - `string` x509Token : field description
 
 #### Outbound Security Configurations
 
 - `OutboundSecurityConfig`: Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
-    - Fields:
-        - `crypto:PublicKey` verificationKey : The public key to verify the signature of the SOAP envelope
-        - `crypto:PrivateKey`|`crypto:PublicKey` decryptionKey : The private key to decrypt the SOAP envelope
-        - `SignatureAlgorithm` signatureAlgorithm : The algorithm to verify the SOAP envelope
-        - `EncryptionAlgorithm` decryptionAlgorithm : The algorithm to decrypt the SOAP body
+  - Fields:
+    - `crypto:PublicKey` verificationKey : The public key to verify the signature of the SOAP envelope
+    - `crypto:PrivateKey`|`crypto:PublicKey` decryptionKey : The private key to decrypt the SOAP envelope
+    - `SignatureAlgorithm` signatureAlgorithm : The algorithm to verify the SOAP envelope
+    - `EncryptionAlgorithm` decryptionAlgorithm : The algorithm to decrypt the SOAP body
 
 ### Apply Security Policies
 
@@ -228,54 +227,70 @@ This repository contains only the source code of the package.
 ### Set up the prerequisites
 
 1. Download and install Java SE Development Kit (JDK) version 17 (from one of the following locations).
-    * [Oracle](https://www.oracle.com/java/technologies/downloads/)
+    - [Oracle](https://www.oracle.com/java/technologies/downloads/)
 
-    * [OpenJDK](https://adoptium.net/)
+    - [OpenJDK](https://adoptium.net/)
 
       > **Note:** Set the JAVA_HOME environment variable to the path name of the directory into which you installed JDK.
 
 2. Export your Github Personal access token with the read package permissions as follows.
 
-              export packageUser=<Username>
-              export packagePAT=<Personal access token>
+    ```bash
+        export packageUser=<Username>
+        export packagePAT=<Personal access token>
+    ```
 
 ### Build the source
 
 Execute the commands below to build from source.
 
 1. To build the library:
-   ```    
+
+   ```bash
    ./gradlew clean build
    ```
 
 2. To run the integration tests:
-   ```
+
+   ```bash
    ./gradlew clean test
    ```
+
 3. To build the module without the tests:
-   ```
+
+   ```bash
    ./gradlew clean build -x test
    ```
+
 4. To debug module implementation:
-   ```
+
+   ```bash
    ./gradlew clean build -Pdebug=<port>
    ./gradlew clean test -Pdebug=<port>
    ```
+
 5. To debug the module with Ballerina language:
-   ```
+
+   ```bash
    ./gradlew clean build -PbalJavaDebug=<port>
    ./gradlew clean test -PbalJavaDebug=<port>
    ```
+
 6. Publish ZIP artifact to the local `.m2` repository:
-   ```
+
+   ```bash
    ./gradlew clean build publishToMavenLocal
    ```
+
 7. Publish the generated artifacts to the local Ballerina central repository:
-   ```
+
+   ```bash
    ./gradlew clean build -PpublishToLocalCentral=true
    ```
+
 8. Publish the generated artifacts to the Ballerina central repository:
-   ```
+
+   ```bash
    ./gradlew clean build -PpublishToCentral=true
    ```
 
@@ -291,7 +306,7 @@ All contributors are encouraged to read the [Ballerina Code of Conduct](https://
 
 ## Useful links
 
-* Chat live with us via our [Discord server](https://discord.gg/ballerinalang).
-* Post all technical questions on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.
-* For more information go to the [`soap` library](https://lib.ballerina.io/ballerina/soap/latest).
-* For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/).
+- Chat live with us via our [Discord server](https://discord.gg/ballerinalang).
+- Post all technical questions on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.
+- For more information go to the [`soap` library](https://lib.ballerina.io/ballerina/soap/latest).
+- For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/).

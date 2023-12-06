@@ -1,4 +1,4 @@
-## Overview
+# Overview
 
 This module offers a set of APIs that facilitate the transmission of XML requests to a SOAP 1.2 backend. It excels in managing security policies within SOAP requests, ensuring the transmission of secured SOAP envelopes. Moreover, it possesses the capability to efficiently extract data from security-applied SOAP responses.
 
@@ -39,7 +39,7 @@ public function main() returns error? {
                             </quer:Add>
                             </soap:Body>
                         </soap:Envelope>`;
-    xml|mime:Entity[] response = check soapClient->sendReceive(envelope, "http://tempuri.org/Add");
+    xml response = check soapClient->sendReceive(envelope, "http://tempuri.org/Add");
 }
 ```
 
@@ -62,6 +62,7 @@ public function main() returns error? {
     check soapClient->sendOnly(envelope, "http://tempuri.org/Add");
 }
 ```
+
 ## Security
 
 The SOAP client module introduces a robust framework for configuring security measures in SOAP communication. Security is a critical concern when exchanging data via web services, and this module offers comprehensive options to fortify SOAP requests and responses.
@@ -88,40 +89,40 @@ These policies empower SOAP clients to enhance the security of their web service
 
 #### Inbound Security Configurations
 
--  `TimestampTokenConfig`: Represents the record for Timestamp Token policy.
-	- Fields:
-	    - `int` timeToLive : The time to get expired
+- `TimestampTokenConfig`: Represents the record for Timestamp Token policy.
+  - Fields:
+    - `int` timeToLive : The time to get expired
 
 - `UsernameTokenConfig`: Represents the record for Username Token policy.
-    - Fields:
-        -  `string` username : The name of the user
-        -  `string` password : The password of the user
-        -  `PasswordType` passwordType : The password type of the username token
+  - Fields:
+    - `string` username : The name of the user
+    - `string` password : The password of the user
+    - `PasswordType` passwordType : The password type of the username token
 
 - `SymmetricBindingConfig`: Represents the record for Symmetric Binding policy.
-    - Fields:
-        - `crypto:PrivateKey` symmetricKey : The key to sign and encrypt the SOAP envelope
-        - `crypto:PublicKey` servicePublicKey : The key to encrypt the symmetric key
-        - `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
-        - `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP envelope
-        - `string` x509Token : The path or token of the X509 certificate
+  - Fields:
+    - `crypto:PrivateKey` symmetricKey : The key to sign and encrypt the SOAP envelope
+    - `crypto:PublicKey` servicePublicKey : The key to encrypt the symmetric key
+    - `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
+    - `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP envelope
+    - `string` x509Token : The path or token of the X509 certificate
 
 - `AsymmetricBindingConfig`: Represents the record for Username Token with Asymmetric Binding policy.
-    - Fields:
-        - `crypto:PrivateKey` signatureKey : The private key to sign the SOAP envelope
-        - `crypto:PublicKey` encryptionKey : The public key to encrypt the SOAP body
-        - `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
-        - `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP body
-        - `string` x509Token : field description
+  - Fields:
+    - `crypto:PrivateKey` signatureKey : The private key to sign the SOAP envelope
+    - `crypto:PublicKey` encryptionKey : The public key to encrypt the SOAP body
+    - `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
+    - `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP body
+    - `string` x509Token : field description
 
 #### Outbound Security Configurations
 
 - `OutboundSecurityConfig`: Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
-    - Fields:
-        - `crypto:PublicKey` verificationKey : The public key to verify the signature of the SOAP envelope
-        - `crypto:PrivateKey`|`crypto:PublicKey` decryptionKey : The private key to decrypt the SOAP envelope
-        - `SignatureAlgorithm` signatureAlgorithm : The algorithm to verify the SOAP envelope
-        - `EncryptionAlgorithm` decryptionAlgorithm : The algorithm to decrypt the SOAP body
+  - Fields:
+    - `crypto:PublicKey` verificationKey : The public key to verify the signature of the SOAP envelope
+    - `crypto:PrivateKey`|`crypto:PublicKey` decryptionKey : The private key to decrypt the SOAP envelope
+    - `SignatureAlgorithm` signatureAlgorithm : The algorithm to verify the SOAP envelope
+    - `EncryptionAlgorithm` decryptionAlgorithm : The algorithm to decrypt the SOAP body
 
 ### Apply Security Policies
 
