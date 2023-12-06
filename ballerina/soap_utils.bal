@@ -152,13 +152,24 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
     http:Request req = new;
     if body is xml {
         req.setXmlPayload(body);
-        req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
     } else {
         req.setBodyParts(body);
-        req.setHeader(mime:CONTENT_TYPE, mime:MULTIPART_MIXED);
     }
     if soapAction is string {
-        req.addHeader(SOAP_ACTION, soapAction);
+        mime:MediaType|mime:InvalidContentTypeError mediaType;
+        if body is xml {
+            mediaType = mime:getMediaType(mime:APPLICATION_SOAP_XML);
+        } else {
+            mediaType = mime:getMediaType(mime:MULTIPART_MIXED);
+        }
+        if mediaType is mime:MediaType {
+            mediaType.parameters = {"action": string `"${soapAction}"`};
+            req.setHeader(mime:CONTENT_TYPE, mediaType.toString());
+        }
+    } else if body is xml {
+        req.setHeader(mime:CONTENT_TYPE, mime:TEXT_XML);
+    } else {
+        req.setHeader(mime:CONTENT_TYPE, mime:MULTIPART_MIXED);
     }
     foreach string key in headers.keys() {
         req.addHeader(key, headers[key].toBalString());
