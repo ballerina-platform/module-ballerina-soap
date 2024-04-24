@@ -40,8 +40,10 @@ public enum EncryptionAlgorithm {
     RSA_ECB = "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
 }
 
+# Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
 public type OutboundSecurityConfig record {
     *wssec:OutboundSecurityConfig;
 };
 
+# Union type of all the inbound web service security configurations.
 public type InboundSecurityConfig wssec:InboundSecurityConfig;
