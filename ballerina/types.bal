@@ -41,6 +41,11 @@ public enum EncryptionAlgorithm {
 }
 
 # Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
+# 
+# + verificationKey - The public key to verify the signature of the SOAP envelope
+# + decryptionKey - The private key to decrypt the SOAP envelope
+# + signatureAlgorithm - The algorithm to verify the SOAP envelope
+# + decryptionAlgorithm - The algorithm to decrypt the SOAP body
 public type OutboundSecurityConfig record {
     *wssec:OutboundSecurityConfig;
 };
