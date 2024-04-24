@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import soap.wssec;
+
 # Represents enums for all the supported password types.
 #
 public enum PasswordType {
@@ -37,3 +39,9 @@ public enum SignatureAlgorithm {
 public enum EncryptionAlgorithm {
     RSA_ECB = "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
 }
+
+public type OutboundSecurityConfig record {
+    *wssec:OutboundSecurityConfig;
+};
+
+public type InboundSecurityConfig wssec:InboundSecurityConfig;

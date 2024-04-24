@@ -15,7 +15,6 @@
 // under the License.
 
 import soap;
-import soap.wssec;
 
 import ballerina/http;
 import ballerina/mime;
@@ -24,8 +23,8 @@ import ballerina/jballerina.java;
 # Object for the basic SOAP 1.2 client endpoint.
 public isolated client class Client {
     private final http:Client soapClient;
-    private final readonly & wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity;
-    private final readonly & wssec:OutboundSecurityConfig outboundSecurity;
+    private final readonly & soap:InboundSecurityConfig|soap:InboundSecurityConfig[] inboundSecurity;
+    private final readonly & soap:OutboundSecurityConfig outboundSecurity;
 
     # Gets invoked during object initialization.
     #
@@ -82,9 +81,9 @@ public isolated client class Client {
                 response = check soap:sendReceive(securedBody, self.soapClient, action, headers, path);
             }
             lock {
-                wssec:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity.clone();
+                soap:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity.clone();
                 do {
-                    if outboundSecurity is wssec:OutboundSecurityConfig && outboundSecurity != {} {
+                    if outboundSecurity is soap:OutboundSecurityConfig && outboundSecurity != {} {
                         if response is xml {
                             return check soap:applyOutboundConfig(outboundSecurity.clone(), response.clone());
                         } else {
