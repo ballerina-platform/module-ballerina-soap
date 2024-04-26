@@ -28,6 +28,13 @@ crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore
 
 service / on new http:Listener(9090) {
 
+    resource function post .(http:Request request) returns http:Response|error {
+        http:Response response = new;
+        xml payload = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body></soap:Envelope>`;
+        response.setPayload(payload);
+        return response;
+    }
+
     resource function post getPayload(http:Request request) returns http:Response|error {
         http:Response response = new;
         response.setPayload(check (check request.getBodyParts())[0].getXml());
