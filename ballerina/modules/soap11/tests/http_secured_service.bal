@@ -18,7 +18,7 @@ import ballerina/http;
 
 service / on new http:Listener(9091) {
 
-    resource function post .(http:Request request) returns xml|error {
+    resource function post .() returns xml|error {
         return xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:MustUnderstand</faultcode><faultstring>System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
    at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
    at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
