@@ -14,8 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import soap.wssec;
-
 import ballerina/http;
 
 # SOAP client configurations.
@@ -25,6 +23,6 @@ import ballerina/http;
 # + outboundSecurity - Web service security configurations to decrypt and verify SOAP responses
 public type ClientConfig record {|
     http:ClientConfiguration httpConfig = {};
-    wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] inboundSecurity = NO_POLICY;
-    wssec:OutboundSecurityConfig outboundSecurity = {};
+    InboundSecurityConfig|InboundSecurityConfig[] inboundSecurity = NO_POLICY;
+    OutboundSecurityConfig outboundSecurity = {};
 |};

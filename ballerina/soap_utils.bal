@@ -64,7 +64,7 @@ public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec
     }
 }
 
-public isolated function applyOutboundConfig(wssec:OutboundSecurityConfig outboundSecurity, xml envelope,
+public isolated function applyOutboundConfig(OutboundSecurityConfig outboundSecurity, xml envelope,
                                              boolean soap12 = true) returns xml|Error {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
