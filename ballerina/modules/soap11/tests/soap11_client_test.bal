@@ -179,7 +179,7 @@ function testSendOnly() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+    Client soapClient = check new ("http://localhost:9090");
     check soapClient->sendOnly(body, "http://tempuri.org/Add");
 }
 
@@ -206,8 +206,8 @@ function testSendOnlyError() returns error? {
 @test:Config {
     groups: ["soap11", "send_receive"]
 }
-function testsendReceive() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+function testSendReceive() returns error? {
+    Client soapClient = check new ("http://localhost:9090",
         {
             inboundSecurity: NO_POLICY,
             outboundSecurity: {}
@@ -244,19 +244,18 @@ function testSendReceiveWithHeaders() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+    Client soapClient = check new ("http://localhost:9090");
 
-    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add",
-                                                                {foo: ["bar1", "bar2"]});
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add", {foo: ["bar1", "bar2"]});
     xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body></soap:Envelope>`;
     test:assertEquals(response, expected);
 }
 
 @test:Config {
-    groups: ["soap11"]
+    groups: ["soap11", "q"]
 }
 function testTransportBindingError() returns error? {
-    Client|Error soapClient = new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client|Error soapClient = new ("http://localhost:9090",
         inboundSecurity = TRANSPORT_BINDING
     );
     test:assertTrue(soapClient is Error);
@@ -264,10 +263,10 @@ function testTransportBindingError() returns error? {
 }
 
 @test:Config {
-    groups: ["soap11"]
+    groups: ["soap11", "q"]
 }
 function testTransportBindingError2() returns error? {
-    Client|Error soapClient = new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client|Error soapClient = new ("http://localhost:9090",
         inboundSecurity = [
             TRANSPORT_BINDING
         ]
@@ -297,10 +296,10 @@ function testSendReceiveError() returns error? {
 }
 
 @test:Config {
-    groups: ["soap11", "send_receive"]
+    groups: ["soap11", "send_receive", "q"]
 }
 function testSendReceiveWithTimestampTokenSecurity() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client soapClient = check new ("http://localhost:9091",
         {
             inboundSecurity: [
                 {
@@ -332,7 +331,7 @@ function testSendReceiveWithTimestampTokenSecurity() returns error? {
     groups: ["soap11", "send_receive"]
 }
 function testSendReceiveWithUsernameTokenSecurity() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client soapClient = check new ("http://localhost:9091",
         {
             inboundSecurity: {
                 username: "user",
@@ -378,7 +377,7 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
     };
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client soapClient = check new ("http://localhost:9091",
         {
             inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
@@ -424,7 +423,7 @@ function testSendReceiveWithSymmetricBindingSecurity() returns error? {
     };
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client soapClient = check new ("http://localhost:9091",
         {
             inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
