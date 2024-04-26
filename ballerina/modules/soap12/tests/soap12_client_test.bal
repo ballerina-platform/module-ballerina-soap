@@ -62,7 +62,7 @@ function testSendOnly12() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+    Client soapClient = check new ("http://localhost:9090");
 
     check soapClient->sendOnly(body, "http://tempuri.org/Add");
 }
@@ -103,7 +103,7 @@ function testSendReceive12WithAction() returns error? {
     groups: ["soap12", "send_receive"]
 }
 function testSendReceive12() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+    Client soapClient = check new ("http://localhost:9090");
     xml body = xml `<soap:Envelope
                     xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                     soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
@@ -252,7 +252,7 @@ function testSendReceive12WithHeaders() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+    Client soapClient = check new ("http://localhost:9090");
 
     xml response = check soapClient->sendReceive(body, headers = {foo: ["bar1", "bar2"]});
 
@@ -275,7 +275,7 @@ function testSendOnly12WithoutSoapAction() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL");
+    Client soapClient = check new ("http://localhost:9090");
 
     check soapClient->sendOnly(body);
 }
@@ -284,7 +284,7 @@ function testSendOnly12WithoutSoapAction() returns error? {
     groups: ["soap12"]
 }
 function testTransportBindingError() returns error? {
-    Client|Error soapClient = new ("http://www.dneonline.com/calculator.asmx?WSDL", inboundSecurity = TRANSPORT_BINDING);
+    Client|Error soapClient = new ("http://localhost:9091", inboundSecurity = TRANSPORT_BINDING);
     test:assertTrue(soapClient is Error);
     test:assertEquals((<Error>soapClient).message(), SOAP_CLIENT_ERROR);
 }
@@ -293,7 +293,7 @@ function testTransportBindingError() returns error? {
     groups: ["soap12"]
 }
 function testTransportBindingError2() returns error? {
-    Client|Error soapClient = new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client|Error soapClient = new ("http://localhost:9091",
         inboundSecurity = [
             TRANSPORT_BINDING
         ]
@@ -326,7 +326,7 @@ function testSendReceiveError() returns error? {
     groups: ["soap12", "send_receive"]
 }
 function testSendReceiveWithTimestampTokenSecurity() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client soapClient = check new ("http://localhost:9091",
         {
             inboundSecurity: [
                 {
@@ -346,11 +346,12 @@ function testSendReceiveWithTimestampTokenSecurity() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
     xml response = check soapClient->sendReceive(body);
-    xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:MustUnderstand</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
-   at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
-   at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
-   at System.Web.Services.Protocols.WebServiceHandler.Invoke()
-   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</soap:Text></soap:Reason></soap:Fault></soap:Body></soap:Envelope>`;
+    xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:Sender</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapException: Unable to handle request without a valid action parameter. Please supply a valid soap action.
+   at System.Web.Services.Protocols.Soap12ServerProtocolHelper.RouteRequest()
+   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
+   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
+   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
+   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</soap:Text></soap:Reason><soap:Detail/></soap:Fault></soap:Body></soap:Envelope>`;
 
     test:assertEquals(response.toString(), expected.toString());
 }
@@ -359,7 +360,7 @@ function testSendReceiveWithTimestampTokenSecurity() returns error? {
     groups: ["soap12", "send_receive"]
 }
 function testSendReceiveWithUsernameTokenSecurity() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client soapClient = check new ("http://localhost:9091",
         {
             inboundSecurity: {
                 username: "user",
@@ -380,11 +381,12 @@ function testSendReceiveWithUsernameTokenSecurity() returns error? {
                         </soap:Body>
                     </soap:Envelope>`;
     xml response = check soapClient->sendReceive(body);
-    xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:MustUnderstand</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapHeaderException: SOAP header Security was not understood.
-   at System.Web.Services.Protocols.SoapHeaderHandling.SetHeaderMembers(SoapHeaderCollection headers, Object target, SoapHeaderMapping[] mappings, SoapHeaderDirection direction, Boolean client)
-   at System.Web.Services.Protocols.SoapServerProtocol.CreateServerInstance()
-   at System.Web.Services.Protocols.WebServiceHandler.Invoke()
-   at System.Web.Services.Protocols.WebServiceHandler.CoreProcessRequest()</soap:Text></soap:Reason></soap:Fault></soap:Body></soap:Envelope>`;
+    xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:Sender</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapException: Unable to handle request without a valid action parameter. Please supply a valid soap action.
+   at System.Web.Services.Protocols.Soap12ServerProtocolHelper.RouteRequest()
+   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
+   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
+   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
+   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</soap:Text></soap:Reason><soap:Detail/></soap:Fault></soap:Body></soap:Envelope>`;
 
     test:assertEquals(response.toString(), expected.toString());
 }
@@ -406,7 +408,7 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
     };
     crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client soapClient = check new ("http://localhost:9091",
         {
             inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
@@ -453,7 +455,7 @@ function testSendReceiveWithSymmetricBindingSecurity() returns error? {
     };
     crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
 
-    Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?WSDL",
+    Client soapClient = check new ("http://localhost:9091",
         {
             inboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
