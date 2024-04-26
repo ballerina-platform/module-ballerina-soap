@@ -252,7 +252,7 @@ function testSendReceiveWithHeaders() returns error? {
 }
 
 @test:Config {
-    groups: ["soap11", "q"]
+    groups: ["soap11"]
 }
 function testTransportBindingError() returns error? {
     Client|Error soapClient = new ("http://localhost:9090",
@@ -263,7 +263,7 @@ function testTransportBindingError() returns error? {
 }
 
 @test:Config {
-    groups: ["soap11", "q"]
+    groups: ["soap11"]
 }
 function testTransportBindingError2() returns error? {
     Client|Error soapClient = new ("http://localhost:9090",
@@ -296,7 +296,7 @@ function testSendReceiveError() returns error? {
 }
 
 @test:Config {
-    groups: ["soap11", "send_receive", "q"]
+    groups: ["soap11", "send_receive"]
 }
 function testSendReceiveWithTimestampTokenSecurity() returns error? {
     Client soapClient = check new ("http://localhost:9091",
