@@ -43,8 +43,8 @@ isolated class Signature {
                     return check crypto:signRsaSha512(data, privateKey);
                 }
             }
-        } on fail var e {
-            return error Error("Error occurred while signing the data", e.cause());
+        } on fail error signatureError {
+            return error Error("Error occurred while signing the data", signatureError);
         }
     }
 
@@ -65,8 +65,8 @@ isolated class Signature {
                     return check crypto:verifyRsaSha512Signature(data, signature, publicKey);
                 }
             }
-        } on fail var e {
-            return error Error("Error occurred while verifying the signature", e.cause());
+        } on fail error signatureError {
+            return error Error("Error occurred while verifying the signature", signatureError);
         }
     }
 

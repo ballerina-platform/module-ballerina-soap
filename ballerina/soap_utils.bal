@@ -98,8 +98,8 @@ public isolated function applyOutboundConfig(OutboundSecurityConfig outboundSecu
             }
         }
         return soapEnvelope;
-    } on fail var e {
-        return error Error("Outbound security configurations do not match with the SOAP response.", e.cause());
+    } on fail error soapError {
+        return error Error("Outbound security configurations do not match with the SOAP response", soapError);
     }
 }
 
@@ -114,8 +114,8 @@ public isolated function sendReceive(xml|mime:Entity[] body, http:Client httpCli
             return check createSoapResponse(response);
         }
         return check createSoapResponse(response);
-    } on fail var err {
-        return error Error(SOAP_RESPONSE_ERROR, err);
+    } on fail var soapError {
+        return error Error(SOAP_RESPONSE_ERROR, soapError);
     }
 }
 
