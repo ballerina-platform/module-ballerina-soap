@@ -63,7 +63,15 @@ service / on new http:Listener(9090) {
             response.setPayload(payload);
             return response;
         }
-        return error("Invalid action is found");
+        xml payload = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:Client</faultcode><faultstring>System.Web.Services.Protocols.SoapException: Server did not recognize the value of HTTP Header SOAPAction: http://tempuri.org/invalid_action.
+   at System.Web.Services.Protocols.Soap11ServerProtocolHelper.RouteRequest()
+   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
+   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
+   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
+   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</faultstring><detail/></soap:Fault></soap:Body></soap:Envelope>`;
+        http:Response response = new;
+        response.setPayload(payload);
+        return response;
     }
 
     resource function post getSamePayload(http:Request request) returns http:Response|error {

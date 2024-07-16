@@ -232,6 +232,37 @@ function testSendReceive() returns error? {
 @test:Config {
     groups: ["soap11", "send_receive"]
 }
+function testSendReceiveWithInvalidAction() returns error? {
+    Client soapClient = check new ("http://localhost:9090",
+        {
+            inboundSecurity: NO_POLICY,
+            outboundSecurity: {}
+        }
+    );
+
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/invalid_action");
+    xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:Client</faultcode><faultstring>System.Web.Services.Protocols.SoapException: Server did not recognize the value of HTTP Header SOAPAction: http://tempuri.org/invalid_action.
+   at System.Web.Services.Protocols.Soap11ServerProtocolHelper.RouteRequest()
+   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
+   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
+   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
+   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</faultstring><detail/></soap:Fault></soap:Body></soap:Envelope>`;
+    test:assertEquals(response, expected);
+}
+
+@test:Config {
+    groups: ["soap11", "send_receive"]
+}
 function testSendReceiveWithHeaders() returns error? {
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
@@ -627,5 +658,5 @@ function testInvalidOutboundConfigWithMime() returns error? {
     mtomMessage.push(bytesPart);
     xml|Error response = soapClient->sendReceive(mtomMessage, "http://tempuri.org/Add", path = "/getSecuredMimePayload");
     test:assertTrue(response is Error);
-    test:assertEquals((<Error>response).message(), "Outbound security configurations do not match with the SOAP response.");
+    test:assertEquals((<Error>response).message(), "Outbound security configurations do not match with the SOAP response");
 }
