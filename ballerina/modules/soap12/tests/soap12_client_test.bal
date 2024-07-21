@@ -363,7 +363,6 @@ function testSendReceiveWithInvalidAction() returns error? {
                     </soap:Body>
                 </soap:Envelope>`;
     xml|Error response = soapClient->sendReceive(body, "http://tempuri.org/invalid_action");
-    io:println(response);
     test:assertTrue(response is Error);
     test:assertEquals((<Error>response).message(), SOAP_ERROR);
 }
