@@ -33,10 +33,8 @@ service / on new http:Listener(9090) {
         return xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><AddResponse xmlns="http://tempuri.org/"><AddResult>5</AddResult></AddResponse></soap:Body></soap:Envelope>`;
     }
 
-    resource function post getPayload(http:Request request) returns http:Response|error {
-        http:Response response = new;
-        response.setPayload(check (check request.getBodyParts())[0].getXml());
-        return response;
+    resource function post getPayload(http:Request request) returns xml|error {
+        return check (check request.getBodyParts())[0].getXml();
     }
 
     resource function post getMimePayload(http:Request request) returns http:Response|error {
@@ -52,36 +50,27 @@ service / on new http:Listener(9090) {
         return response;
     }
 
-    resource function post getActionPayload(http:Request request) returns http:Response|error {
+    resource function post getActionPayload(http:Request request) returns xml|error {
         string[] headers = check request.getHeaders(mime:CONTENT_TYPE);
         mime:MediaType mediaHeader = check mime:getMediaType(headers[0]);
         map<string> actionMap = mediaHeader.parameters;
         string action = actionMap.get("action");
         if action == "http://tempuri.org/Add" {
-            xml payload = check request.getXmlPayload();
-            http:Response response = new;
-            response.setPayload(payload);
-            return response;
+            return check request.getXmlPayload();
         }
-        xml payload = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:Client</faultcode><faultstring>System.Web.Services.Protocols.SoapException: Server did not recognize the value of HTTP Header SOAPAction: http://tempuri.org/invalid_action.
+        return xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:Client</faultcode><faultstring>System.Web.Services.Protocols.SoapException: Server did not recognize the value of HTTP Header SOAPAction: http://tempuri.org/invalid_action.
    at System.Web.Services.Protocols.Soap11ServerProtocolHelper.RouteRequest()
    at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
    at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
    at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
    at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</faultstring><detail/></soap:Fault></soap:Body></soap:Envelope>`;
-        http:Response response = new;
-        response.setPayload(payload);
-        return response;
     }
 
-    resource function post getSamePayload(http:Request request) returns http:Response|error {
-        xml payload = check request.getXmlPayload();
-        http:Response response = new;
-        response.setPayload(payload);
-        return response;
+    resource function post getSamePayload(http:Request request) returns xml|error {
+        return check request.getXmlPayload();
     }
 
-    resource function post getSecuredPayload(http:Request request) returns http:Response|error {
+    resource function post getSecuredPayload(http:Request request) returns xml|error {
         xml payload = check request.getXmlPayload();
         xml applyOutboundConfig = check soap:applyOutboundConfig(
             {
@@ -92,7 +81,7 @@ service / on new http:Listener(9090) {
             },
             payload
         );
-        xml securedEnv = check soap:applySecurityPolicies(
+        return check soap:applySecurityPolicies(
             {
                 signatureAlgorithm: soap:RSA_SHA256,
                 encryptionAlgorithm: soap:RSA_ECB,
@@ -101,9 +90,6 @@ service / on new http:Listener(9090) {
             },
             applyOutboundConfig
         );
-        http:Response response = new;
-        response.setPayload(securedEnv);
-        return response;
     }
 
     resource function post getSecuredMimePayload(http:Request request) returns http:Response|error {

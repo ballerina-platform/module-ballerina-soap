@@ -42,10 +42,8 @@ service / on new http:Listener(9090) {
         }
     }
 
-    resource function post getPayload(http:Request request) returns http:Response|error {
-        http:Response response = new;
-        response.setPayload(check (check request.getBodyParts())[0].getXml());
-        return response;
+    resource function post getPayload(http:Request request) returns xml|error {
+        return check (check request.getBodyParts())[0].getXml();
     }
 
     resource function post getMimePayload(http:Request request) returns http:Response|error {
@@ -61,11 +59,8 @@ service / on new http:Listener(9090) {
         return response;
     }
 
-    resource function post getSamePayload(http:Request request) returns http:Response|error {
-        xml payload = check request.getXmlPayload();
-        http:Response response = new;
-        response.setPayload(payload);
-        return response;
+    resource function post getSamePayload(http:Request request) returns xml|error {
+        return check request.getXmlPayload();
     }
 
     resource function post getSecuredMimePayload(http:Request request) returns http:Response|error {
@@ -102,7 +97,7 @@ service / on new http:Listener(9090) {
         return response;
     }
 
-    resource function post getSecuredPayload(http:Request request) returns http:Response|error {
+    resource function post getSecuredPayload(http:Request request) returns xml|error {
         xml payload = check request.getXmlPayload();
         xml applyOutboundConfig = check soap:applyOutboundConfig(
             {
@@ -114,7 +109,7 @@ service / on new http:Listener(9090) {
             payload,
             false
         );
-        xml securedEnv = check soap:applySecurityPolicies(
+        return check soap:applySecurityPolicies(
             {
                 signatureAlgorithm: soap:RSA_SHA256,
                 encryptionAlgorithm: soap:RSA_ECB,
@@ -124,8 +119,5 @@ service / on new http:Listener(9090) {
             applyOutboundConfig,
             false
         );
-        http:Response response = new;
-        response.setPayload(securedEnv);
-        return response;
     }
 }
