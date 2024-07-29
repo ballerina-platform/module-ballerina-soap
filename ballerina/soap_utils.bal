@@ -110,9 +110,6 @@ public isolated function sendReceive(xml|mime:Entity[] body, http:Client httpCli
         : createSoap11HttpRequest(body, <string>soapAction, headers);
     do {
         http:Response response = check httpClient->post(path, req);
-        if soap12 {
-            return check createSoapResponse(response);
-        }
         return check createSoapResponse(response);
     } on fail var soapError {
         return error Error(SOAP_RESPONSE_ERROR, soapError);
@@ -180,7 +177,11 @@ isolated function createSoap12HttpRequest(xml|mime:Entity[] body, string? soapAc
 isolated function createSoapResponse(http:Response response) returns xml|mime:Entity[]|error {
     mime:Entity[]|http:ClientError payload = response.getBodyParts();
     if payload !is mime:Entity[] {
-        return response.getXmlPayload();
+        xml|error responsePayload = response.getXmlPayload();
+        if responsePayload is xml {
+            return responsePayload;
+        }
+        return error(response.reasonPhrase);
     }
     return payload;
 }
