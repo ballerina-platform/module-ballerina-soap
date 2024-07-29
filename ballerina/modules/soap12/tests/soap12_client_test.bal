@@ -102,6 +102,18 @@ function testSendReceive12WithAction() returns error? {
 @test:Config {
     groups: ["soap12", "send_receive"]
 }
+function testSendReceive12WithServerError() returns error? {
+    Client soapClient = check new ("http://localhost:9090");
+    xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
+
+    xml|Error response = soapClient->sendReceive(body, path = "/getErrorPayload");
+    test:assertTrue(response is Error);
+    test:assertEquals((<error>(<error>(<error>response).cause()).cause()).message(), "Internal Server Error");
+}
+
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
 function testSendReceive12WithInvalidSoapAction() returns error? {
     Client soapClient = check new ("http://localhost:9090");
     xml body = xml `<soap:Envelope
@@ -343,26 +355,6 @@ function testSendReceiveError() returns error? {
                     </soap:Body>
                 </soap:Envelope>`;
     xml|Error response = soapClient->sendReceive(body, "http://tempuri.org/Add");
-    test:assertTrue(response is Error);
-    test:assertEquals((<Error>response).message(), SOAP_ERROR);
-}
-
-@test:Config {
-    groups: ["soap12", "send_receive"]
-}
-function testSendReceiveWithInvalidAction() returns error? {
-    Client soapClient = check new ("http://www.dneonline.com/invalidcalculator.asmx?WSDL");
-    xml body = xml `<soap:Envelope
-                    xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-                    soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
-                    <soap:Body>
-                      <quer:Add xmlns:quer="http://tempuri.org/">
-                        <quer:intA>2</quer:intA>
-                        <quer:intB>3</quer:intB>
-                      </quer:Add>
-                    </soap:Body>
-                </soap:Envelope>`;
-    xml|Error response = soapClient->sendReceive(body, "http://tempuri.org/invalid_action");
     test:assertTrue(response is Error);
     test:assertEquals((<Error>response).message(), SOAP_ERROR);
 }

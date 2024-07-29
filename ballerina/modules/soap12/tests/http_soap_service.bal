@@ -66,6 +66,12 @@ service / on new http:Listener(9090) {
    at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</faultstring><detail/></soap:Fault></soap:Body></soap:Envelope>`;
     }
 
+    resource function post getErrorPayload(http:Request request) returns xml|http:InternalServerError {
+        return {
+            body:  "Error occurred in the server"
+        };
+    }
+
     resource function post getSamePayload(http:Request request) returns xml|error {
         return check request.getXmlPayload();
     }
