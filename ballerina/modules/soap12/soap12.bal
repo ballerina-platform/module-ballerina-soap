@@ -91,13 +91,13 @@ public isolated client class Client {
                                                                   check response[0].getXml().clone());
                         }
                     }
-                } on fail var e {
-                    return error Error(INVALID_OUTBOUND_SECURITY_ERROR, e.cause());
+                } on fail error soapError {
+                    return error Error(INVALID_OUTBOUND_SECURITY_ERROR, soapError);
                 }
                 return response;
             }
-        } on fail var e {
-            return error Error(SOAP_ERROR, e.cause());
+        } on fail error soapError {
+            return error Error(SOAP_ERROR, soapError);
         }
     }
 
@@ -122,8 +122,8 @@ public isolated client class Client {
                 securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone());
             }
             return check soap:sendOnly(securedBody, self.soapClient, action, headers, path);
-        } on fail var e {
-            return error Error(SOAP_ERROR, e.cause());
+        } on fail error soapError {
+            return error Error(SOAP_ERROR, soapError);
         }
     }
 }

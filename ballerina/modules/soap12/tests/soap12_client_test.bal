@@ -102,6 +102,43 @@ function testSendReceive12WithAction() returns error? {
 @test:Config {
     groups: ["soap12", "send_receive"]
 }
+function testSendReceive12WithServerError() returns error? {
+    Client soapClient = check new ("http://localhost:9090");
+    xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
+
+    xml|Error response = soapClient->sendReceive(body, path = "/getErrorPayload");
+    test:assertTrue(response is Error);
+    test:assertEquals((<error>(<error>(<error>response).cause()).cause()).message(), "Internal Server Error");
+}
+
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
+function testSendReceive12WithInvalidSoapAction() returns error? {
+    Client soapClient = check new ("http://localhost:9090");
+    xml body = xml `<soap:Envelope
+                    xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                    soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                    <soap:Body>
+                      <quer:Add xmlns:quer="http://tempuri.org/">
+                        <quer:intA>2</quer:intA>
+                        <quer:intB>3</quer:intB>
+                      </quer:Add>
+                    </soap:Body>
+                </soap:Envelope>`;
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/invalid_action", path = "/getActionPayload");
+    xml expected = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><faultcode>soap:Client</faultcode><faultstring>System.Web.Services.Protocols.SoapException: Server did not recognize the value of HTTP Header SOAPAction: http://tempuri.org/invalid_action.
+   at System.Web.Services.Protocols.Soap11ServerProtocolHelper.RouteRequest()
+   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
+   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
+   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
+   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</faultstring><detail/></soap:Fault></soap:Body></soap:Envelope>`;
+    test:assertEquals(response, expected);
+}
+
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
 function testSendReceive12() returns error? {
     Client soapClient = check new ("http://localhost:9090");
     xml body = xml `<soap:Envelope
@@ -199,7 +236,7 @@ function testSendReceive12WithMime2() returns error? {
 }
 
 @test:Config {
-    groups: ["soap12", "send_receive", "mime", "h"]
+    groups: ["soap12", "send_receive", "mime"]
 }
 function testSendReceive12MimeWithoutAction() returns error? {
     Client soapClient = check new ("http://localhost:9090");
@@ -608,5 +645,5 @@ function testInvalidOutboundConfigWithMime12() returns error? {
 
     mime:Entity[]|Error response = soapClient->sendReceive(mtomMessage, "http://tempuri.org/Add", path = "/getSecuredMimePayload");
     test:assertTrue(response is Error);
-    test:assertEquals((<Error>response).message(), "Outbound security configurations do not match with the SOAP response.");
+    test:assertEquals((<Error>response).message(), "Outbound security configurations do not match with the SOAP response");
 }

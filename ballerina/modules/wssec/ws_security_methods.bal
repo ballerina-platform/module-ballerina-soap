@@ -65,8 +65,8 @@ isolated function applyEncryptedKey(string envelopeString, crypto:PrivateKey sym
             securedEnvelope = regexp:replace(re `<wsse:SecurityTokenReference .*/>`, securedEnvelope, replace);
         }
         return securedEnvelope;
-    } on fail var e {
-        return error Error("Error occurred while applying the encrypted key to the envelope", e.cause());
+    } on fail error encryptionError {
+        return error Error("Error occurred while applying the encrypted key to the envelope", encryptionError);
     }
 }
 

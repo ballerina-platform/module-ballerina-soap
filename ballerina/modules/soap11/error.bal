@@ -17,7 +17,7 @@
 # Defines the common error type for the SOAP 1.1 module.
 public type Error distinct error;
 
-const SOAP_RESPONSE_ERROR = "Failed to create SOAP response.";
-const SOAP_CLIENT_ERROR = "Failed to initialize SOAP 1.1 client.";
+const SOAP_RESPONSE_ERROR = "Failed to create SOAP response";
+const SOAP_CLIENT_ERROR = "Failed to initialize SOAP 1.1 client";
 const SOAP_ERROR = "Error occurred while executing the API";
-const INVALID_OUTBOUND_SECURITY_ERROR = "Outbound security configurations do not match with the SOAP response.";
+const INVALID_OUTBOUND_SECURITY_ERROR = "Outbound security configurations do not match with the SOAP response";
