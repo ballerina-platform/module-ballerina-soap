@@ -321,7 +321,7 @@ function testSendOnly12WithoutSoapAction() returns error? {
     groups: ["soap12"]
 }
 function testTransportBindingError() returns error? {
-    Client|Error soapClient = new ("http://localhost:9091", inboundSecurity = TRANSPORT_BINDING);
+    Client|Error soapClient = new ("http://localhost:9091", outboundSecurity = TRANSPORT_BINDING);
     test:assertTrue(soapClient is Error);
     test:assertEquals((<Error>soapClient).message(), SOAP_CLIENT_ERROR);
 }
@@ -331,7 +331,7 @@ function testTransportBindingError() returns error? {
 }
 function testTransportBindingError2() returns error? {
     Client|Error soapClient = new ("http://localhost:9091",
-        inboundSecurity = [
+        outboundSecurity = [
             TRANSPORT_BINDING
         ]
     );
@@ -365,7 +365,7 @@ function testSendReceiveError() returns error? {
 function testSendReceiveWithTimestampTokenSecurity() returns error? {
     Client soapClient = check new ("http://localhost:9091",
         {
-            inboundSecurity: [
+            outboundSecurity: [
                 {
                     timeToLive: 600
                 }
@@ -399,12 +399,12 @@ function testSendReceiveWithTimestampTokenSecurity() returns error? {
 function testSendReceiveWithUsernameTokenSecurity() returns error? {
     Client soapClient = check new ("http://localhost:9091",
         {
-            inboundSecurity: {
+            outboundSecurity: {
                 username: "user",
                 password: "password",
                 passwordType: soap:TEXT
             },
-            outboundSecurity: {}
+            inboundSecurity: {}
         }
     );
     xml body = xml `<soap:Envelope
@@ -447,7 +447,7 @@ function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
 
     Client soapClient = check new ("http://localhost:9091",
         {
-            inboundSecurity: {
+            outboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
                 encryptionAlgorithm: soap:RSA_ECB,
                 signatureKey: clientPrivateKey,
@@ -494,7 +494,7 @@ function testSendReceiveWithSymmetricBindingSecurity() returns error? {
 
     Client soapClient = check new ("http://localhost:9091",
         {
-            inboundSecurity: {
+            outboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
                 encryptionAlgorithm: soap:RSA_ECB,
                 symmetricKey: symmetricKey,
@@ -530,7 +530,7 @@ function testSoapEndpoint() returns error? {
     string password = "password";
     Client soapClient = check new ("http://localhost:9090",
         {
-            inboundSecurity: {
+            outboundSecurity: {
                 username: username,
                 password: password,
                 passwordType: wssec:TEXT
@@ -548,13 +548,13 @@ function testSoapEndpoint() returns error? {
 function testSoapReceiveWithSymmetricBindingAndOutboundConfig() returns error? {
     Client soapClient = check new ("http://localhost:9090",
         {
-            inboundSecurity: {
+            outboundSecurity: {
                 signatureAlgorithm: wssec:RSA_SHA256,
                 encryptionAlgorithm: wssec:RSA_ECB,
                 symmetricKey: symmetricKey,
                 servicePublicKey: serverPublicKey
             },
-            outboundSecurity: {
+            inboundSecurity: {
                 verificationKey: publicKey,
                 signatureAlgorithm: wssec:RSA_SHA256,
                 decryptionAlgorithm: wssec:RSA_ECB,
@@ -573,13 +573,13 @@ function testSoapReceiveWithSymmetricBindingAndOutboundConfig() returns error? {
 function testSendReceiveWithAsymmetricBindingAndOutboundConfig() returns error? {
     Client soapClient = check new ("http://localhost:9090",
         {
-            inboundSecurity: {
+            outboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
                 encryptionAlgorithm: soap:RSA_ECB,
                 signatureKey: clientPrivateKey,
                 encryptionKey: serverPublicKey
             },
-            outboundSecurity: {
+            inboundSecurity: {
                 verificationKey: serverPublicKey,
                 signatureAlgorithm: soap:RSA_SHA256,
                 decryptionAlgorithm: soap:RSA_ECB,
@@ -599,13 +599,13 @@ function testSendReceiveWithAsymmetricBindingAndOutboundConfig() returns error? 
 function testInvalidOutboundConfigWithMime12() returns error? {
     Client soapClient = check new ("http://localhost:9090",
         {
-            inboundSecurity: {
+            outboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
                 encryptionAlgorithm: soap:RSA_ECB,
                 signatureKey: clientPrivateKey,
                 encryptionKey: serverPublicKey
             },
-            outboundSecurity: {
+            inboundSecurity: {
                 verificationKey: clientPublicKey,
                 signatureAlgorithm: soap:RSA_SHA256,
                 decryptionAlgorithm: soap:RSA_ECB,

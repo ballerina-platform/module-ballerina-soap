@@ -456,7 +456,7 @@ function testSymmetricBindingWithOutboundConfig() returns error? {
     xml securedEnvelope = check applySymmetricBinding(envelope, false, symmetricBinding);
     string envelopeString = securedEnvelope.toString();
 
-    OutboundSecurityConfig outboundConfig = {
+    InboundSecurityConfig outboundConfig = {
         verificationKey: publicKey,
         signatureAlgorithm: RSA_SHA256,
         decryptionAlgorithm: RSA_ECB,

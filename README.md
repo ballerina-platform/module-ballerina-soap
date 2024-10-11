@@ -85,9 +85,9 @@ The SOAP client module introduces a robust framework for configuring security me
 
 There are two primary security configurations available for SOAP clients:
 
-- `inboundSecurity`: This configuration is applied to the SOAP envelope when a request is made. It includes various ws security policies such as Username Token, Timestamp Token, X509 Token, Symmetric Binding, Asymmetric Binding, and Transport Binding, either individually or in combination with each other.
+- `outboundSecurity`: This configuration is applied to the SOAP envelope when a request is made. It includes various ws security policies such as Username Token, Timestamp Token, X509 Token, Symmetric Binding, Asymmetric Binding, and Transport Binding, either individually or in combination with each other.
 
-- `outboundSecurity`: This configuration is applied to the SOAP envelope when a response is received. Its purpose is to decrypt the data within the envelope and verify the digital signature for security validation.
+- `inboundSecurity`: This configuration is applied to the SOAP envelope when a response is received. Its purpose is to decrypt the data within the envelope and verify the digital signature for security validation.
 
 ### Policies
 
@@ -133,7 +133,7 @@ These policies empower SOAP clients to enhance the security of their web service
 
 #### Outbound Security Configurations
 
-- `OutboundSecurityConfig`: Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
+- `InboundSecurityConfig`: Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
   - Fields:
     - `crypto:PublicKey` verificationKey : The public key to verify the signature of the SOAP envelope
     - `crypto:PrivateKey`|`crypto:PublicKey` decryptionKey : The private key to decrypt the SOAP envelope
@@ -153,7 +153,7 @@ import ballerina/soap.soap11;
 public function main() returns error? {
     soap11:Client soapClient = check new ("https://www.secured-soap-endpoint.com", 
         {
-            inboundSecurity: [
+            outboundSecurity: [
             {
                 username: "username",
                 password: "password",
@@ -190,13 +190,13 @@ public function main() returns error? {
 
     soap12:Client soapClient = check new ("https://www.secured-soap-endpoint.com",
     {
-        inboundSecurity: {
+        outboundSecurity: {
                 signatureAlgorithm: soap:RSA_SHA256,
                 encryptionAlgorithm: soap:RSA_ECB,
                 signatureKey: clientPrivateKey,
                 encryptionKey: serverPublicKey,
         },
-        outboundSecurity: {
+        inboundSecurity: {
                 verificationKey: serverPublicKey,
                 signatureAlgorithm: soap:RSA_SHA256,
                 decryptionKey: clientPrivateKey,

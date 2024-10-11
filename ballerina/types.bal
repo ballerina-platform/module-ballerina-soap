@@ -46,9 +46,9 @@ public enum EncryptionAlgorithm {
 # + decryptionKey - The private key to decrypt the SOAP envelope
 # + signatureAlgorithm - The algorithm to verify the SOAP envelope
 # + decryptionAlgorithm - The algorithm to decrypt the SOAP body
-public type OutboundSecurityConfig record {
-    *wssec:OutboundSecurityConfig;
+public type InboundSecurityConfig record {
+    *wssec:InboundSecurityConfig;
 };
 
 # Union type of all the inbound web service security configurations.
-public type InboundSecurityConfig wssec:InboundSecurityConfig;
+public type OutboundSecurityConfig wssec:OutboundSecurityConfig;

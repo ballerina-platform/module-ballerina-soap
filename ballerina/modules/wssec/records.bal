@@ -17,7 +17,7 @@
 import ballerina/crypto;
 
 # Union type of all the inbound web service security configurations.
-public type InboundSecurityConfig NoPolicy|UsernameTokenConfig|TimestampTokenConfig|SymmetricBindingConfig
+public type OutboundSecurityConfig NoPolicy|UsernameTokenConfig|TimestampTokenConfig|SymmetricBindingConfig
     |AsymmetricBindingConfig|TransportBindingConfig;
 
 # Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
@@ -26,7 +26,7 @@ public type InboundSecurityConfig NoPolicy|UsernameTokenConfig|TimestampTokenCon
 # + decryptionKey - The private key to decrypt the SOAP envelope
 # + signatureAlgorithm - The algorithm to verify the SOAP envelope
 # + decryptionAlgorithm - The algorithm to decrypt the SOAP body
-public type OutboundSecurityConfig record {|
+public type InboundSecurityConfig record {|
     crypto:PublicKey verificationKey?;
     crypto:PrivateKey|crypto:PublicKey decryptionKey?;
     SignatureAlgorithm signatureAlgorithm?;
