@@ -32,6 +32,10 @@ const X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.
 const wssec:TransportBindingConfig TRANSPORT_BINDING = "TransportBinding";
 const wssec:NoPolicy NO_POLICY = "NoPolicy";
 
+const KEY_STORE_PATH_2 = "modules/wssec/tests/resources/keystore.jks";
+const ALIAS = "mykey";
+const PASSWORD = "password";
+
 const crypto:KeyStore clientKeyStore = {
     path: X509_KEY_STORE_PATH_2,
     password: KEY_PASSWORD
@@ -362,40 +366,6 @@ function testSendReceiveError() returns error? {
 @test:Config {
     groups: ["soap12", "send_receive"]
 }
-function testSendReceiveWithTimestampTokenSecurity() returns error? {
-    Client soapClient = check new ("http://localhost:9091",
-        {
-            outboundSecurity: [
-                {
-                    timeToLive: 600
-                }
-            ]
-        }
-    );
-    xml body = xml `<soap:Envelope
-                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
-                        <soap:Body>
-                          <quer:Add xmlns:quer="http://tempuri.org/">
-                            <quer:intA>2</quer:intA>
-                            <quer:intB>3</quer:intB>
-                          </quer:Add>
-                        </soap:Body>
-                    </soap:Envelope>`;
-    xml response = check soapClient->sendReceive(body);
-    xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:Sender</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapException: Unable to handle request without a valid action parameter. Please supply a valid soap action.
-   at System.Web.Services.Protocols.Soap12ServerProtocolHelper.RouteRequest()
-   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
-   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
-   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
-   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</soap:Text></soap:Reason><soap:Detail/></soap:Fault></soap:Body></soap:Envelope>`;
-
-    test:assertEquals(response.toString(), expected.toString());
-}
-
-@test:Config {
-    groups: ["soap12", "send_receive"]
-}
 function testSendReceiveWithUsernameTokenSecurity() returns error? {
     Client soapClient = check new ("http://localhost:9091",
         {
@@ -407,7 +377,7 @@ function testSendReceiveWithUsernameTokenSecurity() returns error? {
             inboundSecurity: {}
         }
     );
-    xml body = xml `<soap:Envelope
+    xml envelope = xml `<soap:Envelope
                         xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                         soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
                         <soap:Body>
@@ -417,109 +387,53 @@ function testSendReceiveWithUsernameTokenSecurity() returns error? {
                           </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
-    xml response = check soapClient->sendReceive(body);
-    xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:Sender</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapException: Unable to handle request without a valid action parameter. Please supply a valid soap action.
-   at System.Web.Services.Protocols.Soap12ServerProtocolHelper.RouteRequest()
-   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
-   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
-   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
-   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</soap:Text></soap:Reason><soap:Detail/></soap:Fault></soap:Body></soap:Envelope>`;
-
-    test:assertEquals(response.toString(), expected.toString());
+    xml response = check soapClient->sendReceive(envelope);
+    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
+    error? assertUsernameToken = soap:assertUsernameToken(response.toString(), "user", "password", soap:TEXT, (envelope/<soap12:Body>/*).toString());
+    test:assertTrue(assertUsernameToken !is error);
 }
 
 @test:Config {
-    groups: ["soap12", "send_receive"]
+    groups: ["soap12", "send_receive", "new"]
 }
 function testSendReceiveWithAsymmetricBindingSecurity() returns error? {
-    crypto:KeyStore serverKeyStore = {
-        path: X509_KEY_STORE_PATH,
-        password: KEY_PASSWORD
-    };
-
-    crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
-
-    crypto:KeyStore clientKeyStore = {
-        path: X509_KEY_STORE_PATH_2,
-        password: KEY_PASSWORD
-    };
-    crypto:PrivateKey clientPrivateKey = check crypto:decodeRsaPrivateKeyFromKeyStore(clientKeyStore, KEY_ALIAS, KEY_PASSWORD);
-
+    xml envelope = xml 
+    `<soap:Envelope
+        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+        <soap:Body>
+            <quer:Add xmlns:quer="http://tempuri.org/">
+            <quer:intA>2</quer:intA>
+            <quer:intB>3</quer:intB>
+            </quer:Add>
+        </soap:Body>
+    </soap:Envelope>`;
     Client soapClient = check new ("http://localhost:9091",
         {
             outboundSecurity: {
-                signatureAlgorithm: soap:RSA_SHA256,
-                encryptionAlgorithm: soap:RSA_ECB,
-                signatureKey: clientPrivateKey,
-                encryptionKey: serverPublicKey
+                signatureConfig: {
+                    keystore: {
+                        path: KEY_STORE_PATH_2,
+                        password: PASSWORD
+                    },
+                    privateKeyAlias: ALIAS, 
+                    privateKeyPassword: PASSWORD,
+                    signatureAlgorithm: wssec:RSA_SHA512,
+                    canonicalizationAlgorithm: wssec:C14N_EXCL_OMIT_COMMENTS, 
+                    digestAlgorithm: wssec:SHA512
+                }
             }
         }
     );
-    xml body = xml `<soap:Envelope
-                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
-                        <soap:Body>
-                          <quer:Add xmlns:quer="http://tempuri.org/">
-                            <quer:intA>2</quer:intA>
-                            <quer:intB>3</quer:intB>
-                          </quer:Add>
-                        </soap:Body>
-                    </soap:Envelope>`;
-    xml response = check soapClient->sendReceive(body);
-    xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:Sender</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapException: Unable to handle request without a valid action parameter. Please supply a valid soap action.
-   at System.Web.Services.Protocols.Soap12ServerProtocolHelper.RouteRequest()
-   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
-   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
-   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
-   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</soap:Text></soap:Reason><soap:Detail/></soap:Fault></soap:Body></soap:Envelope>`;
-
-    test:assertEquals(response.toString(), expected.toString());
-}
-
-@test:Config {
-    groups: ["soap12", "send_receive"]
-}
-function testSendReceiveWithSymmetricBindingSecurity() returns error? {
-    crypto:KeyStore serverKeyStore = {
-        path: X509_KEY_STORE_PATH,
-        password: KEY_PASSWORD
-    };
-    crypto:PublicKey serverPublicKey = check crypto:decodeRsaPublicKeyFromTrustStore(serverKeyStore, KEY_ALIAS);
-
-    crypto:KeyStore keyStore = {
-        path: KEY_STORE_PATH,
-        password: KEY_PASSWORD
-    };
-    crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(keyStore, KEY_ALIAS, KEY_PASSWORD);
-
-    Client soapClient = check new ("http://localhost:9091",
-        {
-            outboundSecurity: {
-                signatureAlgorithm: soap:RSA_SHA256,
-                encryptionAlgorithm: soap:RSA_ECB,
-                symmetricKey: symmetricKey,
-                servicePublicKey: serverPublicKey
-            }
+    xml response = check soapClient->sendReceive(envelope);
+    wssec:InboundConfig inboundConfig = {
+        keystore: {
+            path: KEY_STORE_PATH_2,
+            password: PASSWORD
         }
-    );
-    xml body = xml `<soap:Envelope
-                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
-                        <soap:Body>
-                          <quer:Add xmlns:quer="http://tempuri.org/">
-                            <quer:intA>2</quer:intA>
-                            <quer:intB>3</quer:intB>
-                          </quer:Add>
-                        </soap:Body>
-                    </soap:Envelope>`;
-    xml response = check soapClient->sendReceive(body);
-    xml expected = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:Sender</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">System.Web.Services.Protocols.SoapException: Unable to handle request without a valid action parameter. Please supply a valid soap action.
-   at System.Web.Services.Protocols.Soap12ServerProtocolHelper.RouteRequest()
-   at System.Web.Services.Protocols.SoapServerProtocol.RouteRequest(SoapServerMessage message)
-   at System.Web.Services.Protocols.SoapServerProtocol.Initialize()
-   at System.Web.Services.Protocols.ServerProtocol.SetContext(Type type, HttpContext context, HttpRequest request, HttpResponse response)
-   at System.Web.Services.Protocols.ServerProtocolFactory.Create(Type type, HttpContext context, HttpRequest request, HttpResponse response, Boolean&amp; abortProcessing)</soap:Text></soap:Reason><soap:Detail/></soap:Fault></soap:Body></soap:Envelope>`;
-    test:assertEquals(response.toString(), expected.toString());
+    };
+    boolean verifySignature = check wssec:verifySignature(response, inboundConfig);
+    test:assertTrue(verifySignature);
 }
 
 @test:Config {

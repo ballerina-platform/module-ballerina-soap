@@ -32,18 +32,18 @@ isolated class WsSecurity {
         'class: "org.wssec.WsSecurity"
     } external;
 
-    isolated function applySignatureOnly(Document soapEnvelope, SignatureConfig signatureConfig)
+    isolated function applySignatureOnly(Document soapEnvelope, boolean soap12, SignatureConfig signatureConfig)
         returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
 
-    isolated function applyEncryptionOnly(Document soapEnvelope, EncryptionConfig encryptionConfig)
+    isolated function applyEncryptionOnly(Document soapEnvelope, boolean soap12, EncryptionConfig encryptionConfig)
         returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
 
-    isolated function applySignatureAndEncryption(Document soapEnvelope, SignatureConfig signatureConfig, 
-                                                  EncryptionConfig encryptionConfig)
+    isolated function applySignatureAndEncryption(Document soapEnvelope, boolean soap12, 
+                                                  SignatureConfig signatureConfig, EncryptionConfig encryptionConfig)
         returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;

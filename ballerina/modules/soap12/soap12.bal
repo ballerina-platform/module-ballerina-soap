@@ -64,7 +64,7 @@ public isolated client class Client {
     } external;
 
     isolated function generateResponse(xml|mime:Entity[] body, string? action = (),
-                                         map<string|string[]> headers = {}, string path = "")
+                                       map<string|string[]> headers = {}, string path = "")
         returns xml|mime:Entity[]|Error {
         do {
             xml securedBody;

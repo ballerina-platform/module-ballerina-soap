@@ -18,7 +18,7 @@ import ballerina/crypto;
 
 # Union type of all the inbound web service security configurations.
 public type OutboundSecurityConfig NoPolicy|UsernameTokenConfig|TimestampTokenConfig|SymmetricBindingConfig
-    |AsymmetricBindingConfig|TransportBindingConfig;
+    |AsymmetricBindingConfig|TransportBindingConfig|AsymmetricConfig;
 
 # Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
 #

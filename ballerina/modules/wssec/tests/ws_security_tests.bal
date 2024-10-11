@@ -636,8 +636,20 @@ function testAsymmetricBindingWithSignatureWithRsaSha1() returns error? {
     groups: ["username_token", "signature", "asymmetric_binding", "new"]
 }
 function testAsymmetricBindingWithSignatureWithRsaSha512() returns error? {
-    xml envelope = check io:fileReadXml(SOAP_ENVELOPE_PATH);
-    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
+    xml envelope = xml `<soap:Envelope
+                            xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                            soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                            <soap:Header>
+                                <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soap:mustUnderstand="1">
+                                </wsse:Security>
+                            </soap:Header>
+                            <soap:Body>
+                                <quer:Add xmlns:quer="http://tempuri.org/">
+                                <quer:intA>2</quer:intA>
+                                <quer:intB>3</quer:intB>
+                                </quer:Add>
+                            </soap:Body>
+                        </soap:Envelope>`;
 
     AsymmetricConfig asymmetricConfig = {
         signatureConfig: {
@@ -652,7 +664,7 @@ function testAsymmetricBindingWithSignatureWithRsaSha512() returns error? {
             digestAlgorithm: SHA512
         }
     };
-    xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);
+    xml securedEnvelope = check applyAsymmetricConfigurations(envelope, true, asymmetricConfig);
     string envelopeString = securedEnvelope.toString();
     InboundConfig inboundConfig = {
         keystore: {

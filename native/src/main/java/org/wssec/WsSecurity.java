@@ -195,7 +195,8 @@ public final class WsSecurity {
         return securityConfig;
     }
 
-    public static Object applySignatureOnly(BObject documentBuilder, BMap<BString, Object> signatureConfig) {
+    public static Object applySignatureOnly(BObject documentBuilder, Boolean soap12, BMap<BString,
+                                            Object> signatureConfig) {
         Document document = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
         BMap<BString, BString> keyStore = (BMap<BString, BString>) signatureConfig
                 .getMapValue(StringUtils.fromString("keystore"));
@@ -208,7 +209,7 @@ public final class WsSecurity {
         String privateKeyPassword = signatureConfig.get(StringUtils.fromString("privateKeyPassword")).toString();
         String privateKeyAlias = signatureConfig.get(StringUtils.fromString("privateKeyAlias")).toString();
         try {
-            validateSoapHeader(document);
+            validateSoapHeader(soap12, document);
             WSSecHeader secHeader = new WSSecHeader(document);
             secHeader.insertSecurityHeader();
             WSSecSignature wsSecSignature = new WSSecSignature(secHeader);
@@ -229,11 +230,11 @@ public final class WsSecurity {
         }
     }
 
-    private static void validateSoapHeader(Document document) {
+    private static void validateSoapHeader(Boolean soap12, Document document) {
         Init.init();
-        Element header = (Element) document
-                .getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/",
-                              "Header").item(0);
+        String namespace = (soap12) ? "http://www.w3.org/2003/05/soap-envelope" : "http://schemas.xmlsoap" +
+                ".org/soap/envelope/";
+        Element header = (Element) document.getElementsByTagNameNS(namespace, "Header").item(0);
         if (header == null) {
             throw new IllegalStateException("SOAP Envelope must have a Header");
         }
@@ -317,7 +318,7 @@ public final class WsSecurity {
         }
     }
 
-    public static Object applyEncryptionOnly(BObject documentBuilder,
+    public static Object applyEncryptionOnly(BObject documentBuilder, Boolean soap12,
                                              BMap<BString, Object> config) {
         try {
             Document document = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
@@ -326,7 +327,7 @@ public final class WsSecurity {
             String path = keyStore.get(StringUtils.fromString("path")).toString();
             String password = keyStore.get(StringUtils.fromString("password")).toString();
             String publicKeyAlias = config.get(StringUtils.fromString("publicKeyAlias")).toString();
-            validateSoapHeader(document);
+            validateSoapHeader(soap12, document);
             WSSecHeader secHeader = new WSSecHeader(document);
             secHeader.insertSecurityHeader();
             WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
@@ -347,7 +348,8 @@ public final class WsSecurity {
         }
     }
 
-    public static Object applySignatureAndEncryption(BObject documentBuilder, BMap<BString, Object> signatureConfig,
+    public static Object applySignatureAndEncryption(BObject documentBuilder, Boolean soap12,
+                                                     BMap<BString, Object> signatureConfig,
                                                      BMap<BString, Object> encryptionConfig) {
         try {
             Document document = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
@@ -362,7 +364,7 @@ public final class WsSecurity {
             String canonicalizationAlgorithm = signatureConfig
                     .get(StringUtils.fromString("canonicalizationAlgorithm")).toString();
             String signatureAlgorithm = signatureConfig.get(StringUtils.fromString("signatureAlgorithm")).toString();
-            validateSoapHeader(document);
+            validateSoapHeader(soap12, document);
 
             Properties properties = new Properties();
             properties.put("org.apache.ws.security.crypto.provider", "org.apache.wss4j.common.crypto.Merlin");

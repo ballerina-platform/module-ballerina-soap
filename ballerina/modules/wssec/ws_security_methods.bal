@@ -261,11 +261,12 @@ public isolated function applyAsymmetricConfigurations(xml envelope, boolean soa
     EncryptionConfig? encryptionConfig = asymmetricBinding.encryptionConfig;
     string securedEnvelope = envelope.toString();
     if signatureConfig !is () && encryptionConfig !is () {
-        securedEnvelope = check wsSecurity.applySignatureAndEncryption(document, signatureConfig, encryptionConfig);
+        securedEnvelope = check wsSecurity
+            .applySignatureAndEncryption(document, soap12, signatureConfig, encryptionConfig);
     } else if signatureConfig !is () {
-        securedEnvelope = check wsSecurity.applySignatureOnly(document, signatureConfig);
+        securedEnvelope = check wsSecurity.applySignatureOnly(document, soap12, signatureConfig);
     } else if encryptionConfig !is () {
-        securedEnvelope = check wsSecurity.applyEncryptionOnly(document, encryptionConfig);
+        securedEnvelope = check wsSecurity.applyEncryptionOnly(document, soap12, encryptionConfig);
     }
     return convertStringToXml(securedEnvelope);
 }
