@@ -46,7 +46,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -59,13 +58,10 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
 import static org.apache.wss4j.common.WSS4JConstants.AES_128_GCM;
 import static org.apache.wss4j.common.WSS4JConstants.HMAC_SHA1;
-import static org.apache.wss4j.common.WSS4JConstants.RSA_SHA1;
-import static org.apache.wss4j.common.WSS4JConstants.SHA1;
 import static org.apache.wss4j.dom.WSConstants.CUSTOM_KEY_IDENTIFIER;
 import static org.apache.wss4j.dom.WSConstants.X509_KEY_IDENTIFIER;
 import static org.wssec.Constants.DERIVED_KEY_DIGEST;
@@ -291,13 +287,17 @@ public final class WsSecurity {
 
     public static Object decryptEnvelope(BObject documentBuilder, BMap<BString, Object> config) {
         Document encryptedDocument = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
+        BMap<BString, BString> keyStore = (BMap<BString, BString>) config
+                .getMapValue(StringUtils.fromString("keystore"));
+        String path = keyStore.get(StringUtils.fromString("path")).toString();
+        String password = keyStore.get(StringUtils.fromString("password")).toString();
         WSSecHeader secHeader = new WSSecHeader(encryptedDocument);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
         Properties properties = new Properties();
         properties.put("org.apache.ws.security.crypto.provider", "org.apache.wss4j.common.crypto.Merlin");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "/Users/nuvindu/Ballerina/hardrock/digest-value/src/main/resources/keystore.jks");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "password");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", path);
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", password);
         try {
             Crypto crypto = CryptoFactory.getInstance(properties);
             requestData.setSigVerCrypto(crypto);
@@ -305,7 +305,7 @@ public final class WsSecurity {
             requestData.setSecHeader(secHeader);
             CallbackHandler passwordCallbackHandler = callbacks -> {
                 for (Callback callback: callbacks) {
-                    ((WSPasswordCallback) callback).setPassword("password");
+                    ((WSPasswordCallback) callback).setPassword(password);
                 }
             };
             requestData.setCallbackHandler(passwordCallbackHandler);
