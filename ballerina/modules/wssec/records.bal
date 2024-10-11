@@ -81,9 +81,44 @@ public type AsymmetricBindingConfig record {|
     string x509Token?;
 |};
 
+public type AsymmetricConfig record {|
+    SignatureConfig signatureConfig?;
+    EncryptionConfig encryptionConfig?;
+    string x509Token?;
+|};
+
+public type SignatureConfig record {|
+    crypto:KeyStore keystore;
+    string privateKeyAlias;
+    string privateKeyPassword;
+    SignatureAlgorithm signatureAlgorithm?;
+    CanonicalizationAlgorithm canonicalizationAlgorithm;
+    DigestAlgorithm digestAlgorithm;
+|};
+
+public type EncryptionConfig record {|
+    crypto:KeyStore keystore;
+    string publicKeyAlias;
+    SymmetricAlgorithm symmetricAlgorithm?;
+|};
+
 # Represents the record for Transport Binding policy.
 # + protocol - Protocol of the endpoint
 public type TransportBindingConfig "TransportBinding";
 
 # Represents the record to send SOAP envelopes with no security policy.
 public type NoPolicy "NoPolicy";
+
+# Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
+#
+# + verificationKey - The public key to verify the signature of the SOAP envelope
+# + decryptionKey - The private key to decrypt the SOAP envelope
+# + signatureAlgorithm - The algorithm to verify the SOAP envelope
+# + decryptionAlgorithm - The algorithm to decrypt the SOAP body
+public type InboundConfig record {|
+    crypto:KeyStore keystore;
+    crypto:PublicKey verificationKey?;
+    SignatureAlgorithm signatureAlgorithm?;
+    crypto:PrivateKey|crypto:PublicKey decryptionKey?;
+    EncryptionAlgorithm decryptionAlgorithm?;
+|};

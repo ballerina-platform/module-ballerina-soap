@@ -28,6 +28,27 @@ public enum SignatureAlgorithm {
     RSA_SHA512 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"
 }
 
+public enum CanonicalizationAlgorithm {
+    C14N_OMIT_COMMENTS = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+    C14N_WITH_COMMENTS = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments",
+    C14N_EXCL_OMIT_COMMENTS = "http://www.w3.org/2001/10/xml-exc-c14n#",
+    C14N_EXCL_WITH_COMMENTS = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments"
+}
+
+public enum DigestAlgorithm {
+    SHA1 = "http://www.w3.org/2000/09/xmldsig#sha1",
+    SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256",
+    SHA384 = "http://www.w3.org/2001/04/xmldsig-more#sha384",
+    SHA512 = "http://www.w3.org/2001/04/xmlenc#sha512"
+}
+
 public enum EncryptionAlgorithm {
     RSA_ECB = "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
+}
+
+public enum SymmetricAlgorithm {
+    TRIPLE_DES = "http://www.w3.org/2001/04/xmlenc#tripledes-cbc",
+    AES_128 = "http://www.w3.org/2001/04/xmlenc#aes128-cbc",
+    AES_256 = "http://www.w3.org/2001/04/xmlenc#aes256-cbc",
+    AES_192 = "http://www.w3.org/2001/04/xmlenc#aes192-cbc"
 }

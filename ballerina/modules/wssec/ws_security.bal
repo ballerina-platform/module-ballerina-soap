@@ -27,13 +27,39 @@ isolated class WsSecurity {
         'class: "org.wssec.WsSecurity"
     } external;
 
-    isolated function applySignatureOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Signature signature, string? x509FilePath)
+    isolated function applySignatureOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Signature signature,
+                                               string? x509FilePath) returns string|Error = @java:Method {
+        'class: "org.wssec.WsSecurity"
+    } external;
+
+    isolated function applySignatureOnly(Document soapEnvelope, SignatureConfig signatureConfig)
+        returns string|Error = @java:Method {
+        'class: "org.wssec.WsSecurity"
+    } external;
+
+    isolated function applyEncryptionOnly(Document soapEnvelope, EncryptionConfig encryptionConfig)
+        returns string|Error = @java:Method {
+        'class: "org.wssec.WsSecurity"
+    } external;
+
+    isolated function applySignatureAndEncryption(Document soapEnvelope, SignatureConfig signatureConfig, 
+                                                  EncryptionConfig encryptionConfig)
         returns string|Error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
 
     isolated function applyEncryptionOnlyPolicy(WSSecurityHeader wsSecurityPolicy, Encryption encryption)
         returns string|Error = @java:Method {
+        'class: "org.wssec.WsSecurity"
+    } external;
+
+    isolated function verifySignature(Document soapEnvelope, InboundConfig config)
+        returns boolean|error = @java:Method {
+        'class: "org.wssec.WsSecurity"
+    } external;
+
+    isolated function decryptEnvelope(Document soapEnvelope, InboundConfig config)
+        returns Document|error = @java:Method {
         'class: "org.wssec.WsSecurity"
     } external;
 }
