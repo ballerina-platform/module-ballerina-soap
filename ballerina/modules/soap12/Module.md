@@ -87,7 +87,7 @@ These policies empower SOAP clients to enhance the security of their web service
 
 ### Security Policy Configuration Types
 
-#### Inbound Security Configurations
+#### Outbound Security Configurations
 
 - `TimestampTokenConfig`: Represents the record for Timestamp Token policy.
   - Fields:
@@ -113,7 +113,7 @@ These policies empower SOAP clients to enhance the security of their web service
     - `EncryptionConfig` encryptionConfig : Configuration for applying encryption
     - `string` x509Token : The path or token of the X509 certificate
 
-#### Outbound Security Configurations
+#### Inbound Security Configurations
 
 - `InboundSecurityConfig`: Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
   - Fields:

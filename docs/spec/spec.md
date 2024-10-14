@@ -36,8 +36,8 @@ The conforming implementation of the specification is released and included in t
 3. [Security](#3-security)
     * 3.1 [Policies](#31-policies)
     * 3.2 [Security Policy Configuration Types](#32-security-policy-configuration-types)
-        * 3.2.1 [Inbound Security Configurations](#321-inbound-security-configurations)
-        * 3.2.2 [Outbound Security Configurations](#322-outbound-security-configurations)
+        * 3.2.1 [Outbound Security Configurations](#321-outbound-security-configurations)
+        * 3.2.2 [Inbound Security Configurations](#322-inbound-security-configurations)
     * 3.3 [Configure Security Policies](#33-configure-security-policies)
         * [UsernameToken and TranportBinding Policy with SOAP 1.1 Client](#331-usernametoken-and-tranportbinding-policy-with-soap-11-client)
         * [Asymmetric Binding and Outbound Security Configuration with SOAP 1.2 Client](#332-asymmetric-binding-and-outbound-security-configuration-with-soap-12-client)
@@ -299,7 +299,7 @@ These policies empower SOAP clients to enhance the security of their web service
 
 This subsection introduces the configuration types for inbound and outbound security, providing detailed information on each type.
 
-#### 3.2.1 Inbound Security Configurations
+#### 3.2.1 Outbound Security Configurations
 
 * `TimestampTokenConfig`: Represents the record for Timestamp Token policy.
   * Fields:
@@ -325,7 +325,7 @@ This subsection introduces the configuration types for inbound and outbound secu
     - `EncryptionConfig` encryptionConfig : Configuration for applying encryption
     - `string` x509Token : The path or token of the X509 certificate
 
-#### 3.2.2 Outbound Security Configurations
+#### 3.2.2 Inbound Security Configurations
 
 * `InboundSecurityConfig`: Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
   * Fields:
