@@ -43,12 +43,7 @@ public enum DigestAlgorithm {
 }
 
 public enum EncryptionAlgorithm {
-    RSA_ECB = "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
-}
-
-public enum SymmetricAlgorithm {
     TRIPLE_DES = "http://www.w3.org/2001/04/xmlenc#tripledes-cbc",
     AES_128 = "http://www.w3.org/2001/04/xmlenc#aes128-cbc",
-    AES_256 = "http://www.w3.org/2001/04/xmlenc#aes256-cbc",
-    AES_192 = "http://www.w3.org/2001/04/xmlenc#aes192-cbc"
+    AES_256 = "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
 }

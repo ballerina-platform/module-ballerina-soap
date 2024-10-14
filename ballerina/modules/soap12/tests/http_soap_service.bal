@@ -18,6 +18,7 @@ import ballerina/crypto;
 import ballerina/http;
 import ballerina/mime;
 import ballerina/soap;
+import soap.wssec;
 
 const crypto:KeyStore serverKeyStore = {
     path: X509_KEY_STORE_PATH,
@@ -82,7 +83,7 @@ service / on new http:Listener(9090) {
             {
                 verificationKey: clientPublicKey,
                 signatureAlgorithm: soap:RSA_SHA256,
-                decryptionAlgorithm: soap:RSA_ECB,
+                decryptionAlgorithm: wssec:AES_128,
                 decryptionKey: serverPrivateKey
             },
             payload
@@ -96,7 +97,7 @@ service / on new http:Listener(9090) {
             {
                 verificationKey: clientPublicKey,
                 signatureAlgorithm: soap:RSA_SHA256,
-                decryptionAlgorithm: soap:RSA_ECB,
+                decryptionAlgorithm: wssec:AES_128,
                 decryptionKey: serverPrivateKey
             },
             payload

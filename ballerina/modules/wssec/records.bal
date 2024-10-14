@@ -66,21 +66,6 @@ public type SymmetricBindingConfig record {|
     string x509Token?;
 |};
 
-// # Represents the record for Username Token with Asymmetric Binding policy.
-// #
-// # + signatureKey - The private key to sign the SOAP envelope
-// # + encryptionKey - The public key to encrypt the SOAP body
-// # + signatureAlgorithm - The algorithm to sign the SOAP envelope
-// # + encryptionAlgorithm - The algorithm to encrypt the SOAP body
-// # + x509Token - field description
-// public type AsymmetricBindingConfig record {|
-//     crypto:PrivateKey signatureKey?;
-//     crypto:PublicKey encryptionKey?;
-//     SignatureAlgorithm signatureAlgorithm?;
-//     EncryptionAlgorithm encryptionAlgorithm?;
-//     string x509Token?;
-// |};
-
 public type AsymmetricConfig record {|
     SignatureConfig signatureConfig?;
     EncryptionConfig encryptionConfig?;
@@ -99,7 +84,7 @@ public type SignatureConfig record {|
 public type EncryptionConfig record {|
     crypto:KeyStore keystore;
     string publicKeyAlias;
-    SymmetricAlgorithm symmetricAlgorithm?;
+    EncryptionAlgorithm encryptionAlgorithm?;
 |};
 
 # Represents the record for Transport Binding policy.
@@ -116,7 +101,7 @@ public type NoPolicy "NoPolicy";
 # + signatureAlgorithm - The algorithm to verify the SOAP envelope
 # + decryptionAlgorithm - The algorithm to decrypt the SOAP body
 public type InboundConfig record {|
-    crypto:KeyStore keystore;
+    crypto:KeyStore keystore?;
     crypto:PublicKey verificationKey?;
     SignatureAlgorithm signatureAlgorithm?;
     crypto:PrivateKey|crypto:PublicKey decryptionKey?;

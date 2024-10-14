@@ -235,7 +235,7 @@ function testSymmetricBindingPolicyEncryptionOnly() returns error? {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 
     SymmetricBindingConfig symmetricBinding = {
-        encryptionAlgorithm: RSA_ECB,
+        encryptionAlgorithm: AES_128,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
@@ -263,7 +263,7 @@ function testSymmetricBindingWithSignatureAndEncryption() returns error? {
 
     SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
-        encryptionAlgorithm: RSA_ECB,
+        encryptionAlgorithm: AES_128,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
@@ -297,7 +297,7 @@ function testSymmetricBindingPolicyWithX509SignatureAndEncryption() returns erro
 
     SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
-        encryptionAlgorithm: RSA_ECB,
+        encryptionAlgorithm: AES_128,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey,
         x509Token: X509_PUBLIC_CERT_PATH_2
@@ -341,7 +341,7 @@ function testUsernameTokenWithSymmetricBinding() returns error? {
 
     SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
-        encryptionAlgorithm: RSA_ECB,
+        encryptionAlgorithm: AES_128,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
@@ -398,7 +398,7 @@ function testUsernameTokenTimestampWithSymmetricBindingAndX509Token() returns er
 
     SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
-        encryptionAlgorithm: RSA_ECB,
+        encryptionAlgorithm: AES_128,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey,
         x509Token: X509_PUBLIC_CERT_PATH_2
@@ -448,7 +448,7 @@ function testSymmetricBindingWithOutboundConfig() returns error? {
 
     SymmetricBindingConfig symmetricBinding = {
         signatureAlgorithm: RSA_SHA256,
-        encryptionAlgorithm: RSA_ECB,
+        encryptionAlgorithm: AES_128,
         symmetricKey: symmetricKey,
         servicePublicKey: serverPublicKey
     };
@@ -459,7 +459,7 @@ function testSymmetricBindingWithOutboundConfig() returns error? {
     InboundSecurityConfig outboundConfig = {
         verificationKey: publicKey,
         signatureAlgorithm: RSA_SHA256,
-        decryptionAlgorithm: RSA_ECB,
+        decryptionAlgorithm: AES_128,
         decryptionKey: publicKey
     };
 
@@ -678,7 +678,7 @@ function testAsymmetricBindingWithSignatureWithRsaSha512() returns error? {
 }
 
 @test:Config {
-    groups: ["username_token", "signature", "symmetric_binding", "new"]
+    groups: ["username_token", "signature", "symmetric_binding", "new4"]
 }
 function testAsymmetricBindingPolicyWithSignatureAndEncryption() returns error? {
     xml envelope = check io:fileReadXml(SOAP_ENVELOPE_PATH);
@@ -701,7 +701,8 @@ function testAsymmetricBindingPolicyWithSignatureAndEncryption() returns error? 
                 path: KEY_STORE_PATH_2,
                 password: PASSWORD
             },
-            publicKeyAlias: ALIAS
+            publicKeyAlias: ALIAS,
+            encryptionAlgorithm: AES_128
         }
     };
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);
@@ -720,7 +721,7 @@ function testAsymmetricBindingPolicyWithSignatureAndEncryption() returns error? 
 }
 
 @test:Config {
-    groups: ["username_token", "signature", "symmetric_binding", "new"]
+    groups: ["username_token", "signature", "symmetric_binding", "new3"]
 }
 function testAsymmetricBindingPolicyWithEncryption() returns error? {
     xml envelope = check io:fileReadXml(SOAP_ENVELOPE_PATH);
@@ -732,7 +733,8 @@ function testAsymmetricBindingPolicyWithEncryption() returns error? {
                 path: KEY_STORE_PATH_2,
                 password: PASSWORD
             },
-            publicKeyAlias: ALIAS
+            publicKeyAlias: ALIAS,
+            encryptionAlgorithm: AES_256
         }
     };
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);

@@ -19,6 +19,7 @@ import soap;
 import ballerina/http;
 import ballerina/mime;
 import ballerina/jballerina.java;
+import soap.wssec;
 
 # Object for the basic SOAP 1.1 client endpoint.
 public isolated client class Client {
@@ -85,9 +86,9 @@ public isolated client class Client {
                 do {
                     if inboundSecurity is soap:InboundSecurityConfig && inboundSecurity != {} {
                         if response is xml {
-                            return check soap:applyOutboundConfig(inboundSecurity.clone(), response.clone(), false);
+                            return check soap:applyOutboundConfig(<wssec:InboundConfig>inboundSecurity.clone(), response.clone(), false);
                         } else {
-                            return check soap:applyOutboundConfig(inboundSecurity.clone(), 
+                            return check soap:applyOutboundConfig(<wssec:InboundConfig>inboundSecurity.clone(), 
                                                                   check response[0].getXml().clone(), false);
                         }
                     }

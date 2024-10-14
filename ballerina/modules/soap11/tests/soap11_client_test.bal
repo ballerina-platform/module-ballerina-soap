@@ -383,24 +383,29 @@ function testSoapEndpoint() returns error? {
 @test:Config {
     groups: ["soap11", "send_receive"]
 }
-function testSoapReceiveWithSymmetricBindingAndOutboundConfig() returns error? {
+function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     Client soapClient = check new ("http://localhost:9090",
         {
             outboundSecurity: {
-                signatureAlgorithm: wssec:RSA_SHA256,
-                encryptionAlgorithm: wssec:RSA_ECB,
-                symmetricKey: symmetricKey,
-                servicePublicKey: serverPublicKey
+                encryptionConfig: {
+                    keystore: {
+                        path: KEY_STORE_PATH_2,
+                        password: PASSWORD
+                    },
+                    publicKeyAlias: ALIAS,
+                    encryptionAlgorithm: wssec:AES_128
+                }
             },
             inboundSecurity: {
+                keystore: {path: KEY_STORE_PATH_2, password: PASSWORD},
                 verificationKey: publicKey,
                 signatureAlgorithm: wssec:RSA_SHA256,
-                decryptionAlgorithm: wssec:RSA_ECB,
-                decryptionKey: publicKey
+                decryptionAlgorithm: wssec:AES_128
             }
         }
     );
     xml body = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
     xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add", path = "/getSamePayload");
-    return soap:assertSymmetricBinding(response.toString(), string `<soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body>`);
+    test:assertEquals((response/<soap11:Body>).toString(), (body/<soap11:Body>).toString());
 }
