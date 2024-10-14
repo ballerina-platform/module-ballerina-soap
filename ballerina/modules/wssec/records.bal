@@ -18,7 +18,7 @@ import ballerina/crypto;
 
 # Union type of all the inbound web service security configurations.
 public type OutboundSecurityConfig NoPolicy|UsernameTokenConfig|TimestampTokenConfig|SymmetricBindingConfig
-    |TransportBindingConfig|AsymmetricConfig;
+    |TransportBindingConfig|AsymmetricBindingConfig;
 
 # Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
 #
@@ -66,12 +66,25 @@ public type SymmetricBindingConfig record {|
     string x509Token?;
 |};
 
-public type AsymmetricConfig record {|
+# Represents the record for Asymmetric Binding policy.
+#
+# + signatureConfig - Configuration for applying digital signatures
+# + encryptionConfig - Configuration for applying encryption
+# + x509Token - The path or token of the X509 certificate
+public type AsymmetricBindingConfig record {|
     SignatureConfig signatureConfig?;
     EncryptionConfig encryptionConfig?;
     string x509Token?;
 |};
 
+# Represents the record for signature configurations.
+#
+# + keystore - The keystore to store the private key
+# + privateKeyAlias - The alias of the private key
+# + privateKeyPassword - The password of the private key
+# + signatureAlgorithm - The algorithm to sign the SOAP envelope
+# + canonicalizationAlgorithm - The algorithm to canonicalize the SOAP envelope
+# + digestAlgorithm - The algorithm to digest the SOAP envelope
 public type SignatureConfig record {|
     crypto:KeyStore keystore;
     string privateKeyAlias;
@@ -81,6 +94,11 @@ public type SignatureConfig record {|
     DigestAlgorithm digestAlgorithm;
 |};
 
+# Represents the record for encryption configurations.
+#
+# + keystore - The keystore to store the public key
+# + publicKeyAlias - The alias of the public key
+# + encryptionAlgorithm - The algorithm to encrypt the SOAP envelope
 public type EncryptionConfig record {|
     crypto:KeyStore keystore;
     string publicKeyAlias;

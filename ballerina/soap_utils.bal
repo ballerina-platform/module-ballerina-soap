@@ -51,7 +51,7 @@ public isolated function applySecurityPolicies(wssec:OutboundSecurityConfig|wsse
         return wssec:applyUsernameToken(envelope, security);
     } else if security is wssec:SymmetricBindingConfig {
         return wssec:applySymmetricBinding(envelope, soap12, security);
-    } else if security is wssec:AsymmetricConfig {
+    } else if security is wssec:AsymmetricBindingConfig {
         return wssec:applyAsymmetricConfigurations(envelope, soap12, security);
     } else if security is wssec:OutboundSecurityConfig {
         return envelope;

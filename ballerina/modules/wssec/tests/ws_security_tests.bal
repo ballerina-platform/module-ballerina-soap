@@ -488,7 +488,7 @@ function testAsymmetricBindingWithSignatureRsaSha256() returns error? {
         </soap:Envelope>`;
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 
-    AsymmetricConfig asymmetricConfig = {
+    AsymmetricBindingConfig asymmetricConfig = {
         signatureConfig: {
             keystore: {
                 path: KEY_STORE_PATH_2,
@@ -529,7 +529,7 @@ function testUsernameTokenWithAsymmetricBinding() returns error? {
     };
     envelope = check applyUsernameToken(envelope, utRecord);
 
-    AsymmetricConfig asymmetricConfig = {
+    AsymmetricBindingConfig asymmetricConfig = {
         signatureConfig: {
             keystore: {
                 path: KEY_STORE_PATH_2,
@@ -572,7 +572,7 @@ function testUsernameTokenTimestampWithAsymmetricBindingAndX509() returns error?
     envelope = check applyUsernameToken(envelope, utRecord);
     envelope = check applyTimestampToken(envelope = envelope, timeToLive = 600);
 
-    AsymmetricConfig asymmetricConfig = {
+    AsymmetricBindingConfig asymmetricConfig = {
         signatureConfig: {
             keystore: {
                 path: KEY_STORE_PATH_2,
@@ -608,7 +608,7 @@ function testAsymmetricBindingWithSignatureWithRsaSha1() returns error? {
         </soap:Envelope>`;
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 
-    AsymmetricConfig asymmetricConfig = {
+    AsymmetricBindingConfig asymmetricConfig = {
         signatureConfig: {
             keystore: {
                 path: KEY_STORE_PATH_2,
@@ -651,7 +651,7 @@ function testAsymmetricBindingWithSignatureWithRsaSha512() returns error? {
                             </soap:Body>
                         </soap:Envelope>`;
 
-    AsymmetricConfig asymmetricConfig = {
+    AsymmetricBindingConfig asymmetricConfig = {
         signatureConfig: {
             keystore: {
                 path: KEY_STORE_PATH_2,
@@ -684,7 +684,7 @@ function testAsymmetricBindingPolicyWithSignatureAndEncryption() returns error? 
     xml envelope = check io:fileReadXml(SOAP_ENVELOPE_PATH);
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 
-    AsymmetricConfig asymmetricConfig = {
+    AsymmetricBindingConfig asymmetricConfig = {
         signatureConfig: {
             keystore: {
                 path: KEY_STORE_PATH_2,
@@ -727,7 +727,7 @@ function testAsymmetricBindingPolicyWithEncryption() returns error? {
     xml envelope = check io:fileReadXml(SOAP_ENVELOPE_PATH);
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
 
-    AsymmetricConfig asymmetricConfig = {
+    AsymmetricBindingConfig asymmetricConfig = {
         encryptionConfig: {
             keystore: {
                 path: KEY_STORE_PATH_2,

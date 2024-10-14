@@ -200,7 +200,7 @@ public isolated function applySymmetricBinding(xml envelope, boolean soap12, *Sy
 # + asymmetricBinding - The `AsymmetricBindingConfig` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
 public isolated function applyAsymmetricConfigurations(xml envelope, boolean soap12, 
-                                                       *AsymmetricConfig asymmetricBinding)
+                                                       *AsymmetricBindingConfig asymmetricBinding)
     returns xml|Error {
     Document document = check new (envelope);
     WsSecurity wsSecurity = new;
