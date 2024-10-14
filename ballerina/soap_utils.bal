@@ -53,8 +53,6 @@ public isolated function applySecurityPolicies(wssec:OutboundSecurityConfig|wsse
         return wssec:applySymmetricBinding(envelope, soap12, security);
     } else if security is wssec:AsymmetricConfig {
         return wssec:applyAsymmetricConfigurations(envelope, soap12, security);
-    } else if security is wssec:AsymmetricBindingConfig {
-        return wssec:applyAsymmetricBinding(envelope, soap12, security);
     } else if security is wssec:OutboundSecurityConfig {
         return envelope;
     } else {

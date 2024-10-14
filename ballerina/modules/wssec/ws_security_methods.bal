@@ -199,58 +199,6 @@ public isolated function applySymmetricBinding(xml envelope, boolean soap12, *Sy
 # + soap12 - A boolean flag. Set to `true` for SOAP 1.2, or `false` for SOAP 1.1.
 # + asymmetricBinding - The `AsymmetricBindingConfig` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
-public isolated function applyAsymmetricBinding(xml envelope, boolean soap12, 
-                                                *AsymmetricBindingConfig asymmetricBinding)
-    returns xml|crypto:Error|Error {
-    Document document = check new (envelope);
-    WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
-    string securedEnvelope = envelope.toBalString();
-    SignatureAlgorithm? signatureAlgorithm = asymmetricBinding.signatureAlgorithm;
-    EncryptionAlgorithm? encryptionAlgorithm = asymmetricBinding.encryptionAlgorithm;
-    if signatureAlgorithm is SignatureAlgorithm {
-        Signature signature = check new ();
-        crypto:PrivateKey? signatureKey = asymmetricBinding.signatureKey;
-        if signatureKey !is crypto:PrivateKey {
-            return error Error("Signature key cannot be nil");
-        }
-        byte[] signedData;
-        if soap12 {
-            signedData = check signature.signData((envelope/<soap12:Body>/*).toString(),
-                                                  signatureAlgorithm, signatureKey);
-        } else {
-            signedData = check signature.signData((envelope/<soap11:Body>/*).toString(),
-                                                  signatureAlgorithm, signatureKey);
-        }
-        Signature signatureResult = check addSignature(signature, signatureAlgorithm, signedData);
-        WsSecurity wsSecurity = new;
-        securedEnvelope = check wsSecurity.applySignatureOnlyPolicy(wsSecurityHeader, signatureResult,
-                                                                    asymmetricBinding.x509Token);
-    }
-    if encryptionAlgorithm is EncryptionAlgorithm {
-        Encryption encryption = check new ();
-        crypto:PublicKey? encryptionKey = asymmetricBinding.encryptionKey;
-        if encryptionKey !is crypto:PublicKey {
-            return error Error("Encryption key cannot be nil");
-        }
-        byte[] encryptData;
-        if soap12 {
-            encryptData = check crypto:encryptRsaEcb((envelope/<soap12:Body>/*).toString().toBytes(), encryptionKey);    
-        } else {
-            encryptData = check crypto:encryptRsaEcb((envelope/<soap11:Body>/*).toString().toBytes(), encryptionKey);
-        }
-        Encryption encryptionResult = check addEncryption(encryption, encryptionAlgorithm, encryptData);
-        WsSecurity wsSecurity = new;
-        securedEnvelope = check wsSecurity.applyEncryptionOnlyPolicy(wsSecurityHeader, encryptionResult);
-    }
-    return convertStringToXml(securedEnvelope);
-}
-
-# Apply asymmetric binding security policy with X509 token to the SOAP envelope.
-#
-# + envelope - The SOAP envelope
-# + soap12 - A boolean flag. Set to `true` for SOAP 1.2, or `false` for SOAP 1.1.
-# + asymmetricBinding - The `AsymmetricBindingConfig` record with the required parameters
-# + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
 public isolated function applyAsymmetricConfigurations(xml envelope, boolean soap12, 
                                                        *AsymmetricConfig asymmetricBinding)
     returns xml|Error {
