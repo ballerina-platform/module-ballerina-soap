@@ -319,13 +319,11 @@ This subsection introduces the configuration types for inbound and outbound secu
     * `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP envelope
     * `string` x509Token : The path or token of the X509 certificate
 
-* `AsymmetricBindingConfig`: Represents the record for Username Token with Asymmetric Binding policy.
-  * Fields:
-    * `crypto:PrivateKey` signatureKey : The private key to sign the SOAP envelope
-    * `crypto:PublicKey` encryptionKey : The public key to encrypt the SOAP body
-    * `SignatureAlgorithm` signatureAlgorithm : The algorithm to sign the SOAP envelope
-    * `EncryptionAlgorithm` encryptionAlgorithm : The algorithm to encrypt the SOAP body
-    * `string` x509Token : field description
+- `AsymmetricBindingConfig`: Represents the record for Asymmetric Binding policy.
+  - Fields:
+    - `SignatureConfig` signatureConfig : Configuration for applying digital signatures
+    - `EncryptionConfig` encryptionConfig : Configuration for applying encryption
+    - `string` x509Token : The path or token of the X509 certificate
 
 #### 3.2.2 Outbound Security Configurations
 
@@ -388,16 +386,31 @@ public function main() returns error? {
     soap12:Client soapClient = check new ("https://www.secured-soap-endpoint.com",
     {
         outboundSecurity: {
-                signatureAlgorithm: soap:RSA_SHA256,
-                encryptionAlgorithm: soap:RSA_ECB,
-                signatureKey: clientPrivateKey,
-                encryptionKey: serverPublicKey,
+            signatureConfig: {
+                keystore: {
+                    path: KEY_STORE_PATH_2,
+                    password: PASSWORD
+                }, 
+                privateKeyAlias: ALIAS, 
+                privateKeyPassword: PASSWORD, 
+                canonicalizationAlgorithm: wssec:C14N_EXCL_OMIT_COMMENTS, 
+                digestAlgorithm: wssec:SHA1
+            },
+            encryptionConfig: {
+                keystore: {
+                    path: KEY_STORE_PATH_2,
+                    password: PASSWORD
+                },
+                publicKeyAlias: ALIAS,
+                encryptionAlgorithm: wssec:AES_128
+            }
         },
         inboundSecurity: {
-                verificationKey: serverPublicKey,
-                signatureAlgorithm: soap:RSA_SHA256,
-                decryptionKey: clientPrivateKey,
-                decryptionAlgorithm: soap:RSA_ECB
+            keystore: {
+                path: KEY_STORE_PATH_2,
+                password: PASSWORD
+            },
+            decryptionAlgorithm: wssec:AES_128
         }
     });
     xml envelope = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" 
