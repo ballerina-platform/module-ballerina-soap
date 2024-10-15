@@ -114,9 +114,10 @@ public type NoPolicy "NoPolicy";
 
 # Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
 #
+# + keystore - The keystore to store the private key
 # + verificationKey - The public key to verify the signature of the SOAP envelope
-# + decryptionKey - The private key to decrypt the SOAP envelope
 # + signatureAlgorithm - The algorithm to verify the SOAP envelope
+# + decryptionKey - The private key to decrypt the SOAP envelope
 # + decryptionAlgorithm - The algorithm to decrypt the SOAP body
 public type InboundConfig record {|
     crypto:KeyStore keystore?;

@@ -398,7 +398,10 @@ function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
                 }
             },
             inboundSecurity: {
-                keystore: {path: KEY_STORE_PATH_2, password: PASSWORD},
+                keystore: {
+                    path: KEY_STORE_PATH_2, 
+                    password: PASSWORD
+                },
                 verificationKey: publicKey,
                 signatureAlgorithm: wssec:RSA_SHA256,
                 decryptionAlgorithm: wssec:AES_128

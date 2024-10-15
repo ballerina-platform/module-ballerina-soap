@@ -37,8 +37,8 @@ public isolated client class Client {
             check soap:validateTransportBindingPolicy(config);
             self.soapClient = check new (url, config.httpConfig);
             readonly & soap:ClientConfig readonlyConfig = soap:getReadOnlyClientConfig(config);
-            self.outboundSecurity = readonlyConfig.outboundSecurity;
             self.inboundSecurity = readonlyConfig.inboundSecurity;
+            self.outboundSecurity = readonlyConfig.outboundSecurity;
         } on fail var err {
             return error Error(SOAP_CLIENT_ERROR, err);
         }
@@ -82,13 +82,13 @@ public isolated client class Client {
                 response = check soap:sendReceive(securedBody, self.soapClient, action, headers, path, false);
             }
             lock {
-                soap:InboundSecurityConfig? inboundSecurity = self.inboundSecurity.clone();
+                wssec:InboundConfig? inboundSecurity = self.inboundSecurity.clone();
                 do {
-                    if inboundSecurity is soap:InboundSecurityConfig && inboundSecurity != {} {
+                    if inboundSecurity is wssec:InboundConfig && inboundSecurity != {} {
                         if response is xml {
-                            return check soap:applyOutboundConfig(<wssec:InboundConfig>inboundSecurity.clone(), response.clone(), false);
+                            return check soap:applyOutboundConfig(inboundSecurity.clone(), response.clone(), false);
                         } else {
-                            return check soap:applyOutboundConfig(<wssec:InboundConfig>inboundSecurity.clone(), 
+                            return check soap:applyOutboundConfig(inboundSecurity.clone(), 
                                                                   check response[0].getXml().clone(), false);
                         }
                     }

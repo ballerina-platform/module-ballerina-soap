@@ -131,7 +131,7 @@ These policies empower SOAP clients to enhance the security of their web service
 
 #### Inbound Security Configurations
 
-- `InboundSecurityConfig`: Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
+- `InboundSecurityConfig`: Represents the record for inbound security configurations to verify and decrypt SOAP envelopes.
   - Fields:
     - `crypto:PublicKey` verificationKey : The public key to verify the signature of the SOAP envelope
     - `crypto:PrivateKey`|`crypto:PublicKey` decryptionKey : The private key to decrypt the SOAP envelope

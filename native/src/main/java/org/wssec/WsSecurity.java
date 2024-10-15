@@ -244,7 +244,7 @@ public final class WsSecurity {
 
     private static void validateSoapHeader(Boolean soap12, Document document) {
         Init.init();
-        String namespace = (soap12) ? WSConstants.URI_SOAP12_ENV : WSConstants.URI_SOAP11_ENV;
+        String namespace = soap12 ? WSConstants.URI_SOAP12_ENV : WSConstants.URI_SOAP11_ENV;
         Element header = (Element) document.getElementsByTagNameNS(namespace, ELEM_HEADER).item(0);
         if (header == null) {
             throw new IllegalStateException("SOAP Envelope must have a Header");
