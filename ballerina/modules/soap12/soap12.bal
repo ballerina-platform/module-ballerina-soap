@@ -25,7 +25,7 @@ import soap.wssec;
 public isolated client class Client {
     private final http:Client soapClient;
     private final readonly & soap:OutboundSecurityConfig|soap:OutboundSecurityConfig[] outboundSecurity;
-    private final readonly & wssec:InboundConfig inboundSecurity;
+    private final readonly & soap:InboundSecurityConfig inboundSecurity;
 
     # Gets invoked during object initialization.
     #

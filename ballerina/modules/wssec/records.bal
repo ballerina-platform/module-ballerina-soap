@@ -90,8 +90,8 @@ public type SignatureConfig record {|
     string privateKeyAlias;
     string privateKeyPassword;
     SignatureAlgorithm signatureAlgorithm?;
-    CanonicalizationAlgorithm canonicalizationAlgorithm;
-    DigestAlgorithm digestAlgorithm;
+    CanonicalizationAlgorithm canonicalizationAlgorithm = C14N_EXCL_OMIT_COMMENTS;
+    DigestAlgorithm digestAlgorithm = SHA1;
 |};
 
 # Represents the record for encryption configurations.

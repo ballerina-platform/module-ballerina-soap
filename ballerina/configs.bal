@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/http;
-import soap.wssec;
 
 # SOAP client configurations.
 #
@@ -25,5 +24,5 @@ import soap.wssec;
 public type ClientConfig record {|
     http:ClientConfiguration httpConfig = {};
     OutboundSecurityConfig|OutboundSecurityConfig[] outboundSecurity = NO_POLICY;
-    wssec:InboundConfig inboundSecurity = {};
+    InboundSecurityConfig inboundSecurity = {};
 |};
