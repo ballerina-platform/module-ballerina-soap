@@ -86,9 +86,9 @@ public isolated client class Client {
                 do {
                     if inboundSecurity is wssec:InboundConfig && inboundSecurity != {} {
                         if response is xml {
-                            return check soap:applyOutboundConfig(inboundSecurity.clone(), response.clone(), false);
+                            return check soap:applyInboundConfig(inboundSecurity.clone(), response.clone(), false);
                         } else {
-                            return check soap:applyOutboundConfig(inboundSecurity.clone(), 
+                            return check soap:applyInboundConfig(inboundSecurity.clone(), 
                                                                   check response[0].getXml().clone(), false);
                         }
                     }

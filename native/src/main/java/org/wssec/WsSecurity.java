@@ -67,6 +67,7 @@ import static org.wssec.Constants.AES;
 import static org.wssec.Constants.CANONICALIZATION_ALGORITHM;
 import static org.wssec.Constants.CRYPTO_PROVIDER_FIELD;
 import static org.wssec.Constants.CRYPTO_PROVIDER_VALUE;
+import static org.wssec.Constants.DECRYPT_KEYSTORE;
 import static org.wssec.Constants.DERIVED_KEY_DIGEST;
 import static org.wssec.Constants.DERIVED_KEY_TEXT;
 import static org.wssec.Constants.DIGEST_ALGORITHM;
@@ -85,6 +86,7 @@ import static org.wssec.Constants.PRIVATE_KEY_ALIAS;
 import static org.wssec.Constants.PRIVATE_KEY_PASSWORD;
 import static org.wssec.Constants.PUBLIC_KEY_ALIAS;
 import static org.wssec.Constants.SIGNATURE_ALGORITHM;
+import static org.wssec.Constants.SIGNATURE_KEYSTORE;
 import static org.wssec.Constants.X509;
 import static org.wssec.Utils.createError;
 import static org.wssec.WsSecurityUtils.convertDocumentToString;
@@ -255,7 +257,7 @@ public final class WsSecurity {
                                          BMap<BString, Object> config) {
         Document document = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
         BMap<BString, BString> keyStore = (BMap<BString, BString>) config
-                .getMapValue(StringUtils.fromString(KEYSTORE));
+                .getMapValue(StringUtils.fromString(SIGNATURE_KEYSTORE));
         String path = keyStore.get(StringUtils.fromString(PATH)).toString();
         String password = keyStore.get(StringUtils.fromString(PASSWORD)).toString();
         try {
@@ -288,7 +290,7 @@ public final class WsSecurity {
     public static Object decryptEnvelope(BObject documentBuilder, BMap<BString, Object> config) {
         Document encryptedDocument = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
         BMap<BString, BString> keyStore = (BMap<BString, BString>) config
-                .getMapValue(StringUtils.fromString(KEYSTORE));
+                .getMapValue(StringUtils.fromString(DECRYPT_KEYSTORE));
         String path = keyStore.get(StringUtils.fromString(PATH)).toString();
         String password = keyStore.get(StringUtils.fromString(PASSWORD)).toString();
         WSSecHeader secHeader = new WSSecHeader(encryptedDocument);

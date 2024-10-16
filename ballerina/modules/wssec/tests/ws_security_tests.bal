@@ -503,7 +503,7 @@ function testAsymmetricBindingWithSignatureRsaSha256() returns error? {
     };
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);
     InboundConfig inboundConfig = {
-        keystore: {
+        signatureKeystore: {
             path: KEY_STORE_PATH_2,
             password: PASSWORD
         }
@@ -544,7 +544,7 @@ function testUsernameTokenWithAsymmetricBinding() returns error? {
     };
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);
     InboundConfig inboundConfig = {
-        keystore: {
+        signatureKeystore: {
             path: KEY_STORE_PATH_2,
             password: PASSWORD
         }
@@ -587,7 +587,7 @@ function testUsernameTokenTimestampWithAsymmetricBindingAndX509() returns error?
     };
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);
     InboundConfig inboundConfig = {
-        keystore: {
+        signatureKeystore: {
             path: KEY_STORE_PATH_2,
             password: PASSWORD
         }
@@ -623,7 +623,7 @@ function testAsymmetricBindingWithSignatureWithRsaSha1() returns error? {
     };
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);
     InboundConfig inboundConfig = {
-        keystore: {
+        signatureKeystore: {
             path: KEY_STORE_PATH_2,
             password: PASSWORD
         }
@@ -667,7 +667,7 @@ function testAsymmetricBindingWithSignatureWithRsaSha512() returns error? {
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, true, asymmetricConfig);
     string envelopeString = securedEnvelope.toString();
     InboundConfig inboundConfig = {
-        keystore: {
+        signatureKeystore: {
             path: KEY_STORE_PATH_2,
             password: PASSWORD
         }
@@ -708,7 +708,11 @@ function testAsymmetricBindingPolicyWithSignatureAndEncryption() returns error? 
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);
     string envelopeString = securedEnvelope.toString();
     InboundConfig inboundConfig = {
-        keystore: {
+        decryptKeystore: {
+            path: KEY_STORE_PATH_2,
+            password: PASSWORD
+        },
+        signatureKeystore: {
             path: KEY_STORE_PATH_2,
             password: PASSWORD
         }
@@ -740,7 +744,7 @@ function testAsymmetricBindingPolicyWithEncryption() returns error? {
     xml securedEnvelope = check applyAsymmetricConfigurations(envelope, false, asymmetricConfig);
     string envelopeString = securedEnvelope.toString();
     InboundConfig inboundConfig = {
-        keystore: {
+        decryptKeystore: {
             path: KEY_STORE_PATH_2,
             password: PASSWORD
         }

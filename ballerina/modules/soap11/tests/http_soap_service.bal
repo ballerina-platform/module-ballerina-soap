@@ -17,7 +17,6 @@ import ballerina/crypto;
 import ballerina/http;
 import ballerina/mime;
 import ballerina/soap;
-import soap.wssec;
 
 const crypto:KeyStore serverKeyStore = {
     path: X509_KEY_STORE_PATH,
@@ -80,16 +79,20 @@ service / on new http:Listener(9090) {
 
     resource function post getSecuredPayload(http:Request request) returns xml|error {
         xml payload = check request.getXmlPayload();
-        xml applyOutboundConfig = check soap:applyOutboundConfig(
+        xml applyInboundConfig = check soap:applyInboundConfig(
             {
-                verificationKey: clientPublicKey,
-                signatureAlgorithm: soap:RSA_SHA256,
-                decryptionAlgorithm: wssec:AES_128,
-                decryptionKey: serverPrivateKey
+                decryptKeystore: {
+                    path: KEY_STORE_PATH_2,
+                    password: PASSWORD
+                },
+                signatureKeystore: {
+                    path: KEY_STORE_PATH_2,
+                    password: PASSWORD
+                }
             },
             payload,
             false
         );
-        return applyOutboundConfig;
+        return applyInboundConfig;
     }
 }

@@ -47,6 +47,8 @@ public class Constants {
     public static final String CRYPTO_PROVIDER_FIELD = "org.apache.ws.security.crypto.provider";
     public static final String CRYPTO_PROVIDER_VALUE = "org.apache.wss4j.common.crypto.Merlin";
     public static final String KEYSTORE = "keystore";
+    public static final String DECRYPT_KEYSTORE = "decryptKeystore";
+    public static final String SIGNATURE_KEYSTORE = "signatureKeystore";
     public static final String PATH = "path";
     public static final String DIGEST_ALGORITHM = "digestAlgorithm";
     public static final String CANONICALIZATION_ALGORITHM = "canonicalizationAlgorithm";

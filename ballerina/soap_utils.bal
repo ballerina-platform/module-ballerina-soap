@@ -64,19 +64,19 @@ public isolated function applySecurityPolicies(wssec:OutboundSecurityConfig|wsse
     }
 }
 
-public isolated function applyOutboundConfig(wssec:InboundConfig inboundSecurity, xml envelope,
+public isolated function applyInboundConfig(wssec:InboundConfig inboundSecurity, xml envelope,
                                              boolean soap12 = true) returns xml|Error {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
     xml soapEnvelope = envelope;
     do {
-        wssec:EncryptionAlgorithm? encryptionAlgorithm = inboundSecurity.decryptionAlgorithm;
-        if encryptionAlgorithm is wssec:EncryptionAlgorithm {
+        crypto:KeyStore? encryptionAlgorithm = inboundSecurity.decryptKeystore;
+        if encryptionAlgorithm is crypto:KeyStore {
             wssec:Document doc = check wssec:decryptEnvelope(envelope, inboundSecurity);
             soapEnvelope = check doc.getEnvelope();
         }
-        wssec:SignatureAlgorithm? signatureAlgorithm = inboundSecurity.signatureAlgorithm;
-        if signatureAlgorithm is wssec:SignatureAlgorithm {
+        crypto:KeyStore? signatureAlgorithm = inboundSecurity.signatureKeystore;
+        if signatureAlgorithm is crypto:KeyStore {
             boolean validity = check wssec:verifySignature(soapEnvelope, inboundSecurity);
             if !validity {
                 return error Error("Signature verification failed");
