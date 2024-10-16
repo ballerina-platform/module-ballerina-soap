@@ -21,6 +21,24 @@ xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
 xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
 xmlns "http://www.w3.org/2000/09/xmldsig#" as ds;
 
+
+public isolated function verifySignature(xml|Document soapEnvelope, InboundConfig config) returns boolean|error {
+    WsSecurity wsSecurity = new;
+    Document document;
+    if soapEnvelope is xml {
+        document = check new (soapEnvelope);
+    } else {
+        document = soapEnvelope;
+    }
+    return check wsSecurity.verifySignature(document, config);
+}
+
+public isolated function decryptEnvelope(xml soapEnvelope, InboundConfig config) returns Document|error {
+    WsSecurity wsSecurity = new;
+    Document document = check new (soapEnvelope);
+    return check wsSecurity.decryptEnvelope(document, config);
+}
+
 isolated function addSecurityHeader(Document document) returns WSSecurityHeader|Error {
     WSSecurityHeader wsSecHeader = check new (document);
     Error? insertHeader = wsSecHeader.insertSecHeader();
@@ -181,48 +199,23 @@ public isolated function applySymmetricBinding(xml envelope, boolean soap12, *Sy
 # + soap12 - A boolean flag. Set to `true` for SOAP 1.2, or `false` for SOAP 1.1.
 # + asymmetricBinding - The `AsymmetricBindingConfig` record with the required parameters
 # + return - A `xml` type of SOAP envelope if the security binding is successfully added or else `wssec:Error`
-public isolated function applyAsymmetricBinding(xml envelope, boolean soap12, 
-                                                *AsymmetricBindingConfig asymmetricBinding)
-    returns xml|crypto:Error|Error {
+public isolated function applyAsymmetricConfigurations(xml envelope, boolean soap12, 
+                                                       *AsymmetricBindingConfig asymmetricBinding)
+    returns xml|Error {
     Document document = check new (envelope);
-    WSSecurityHeader wsSecurityHeader = check addSecurityHeader(document);
-    string securedEnvelope = envelope.toBalString();
-    SignatureAlgorithm? signatureAlgorithm = asymmetricBinding.signatureAlgorithm;
-    EncryptionAlgorithm? encryptionAlgorithm = asymmetricBinding.encryptionAlgorithm;
-    if signatureAlgorithm is SignatureAlgorithm {
-        Signature signature = check new ();
-        crypto:PrivateKey? signatureKey = asymmetricBinding.signatureKey;
-        if signatureKey !is crypto:PrivateKey {
-            return error Error("Signature key cannot be nil");
-        }
-        byte[] signedData;
-        if soap12 {
-            signedData = check signature.signData((envelope/<soap12:Body>/*).toString(),
-                                                  signatureAlgorithm, signatureKey);
-        } else {
-            signedData = check signature.signData((envelope/<soap11:Body>/*).toString(),
-                                                  signatureAlgorithm, signatureKey);
-        }
-        Signature signatureResult = check addSignature(signature, signatureAlgorithm, signedData);
-        WsSecurity wsSecurity = new;
-        securedEnvelope = check wsSecurity.applySignatureOnlyPolicy(wsSecurityHeader, signatureResult,
-                                                                    asymmetricBinding.x509Token);
-    }
-    if encryptionAlgorithm is EncryptionAlgorithm {
-        Encryption encryption = check new ();
-        crypto:PublicKey? encryptionKey = asymmetricBinding.encryptionKey;
-        if encryptionKey !is crypto:PublicKey {
-            return error Error("Encryption key cannot be nil");
-        }
-        byte[] encryptData;
-        if soap12 {
-            encryptData = check crypto:encryptRsaEcb((envelope/<soap12:Body>/*).toString().toBytes(), encryptionKey);    
-        } else {
-            encryptData = check crypto:encryptRsaEcb((envelope/<soap11:Body>/*).toString().toBytes(), encryptionKey);
-        }
-        Encryption encryptionResult = check addEncryption(encryption, encryptionAlgorithm, encryptData);
-        WsSecurity wsSecurity = new;
-        securedEnvelope = check wsSecurity.applyEncryptionOnlyPolicy(wsSecurityHeader, encryptionResult);
+    WsSecurity wsSecurity = new;
+    _ = check addSecurityHeader(document);
+    SignatureConfig? signatureConfig = asymmetricBinding.signatureConfig;
+    EncryptionConfig? encryptionConfig = asymmetricBinding.encryptionConfig;
+    string securedEnvelope = envelope.toString();
+    if signatureConfig !is () && encryptionConfig !is () {
+        securedEnvelope = check wsSecurity
+            .applySignatureAndEncryption(document, soap12, signatureConfig, encryptionConfig);
+    } else if signatureConfig !is () {
+        securedEnvelope = check wsSecurity.applySignatureOnly(document, soap12, signatureConfig);
+    } else if encryptionConfig !is () {
+        securedEnvelope = check wsSecurity.applyEncryptionOnly(document, soap12, encryptionConfig);
     }
     return convertStringToXml(securedEnvelope);
 }
+

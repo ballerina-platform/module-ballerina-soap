@@ -37,18 +37,35 @@ public enum SignatureAlgorithm {
 # Represents enums for all the supported encryption algorithms.
 #
 public enum EncryptionAlgorithm {
-    RSA_ECB = "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
+    TRIPLE_DES = "http://www.w3.org/2001/04/xmlenc#tripledes-cbc",
+    AES_128 = "http://www.w3.org/2001/04/xmlenc#aes128-cbc",
+    AES_256 = "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
+}
+
+# Represents enums for all the supported canonicalization algorithms.
+#
+public enum CanonicalizationAlgorithm {
+    C14N_OMIT_COMMENTS = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+    C14N_WITH_COMMENTS = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments",
+    C14N_EXCL_OMIT_COMMENTS = "http://www.w3.org/2001/10/xml-exc-c14n#",
+    C14N_EXCL_WITH_COMMENTS = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments"
+}
+
+# Represents enums for all the supported digest algorithms.
+#
+public enum DigestAlgorithm {
+    SHA1 = "http://www.w3.org/2000/09/xmldsig#sha1",
+    SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256",
+    SHA384 = "http://www.w3.org/2001/04/xmldsig-more#sha384",
+    SHA512 = "http://www.w3.org/2001/04/xmlenc#sha512"
 }
 
 # Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
-# 
-# + verificationKey - The public key to verify the signature of the SOAP envelope
-# + decryptionKey - The private key to decrypt the SOAP envelope
-# + signatureAlgorithm - The algorithm to verify the SOAP envelope
-# + decryptionAlgorithm - The algorithm to decrypt the SOAP body
-public type OutboundSecurityConfig record {
-    *wssec:OutboundSecurityConfig;
-};
+#
+# + decryptKeystore - The keystore to decrypt the SOAP envelope
+# + signatureKeystore - The keystore to verify the signature of the SOAP envelope
+public type InboundSecurityConfig wssec:InboundConfig;
 
-# Union type of all the inbound web service security configurations.
-public type InboundSecurityConfig wssec:InboundSecurityConfig;
+# Union type of all the outbound web service security configurations.
+public type OutboundSecurityConfig wssec:OutboundSecurityConfig;
+

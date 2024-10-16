@@ -19,12 +19,13 @@ import soap;
 import ballerina/http;
 import ballerina/mime;
 import ballerina/jballerina.java;
+import soap.wssec;
 
 # Object for the basic SOAP 1.2 client endpoint.
 public isolated client class Client {
     private final http:Client soapClient;
-    private final readonly & soap:InboundSecurityConfig|soap:InboundSecurityConfig[] inboundSecurity;
-    private final readonly & soap:OutboundSecurityConfig outboundSecurity;
+    private final readonly & soap:OutboundSecurityConfig|soap:OutboundSecurityConfig[] outboundSecurity;
+    private final readonly & soap:InboundSecurityConfig inboundSecurity;
 
     # Gets invoked during object initialization.
     #
@@ -36,8 +37,8 @@ public isolated client class Client {
             check soap:validateTransportBindingPolicy(config);
             self.soapClient = check new (url, config.httpConfig);
             readonly & soap:ClientConfig readonlyConfig = soap:getReadOnlyClientConfig(config);
-            self.inboundSecurity = readonlyConfig.inboundSecurity;
             self.outboundSecurity = readonlyConfig.outboundSecurity;
+            self.inboundSecurity = readonlyConfig.inboundSecurity;
         } on fail var err {
             return error Error(SOAP_CLIENT_ERROR, err);
         }
@@ -64,14 +65,14 @@ public isolated client class Client {
     } external;
 
     isolated function generateResponse(xml|mime:Entity[] body, string? action = (),
-                                         map<string|string[]> headers = {}, string path = "")
+                                       map<string|string[]> headers = {}, string path = "")
         returns xml|mime:Entity[]|Error {
         do {
             xml securedBody;
             xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
                 xml envelope = body is xml ? body.clone() : mimeEntity.clone();
-                securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone());
+                securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone());
             }
             xml|mime:Entity[] response;
             if body is mime:Entity[] {
@@ -81,13 +82,13 @@ public isolated client class Client {
                 response = check soap:sendReceive(securedBody, self.soapClient, action, headers, path);
             }
             lock {
-                soap:OutboundSecurityConfig? outboundSecurity = self.outboundSecurity.clone();
+                wssec:InboundConfig? inboundSecurity = self.inboundSecurity.clone();
                 do {
-                    if outboundSecurity is soap:OutboundSecurityConfig && outboundSecurity != {} {
+                    if inboundSecurity is wssec:InboundConfig && inboundSecurity != {} {
                         if response is xml {
-                            return check soap:applyOutboundConfig(outboundSecurity.clone(), response.clone());
+                            return check soap:applyInboundConfig(inboundSecurity.clone(), response.clone());
                         } else {
-                            return check soap:applyOutboundConfig(outboundSecurity.clone(),
+                            return check soap:applyInboundConfig(inboundSecurity.clone(),
                                                                   check response[0].getXml().clone());
                         }
                     }
@@ -119,7 +120,7 @@ public isolated client class Client {
             xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
                 xml envelope = body is xml ? body.clone() : mimeEntity.clone();
-                securedBody = check soap:applySecurityPolicies(self.inboundSecurity.clone(), envelope.clone());
+                securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone());
             }
             return check soap:sendOnly(securedBody, self.soapClient, action, headers, path);
         } on fail error soapError {

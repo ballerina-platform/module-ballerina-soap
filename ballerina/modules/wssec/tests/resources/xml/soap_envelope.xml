@@ -1,0 +1,21 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    <soapenv:Header>
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soapenv:mustUnderstand="1">
+        </wsse:Security>
+    </soapenv:Header>
+    <soapenv:Body>
+        <v1:subscribeReferenceRequest xmlns:v1="http://fidus.brussels/service/referencedir/messages/v1">
+            <v11:messageContext xmlns:v11="http://fidus.brussels/type/referencedir/requests/subscribe/v1">
+                <v12:messageId xmlns:v12="http://fidus.brussels/type/common/messages/v1">3c9c5c6d-2123-405f-ab25-7399001e9512</v12:messageId>
+                <v12:timestamp xmlns:v12="http://fidus.brussels/type/common/messages/v1">2023-08-08T16:15:36.806+02:00</v12:timestamp>
+            </v11:messageContext>
+            <v11:legalContext xmlns:v11="http://fidus.brussels/type/referencedir/requests/subscribe/v1">MunicipalityCitizenRight</v11:legalContext>
+            <v11:subscriptionRequest xmlns:v11="http://fidus.brussels/type/referencedir/requests/subscribe/v1">
+                <v13:reference xmlns:v13="http://fidus.brussels/type/referencedir/requests/v1">
+                    <v13:personNumber>01051537140</v13:personNumber>
+                </v13:reference>
+                <v13:endDate xmlns:v13="http://fidus.brussels/type/referencedir/requests/v1">2024-08-08+02:00</v13:endDate>
+            </v11:subscriptionRequest>
+        </v1:subscribeReferenceRequest>
+    </soapenv:Body>
+</soapenv:Envelope>

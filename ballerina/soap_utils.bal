@@ -25,11 +25,11 @@ import ballerina/test;
 
 public isolated function validateTransportBindingPolicy(ClientConfig config) returns Error? {
     if config.httpConfig.secureSocket is () {
-        wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] securityPolicy = config.inboundSecurity;
+        wssec:OutboundSecurityConfig|wssec:OutboundSecurityConfig[] securityPolicy = config.outboundSecurity;
         if securityPolicy is wssec:TransportBindingConfig {
             return error Error(INVALID_PROTOCOL_ERROR);
-        } else if securityPolicy is wssec:InboundSecurityConfig[] {
-            foreach wssec:InboundSecurityConfig policy in securityPolicy {
+        } else if securityPolicy is wssec:OutboundSecurityConfig[] {
+            foreach wssec:OutboundSecurityConfig policy in securityPolicy {
                 if policy is wssec:TransportBindingConfig {
                     return error Error(INVALID_PROTOCOL_ERROR);
                 }
@@ -42,7 +42,7 @@ public isolated function getReadOnlyClientConfig(ClientConfig original) returns 
     'class: "org.wssec.WsSecurity"
 } external;
 
-public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec:InboundSecurityConfig[] security,
+public isolated function applySecurityPolicies(wssec:OutboundSecurityConfig|wssec:OutboundSecurityConfig[] security,
         xml envelope, boolean soap12 = true)
     returns xml|crypto:Error|wssec:Error {
     if security is wssec:TimestampTokenConfig {
@@ -52,49 +52,34 @@ public isolated function applySecurityPolicies(wssec:InboundSecurityConfig|wssec
     } else if security is wssec:SymmetricBindingConfig {
         return wssec:applySymmetricBinding(envelope, soap12, security);
     } else if security is wssec:AsymmetricBindingConfig {
-        return wssec:applyAsymmetricBinding(envelope, soap12, security);
-    } else if security is wssec:InboundSecurityConfig {
+        return wssec:applyAsymmetricConfigurations(envelope, soap12, security);
+    } else if security is wssec:OutboundSecurityConfig {
         return envelope;
     } else {
-        xml securedEnvelope;
-        foreach wssec:InboundSecurityConfig policy in security {
-            securedEnvelope = check applySecurityPolicies(policy, envelope);
+        xml securedEnvelope = envelope.clone();
+        foreach wssec:OutboundSecurityConfig policy in security {
+            securedEnvelope = check applySecurityPolicies(policy, securedEnvelope);
         }
         return securedEnvelope;
     }
 }
 
-public isolated function applyOutboundConfig(OutboundSecurityConfig outboundSecurity, xml envelope,
+public isolated function applyInboundConfig(wssec:InboundConfig inboundSecurity, xml envelope,
                                              boolean soap12 = true) returns xml|Error {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
     xml soapEnvelope = envelope;
     do {
-        wssec:EncryptionAlgorithm? encryptionAlgorithm = outboundSecurity.decryptionAlgorithm;
-        if encryptionAlgorithm is wssec:EncryptionAlgorithm {
-            crypto:PrivateKey|crypto:PublicKey? clientPrivateKey = outboundSecurity.decryptionKey;
-            if clientPrivateKey is crypto:PrivateKey|crypto:PublicKey {
-                byte[] encData = check wssec:getEncryptedData(soapEnvelope);
-                byte[] decryptDataResult = check crypto:decryptRsaEcb(encData, clientPrivateKey);
-                string decryptedBody = "<soap:Body >" + check string:fromBytes(decryptDataResult) + "</soap:Body>";
-                string decryptedEnv = regexp:replace(re `<soap:Body .*>.*</soap:Body>`, soapEnvelope.toString(),
-                                                    decryptedBody);
-                soapEnvelope = check xml:fromString(decryptedEnv);
-            }
+        crypto:KeyStore? encryptionAlgorithm = inboundSecurity.decryptKeystore;
+        if encryptionAlgorithm is crypto:KeyStore {
+            wssec:Document doc = check wssec:decryptEnvelope(envelope, inboundSecurity);
+            soapEnvelope = check doc.getEnvelope();
         }
-        wssec:SignatureAlgorithm? signatureAlgorithm = outboundSecurity.signatureAlgorithm;
-        if signatureAlgorithm is wssec:SignatureAlgorithm {
-            crypto:PublicKey? serverPublicKey = outboundSecurity.verificationKey;
-            if serverPublicKey is crypto:PublicKey {
-                byte[] signatureData = check wssec:getSignatureData(soapEnvelope);
-                if soap12 {
-                    check wssec:verifyData((soapEnvelope/<soap12:Body>/*).toString().toBytes(),
-                                            signatureData, serverPublicKey, signatureAlgorithm);
-                } else {
-                    check wssec:verifyData((soapEnvelope/<soap11:Body>/*).toString().toBytes(),
-                                            signatureData, serverPublicKey, signatureAlgorithm);
-                }
-
+        crypto:KeyStore? signatureAlgorithm = inboundSecurity.signatureKeystore;
+        if signatureAlgorithm is crypto:KeyStore {
+            boolean validity = check wssec:verifySignature(soapEnvelope, inboundSecurity);
+            if !validity {
+                return error Error("Signature verification failed");
             }
         }
         return soapEnvelope;

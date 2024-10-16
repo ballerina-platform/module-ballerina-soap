@@ -21,36 +21,72 @@ import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecDKEncrypt;
+import org.apache.wss4j.dom.message.WSSecEncrypt;
+import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
+import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
+import org.apache.wss4j.dom.processor.Processor;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Properties;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 import static org.apache.wss4j.common.WSS4JConstants.AES_128_GCM;
+import static org.apache.wss4j.common.WSS4JConstants.ELEM_HEADER;
 import static org.apache.wss4j.common.WSS4JConstants.HMAC_SHA1;
 import static org.apache.wss4j.dom.WSConstants.CUSTOM_KEY_IDENTIFIER;
 import static org.apache.wss4j.dom.WSConstants.X509_KEY_IDENTIFIER;
+import static org.wssec.Constants.AES;
+import static org.wssec.Constants.CANONICALIZATION_ALGORITHM;
+import static org.wssec.Constants.CRYPTO_PROVIDER_FIELD;
+import static org.wssec.Constants.CRYPTO_PROVIDER_VALUE;
+import static org.wssec.Constants.DECRYPT_KEYSTORE;
 import static org.wssec.Constants.DERIVED_KEY_DIGEST;
 import static org.wssec.Constants.DERIVED_KEY_TEXT;
+import static org.wssec.Constants.DIGEST_ALGORITHM;
+import static org.wssec.Constants.ENCRYPTION_ALGORITHM;
 import static org.wssec.Constants.ITERATION;
+import static org.wssec.Constants.KEYSTORE;
+import static org.wssec.Constants.KEYSTORE_PASSWORD_FIELD;
+import static org.wssec.Constants.KEYSTORE_PATH_FIELD;
+import static org.wssec.Constants.NATIVE_DOCUMENT;
 import static org.wssec.Constants.NATIVE_ENCRYPTION;
 import static org.wssec.Constants.NATIVE_SEC_HEADER;
 import static org.wssec.Constants.NATIVE_SIGNATURE;
 import static org.wssec.Constants.PASSWORD;
+import static org.wssec.Constants.PATH;
+import static org.wssec.Constants.PRIVATE_KEY_ALIAS;
+import static org.wssec.Constants.PRIVATE_KEY_PASSWORD;
+import static org.wssec.Constants.PUBLIC_KEY_ALIAS;
+import static org.wssec.Constants.SIGNATURE_ALGORITHM;
+import static org.wssec.Constants.SIGNATURE_KEYSTORE;
 import static org.wssec.Constants.X509;
 import static org.wssec.Utils.createError;
 import static org.wssec.WsSecurityUtils.convertDocumentToString;
@@ -172,5 +208,190 @@ public final class WsSecurity {
     public static BMap getReadOnlyClientConfig(BMap securityConfig) {
         securityConfig.freezeDirect();
         return securityConfig;
+    }
+
+    public static Object applySignatureOnly(BObject documentBuilder, Boolean soap12, BMap<BString,
+                                            Object> signatureConfig) {
+        Document document = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
+        BMap<BString, BString> keyStore = (BMap<BString, BString>) signatureConfig
+                .getMapValue(StringUtils.fromString(KEYSTORE));
+        String path = keyStore.get(StringUtils.fromString(PATH)).toString();
+        String password = keyStore.get(StringUtils.fromString(PASSWORD)).toString();
+        String digestAlgorithm = signatureConfig.get(StringUtils.fromString(DIGEST_ALGORITHM)).toString();
+        String canonicalizationAlgorithm = signatureConfig
+                .get(StringUtils.fromString(CANONICALIZATION_ALGORITHM)).toString();
+        String signatureAlgorithm = signatureConfig.get(StringUtils.fromString(SIGNATURE_ALGORITHM)).toString();
+        String privateKeyPassword = signatureConfig.get(StringUtils.fromString(PRIVATE_KEY_PASSWORD)).toString();
+        String privateKeyAlias = signatureConfig.get(StringUtils.fromString(PRIVATE_KEY_ALIAS)).toString();
+        try {
+            validateSoapHeader(soap12, document);
+            WSSecHeader secHeader = new WSSecHeader(document);
+            secHeader.insertSecurityHeader();
+            Crypto crypto = getCryptoInstance(path, password);
+            generateSignature(privateKeyPassword, privateKeyAlias, digestAlgorithm,
+                              canonicalizationAlgorithm, signatureAlgorithm, crypto, secHeader);
+            return convertDocumentToString(document);
+        } catch (Exception e) {
+            return createError(e.getMessage());
+        }
+    }
+
+    private static Crypto getCryptoInstance(String path, String password) throws WSSecurityException {
+        Properties properties = new Properties();
+        properties.put(CRYPTO_PROVIDER_FIELD, CRYPTO_PROVIDER_VALUE);
+        properties.put(KEYSTORE_PATH_FIELD, path);
+        properties.put(KEYSTORE_PASSWORD_FIELD, password);
+        return CryptoFactory.getInstance(properties);
+    }
+
+    private static void validateSoapHeader(Boolean soap12, Document document) {
+        Init.init();
+        String namespace = soap12 ? WSConstants.URI_SOAP12_ENV : WSConstants.URI_SOAP11_ENV;
+        Element header = (Element) document.getElementsByTagNameNS(namespace, ELEM_HEADER).item(0);
+        if (header == null) {
+            throw new IllegalStateException("SOAP Envelope must have a Header");
+        }
+    }
+
+    public static Object verifySignature(BObject documentBuilder,
+                                         BMap<BString, Object> config) {
+        Document document = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
+        BMap<BString, BString> keyStore = (BMap<BString, BString>) config
+                .getMapValue(StringUtils.fromString(SIGNATURE_KEYSTORE));
+        String path = keyStore.get(StringUtils.fromString(PATH)).toString();
+        String password = keyStore.get(StringUtils.fromString(PASSWORD)).toString();
+        try {
+            WSSecurityEngine secEngine = new WSSecurityEngine();
+            RequestData requestData = new RequestData();
+            Crypto crypto = getCryptoInstance(path, password);
+            requestData.setSigVerCrypto(crypto);
+            CallbackHandler passwordCallbackHandler = callbacks -> {
+                for (Callback callback: callbacks) {
+                    ((WSPasswordCallback) callback).setPassword(PASSWORD);
+                }
+            };
+            requestData.setCallbackHandler(passwordCallbackHandler);
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            secEngine.setWssConfig(wssConfig);
+            Processor processor = (elem, data) -> {
+                if (WSConstants.ENC_KEY_LN.equals(elem.getLocalName())) {
+                    return new ArrayList<>();
+                }
+                return new EncryptedKeyProcessor().handleToken(elem, data);
+            };
+            wssConfig.setProcessor(new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN), processor);
+            secEngine.processSecurityHeader(document, requestData);
+            return true;
+        } catch (WSSecurityException e) {
+            return createError(e.getMessage());
+        }
+    }
+
+    public static Object decryptEnvelope(BObject documentBuilder, BMap<BString, Object> config) {
+        Document encryptedDocument = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
+        BMap<BString, BString> keyStore = (BMap<BString, BString>) config
+                .getMapValue(StringUtils.fromString(DECRYPT_KEYSTORE));
+        String path = keyStore.get(StringUtils.fromString(PATH)).toString();
+        String password = keyStore.get(StringUtils.fromString(PASSWORD)).toString();
+        WSSecHeader secHeader = new WSSecHeader(encryptedDocument);
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        RequestData requestData = new RequestData();
+        try {
+            Crypto crypto = getCryptoInstance(path, password);
+            requestData.setSigVerCrypto(crypto);
+            requestData.setDecCrypto(crypto);
+            requestData.setSecHeader(secHeader);
+            CallbackHandler passwordCallbackHandler = callbacks -> {
+                for (Callback callback: callbacks) {
+                    ((WSPasswordCallback) callback).setPassword(password);
+                }
+            };
+            requestData.setCallbackHandler(passwordCallbackHandler);
+            secEngine.processSecurityHeader(encryptedDocument, requestData);
+            documentBuilder.addNativeData(NATIVE_DOCUMENT, encryptedDocument);
+            return documentBuilder;
+        } catch (Exception e) {
+            return createError(e.getMessage());
+        }
+    }
+
+    public static Object applyEncryptionOnly(BObject documentBuilder, Boolean soap12,
+                                             BMap<BString, Object> config) {
+        try {
+            Document document = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
+            BMap<BString, BString> keyStore = (BMap<BString, BString>) config
+                    .getMapValue(StringUtils.fromString(KEYSTORE));
+            String path = keyStore.get(StringUtils.fromString(PATH)).toString();
+            String password = keyStore.get(StringUtils.fromString(PASSWORD)).toString();
+            String publicKeyAlias = config.get(StringUtils.fromString(PUBLIC_KEY_ALIAS)).toString();
+            String encryptionAlgorithm = config.get(StringUtils.fromString(ENCRYPTION_ALGORITHM)).toString();
+            validateSoapHeader(soap12, document);
+            Crypto crypto = getCryptoInstance(path, password);
+            WSSecHeader secHeader = new WSSecHeader(document);
+            secHeader.insertSecurityHeader();
+            generateEncryption(publicKeyAlias, crypto, secHeader, encryptionAlgorithm);
+            return convertDocumentToString(document);
+        } catch (Exception e) {
+            return createError(e.getMessage());
+        }
+    }
+
+    public static Object applySignatureAndEncryption(BObject documentBuilder, Boolean soap12,
+                                                     BMap<BString, Object> signatureConfig,
+                                                     BMap<BString, Object> encryptionConfig) {
+        try {
+            Document document = (Document) documentBuilder.getNativeData(NATIVE_DOCUMENT);
+            BMap<BString, BString> keyStore = (BMap<BString, BString>) signatureConfig
+                    .getMapValue(StringUtils.fromString(KEYSTORE));
+            String path = keyStore.get(StringUtils.fromString(PATH)).toString();
+            String password = keyStore.get(StringUtils.fromString(PASSWORD)).toString();
+            String publicKeyAlias = encryptionConfig.get(StringUtils.fromString(PUBLIC_KEY_ALIAS)).toString();
+            String privateKeyPassword = signatureConfig.get(StringUtils.fromString(PRIVATE_KEY_PASSWORD)).toString();
+            String privateKeyAlias = signatureConfig.get(StringUtils.fromString(PRIVATE_KEY_ALIAS)).toString();
+            String digestAlgorithm = signatureConfig.get(StringUtils.fromString(DIGEST_ALGORITHM)).toString();
+            String canonicalizationAlgorithm = signatureConfig
+                    .get(StringUtils.fromString(CANONICALIZATION_ALGORITHM)).toString();
+            String signatureAlgorithm = signatureConfig.get(StringUtils.fromString(SIGNATURE_ALGORITHM)).toString();
+            String encryptionAlgorithm = encryptionConfig.get(StringUtils.fromString(ENCRYPTION_ALGORITHM)).toString();
+            validateSoapHeader(soap12, document);
+            Crypto crypto = getCryptoInstance(path, password);
+            WSSecHeader secHeader = new WSSecHeader(document);
+            secHeader.insertSecurityHeader();
+            generateSignature(privateKeyPassword, privateKeyAlias, digestAlgorithm,
+                              canonicalizationAlgorithm, signatureAlgorithm, crypto, secHeader);
+            generateEncryption(publicKeyAlias, crypto, secHeader, encryptionAlgorithm);
+            return convertDocumentToString(document);
+        } catch (Exception e) {
+            return createError(e.getMessage());
+        }
+    }
+
+    private static void generateEncryption(String publicKeyAlias, Crypto crypto,
+                                           WSSecHeader secHeader, String encryptionAlgorithm) throws Exception {
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo(publicKeyAlias);
+        encrypt.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        encrypt.setSymmetricEncAlgorithm(encryptionAlgorithm);
+        encrypt.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
+        SecretKey symmetricKey = generateSymmetricKey();
+        encrypt.build(crypto, symmetricKey);
+    }
+
+    private static void generateSignature(String privateKeyPassword, String privateKeyAlias, String digestAlgorithm,
+                                          String canonicalizationAlgorithm, String signatureAlgorithm, Crypto crypto,
+                                          WSSecHeader secHeader) throws WSSecurityException {
+        WSSecSignature signature = new WSSecSignature(secHeader);
+        signature.setUserInfo(privateKeyAlias, privateKeyPassword);
+        signature.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        signature.setSigCanonicalization(canonicalizationAlgorithm);
+        signature.setDigestAlgo(digestAlgorithm);
+        signature.setSignatureAlgorithm(signatureAlgorithm);
+        signature.build(crypto);
+    }
+
+    public static SecretKey generateSymmetricKey() throws Exception {
+        KeyGenerator keyGen = KeyGenerator.getInstance(AES);
+        keyGen.init(128);
+        return keyGen.generateKey();
     }
 }

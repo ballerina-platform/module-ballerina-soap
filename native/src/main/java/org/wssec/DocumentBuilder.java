@@ -28,9 +28,10 @@ import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import static org.wssec.Constants.NATIVE_DOCUMENT;
+import static org.wssec.Utils.createError;
+import static org.wssec.WsSecurityUtils.convertDocumentToString;
 
 public class DocumentBuilder {
-
     private final Document document;
 
     public DocumentBuilder(BObject documentBuilder, BXml xmlPayload) throws Exception {
@@ -42,6 +43,15 @@ public class DocumentBuilder {
 
     protected DocumentBuilder(Document document) {
         this.document = document;
+    }
+
+    public static Object getEnvelope(BObject document) {
+        Document nativeDocument = (Document) document.getNativeData().get(NATIVE_DOCUMENT);
+        try {
+            return ValueCreator.createXmlValue(convertDocumentToString(nativeDocument).toString());
+        } catch (Exception e) {
+            return createError(e.getMessage());
+        }
     }
 
     public static BArray getSignatureData(BObject document) {

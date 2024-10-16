@@ -17,8 +17,8 @@
 import ballerina/crypto;
 
 # Union type of all the inbound web service security configurations.
-public type InboundSecurityConfig NoPolicy|UsernameTokenConfig|TimestampTokenConfig|SymmetricBindingConfig
-    |AsymmetricBindingConfig|TransportBindingConfig;
+public type OutboundSecurityConfig NoPolicy|UsernameTokenConfig|TimestampTokenConfig|SymmetricBindingConfig
+    |TransportBindingConfig|AsymmetricBindingConfig;
 
 # Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
 #
@@ -26,7 +26,7 @@ public type InboundSecurityConfig NoPolicy|UsernameTokenConfig|TimestampTokenCon
 # + decryptionKey - The private key to decrypt the SOAP envelope
 # + signatureAlgorithm - The algorithm to verify the SOAP envelope
 # + decryptionAlgorithm - The algorithm to decrypt the SOAP body
-public type OutboundSecurityConfig record {|
+public type InboundSecurityConfig record {|
     crypto:PublicKey verificationKey?;
     crypto:PrivateKey|crypto:PublicKey decryptionKey?;
     SignatureAlgorithm signatureAlgorithm?;
@@ -66,19 +66,43 @@ public type SymmetricBindingConfig record {|
     string x509Token?;
 |};
 
-# Represents the record for Username Token with Asymmetric Binding policy.
+# Represents the record for Asymmetric Binding policy.
 #
-# + signatureKey - The private key to sign the SOAP envelope
-# + encryptionKey - The public key to encrypt the SOAP body
-# + signatureAlgorithm - The algorithm to sign the SOAP envelope
-# + encryptionAlgorithm - The algorithm to encrypt the SOAP body
-# + x509Token - field description
+# + signatureConfig - Configuration for applying digital signatures
+# + encryptionConfig - Configuration for applying encryption
+# + x509Token - The path or token of the X509 certificate
 public type AsymmetricBindingConfig record {|
-    crypto:PrivateKey signatureKey?;
-    crypto:PublicKey encryptionKey?;
-    SignatureAlgorithm signatureAlgorithm?;
-    EncryptionAlgorithm encryptionAlgorithm?;
+    SignatureConfig signatureConfig?;
+    EncryptionConfig encryptionConfig?;
     string x509Token?;
+|};
+
+# Represents the record for signature configurations.
+#
+# + keystore - The keystore to store the private key
+# + privateKeyAlias - The alias of the private key
+# + privateKeyPassword - The password of the private key
+# + signatureAlgorithm - The algorithm to sign the SOAP envelope
+# + canonicalizationAlgorithm - The algorithm to canonicalize the SOAP envelope
+# + digestAlgorithm - The algorithm to digest the SOAP envelope
+public type SignatureConfig record {|
+    crypto:KeyStore keystore;
+    string privateKeyAlias;
+    string privateKeyPassword;
+    SignatureAlgorithm signatureAlgorithm?;
+    CanonicalizationAlgorithm canonicalizationAlgorithm = C14N_EXCL_OMIT_COMMENTS;
+    DigestAlgorithm digestAlgorithm = SHA1;
+|};
+
+# Represents the record for encryption configurations.
+#
+# + keystore - The keystore to store the public key
+# + publicKeyAlias - The alias of the public key
+# + encryptionAlgorithm - The algorithm to encrypt the SOAP envelope
+public type EncryptionConfig record {|
+    crypto:KeyStore keystore;
+    string publicKeyAlias;
+    EncryptionAlgorithm encryptionAlgorithm?;
 |};
 
 # Represents the record for Transport Binding policy.
@@ -87,3 +111,12 @@ public type TransportBindingConfig "TransportBinding";
 
 # Represents the record to send SOAP envelopes with no security policy.
 public type NoPolicy "NoPolicy";
+
+# Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
+#
+# + decryptKeystore - The keystore to decrypt the SOAP envelope
+# + signatureKeystore - The keystore to verify the signature of the SOAP envelope
+public type InboundConfig record {|
+    crypto:KeyStore decryptKeystore?;
+    crypto:KeyStore signatureKeystore?;
+|};

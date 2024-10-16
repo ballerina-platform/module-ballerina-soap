@@ -19,10 +19,10 @@ import ballerina/http;
 # SOAP client configurations.
 #
 # + httpConfig - HTTP Configuration
-# + inboundSecurity - Web service security configurations for SOAP requests
-# + outboundSecurity - Web service security configurations to decrypt and verify SOAP responses
+# + outboundSecurity - Web service security configurations for SOAP requests
+# + inboundSecurity - Web service security configurations to decrypt and verify SOAP responses
 public type ClientConfig record {|
     http:ClientConfiguration httpConfig = {};
-    InboundSecurityConfig|InboundSecurityConfig[] inboundSecurity = NO_POLICY;
-    OutboundSecurityConfig outboundSecurity = {};
+    OutboundSecurityConfig|OutboundSecurityConfig[] outboundSecurity = NO_POLICY;
+    InboundSecurityConfig inboundSecurity = {};
 |};

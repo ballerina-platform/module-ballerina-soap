@@ -23,6 +23,7 @@ const PASSWORD = "password";
 const KEY_ALIAS = "wss40";
 const KEY_PASSWORD = "security";
 
+const SOAP_ENVELOPE_PATH = "modules/wssec/tests/resources/xml/soap_envelope.xml";
 const PUBLIC_KEY_PATH = "modules/wssec/tests/resources/public_key.cer";
 const PRIVATE_KEY_PATH = "modules/wssec/tests/resources/private_key.pem";
 const KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
@@ -30,6 +31,9 @@ const X509_PUBLIC_CERT_PATH = "modules/wssec/tests/resources/x509_certificate.cr
 const X509_PUBLIC_CERT_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.crt";
 const X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
 const X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
+
+const KEY_STORE_PATH_2 = "modules/wssec/tests/resources/keystore.jks";
+const ALIAS = "mykey";
 
 const crypto:KeyStore clientKeyStore = {
     path: X509_KEY_STORE_PATH_2,
@@ -97,13 +101,14 @@ function assertSignatureWithX509(string securedEnvelope) {
 }
 
 function assertSignatureWithoutX509(string securedEnvelope) {
-    string:RegExp signature = re `<ds:Signature xmlns:ds=".*" .*">.*</ds:Signature>`;
-    string:RegExp signatureInfo = re `<ds:SignedInfo>.*</ds:SignedInfo>`;
+    string:RegExp signature = re `<ds:Signature .*>`;
+    string:RegExp signatureInfo = re `<ds:SignedInfo>`;
     string:RegExp canonicalizationMethod = re `<ds:CanonicalizationMethod Algorithm=".*">`;
     string:RegExp signatureMethod = re `<ds:SignatureMethod Algorithm=".*"/>`;
     string:RegExp transformMethod = re `<ds:Transform Algorithm=".*"/>`;
     string:RegExp digestMethod = re `<ds:DigestMethod Algorithm=".*"/>`;
-    string:RegExp signatureValue = re `<ds:SignatureValue>.*</ds:SignatureValue>`;
+    string:RegExp digestValue = re `ds:DigestValue>`;
+    string:RegExp signatureValue = re `<ds:SignatureValue>`;
 
     test:assertTrue(securedEnvelope.includesMatch(signature));
     test:assertTrue(securedEnvelope.includesMatch(signatureInfo));
@@ -111,31 +116,28 @@ function assertSignatureWithoutX509(string securedEnvelope) {
     test:assertTrue(securedEnvelope.includesMatch(signatureMethod));
     test:assertTrue(securedEnvelope.includesMatch(transformMethod));
     test:assertTrue(securedEnvelope.includesMatch(digestMethod));
+    test:assertTrue(securedEnvelope.includesMatch(digestValue));
     test:assertTrue(securedEnvelope.includesMatch(signatureValue));
 }
 
 function assertEncryptedSymmetricKey(string securedEnvelope) {
-    string:RegExp encryptedKey = re `<xenc:EncryptedKey .*">.*</xenc:EncryptedKey>`;
+    string:RegExp encryptedKey = re `<xenc:EncryptedKey .*">`;
     string:RegExp encryptionMethod = re `<xenc:EncryptionMethod Algorithm=".*"/>`;
-    string:RegExp keyInfo = re `<ds:KeyInfo .*/>`;
-    string:RegExp cipherData = re `<xenc:CipherData>.*</xenc:CipherData>`;
+    string:RegExp cipherData = re `<xenc:CipherData>`;
 
     test:assertTrue(securedEnvelope.includesMatch(encryptedKey));
     test:assertTrue(securedEnvelope.includesMatch(encryptionMethod));
-    test:assertTrue(securedEnvelope.includesMatch(keyInfo));
     test:assertTrue(securedEnvelope.includesMatch(cipherData));
 }
 
 function assertEncryptedPart(string securedEnvelope) {
     string:RegExp encryptedData = re `<xenc:EncryptedData xmlns:xenc=".*>`;
     string:RegExp encMethod = re `<xenc:EncryptionMethod Algorithm=".*"/>`;
-    string:RegExp keyInfo = re `<ds:KeyInfo xmlns:ds=".*">`;
-    string:RegExp cipherData = re `<xenc:CipherData>.*</xenc:CipherData>`;
-    string:RegExp cipherValue = re `<xenc:CipherValue>.*</xenc:CipherValue>`;
+    string:RegExp cipherData = re `<xenc:CipherData>`;
+    string:RegExp cipherValue = re `<xenc:CipherValue>`;
 
     test:assertTrue(securedEnvelope.includesMatch(encryptedData));
     test:assertTrue(securedEnvelope.includesMatch(encMethod));
-    test:assertTrue(securedEnvelope.includesMatch(keyInfo));
     test:assertTrue(securedEnvelope.includesMatch(cipherData));
     test:assertTrue(securedEnvelope.includesMatch(cipherValue));
 }

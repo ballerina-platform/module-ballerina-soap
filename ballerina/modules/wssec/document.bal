@@ -16,7 +16,7 @@
 
 import ballerina/jballerina.java;
 
-isolated class Document {
+public isolated class Document {
 
     public isolated function init(xml xmlPayload) returns Error? {
         handle|error documentBuilder = newDocument(self, xmlPayload);
@@ -24,6 +24,10 @@ isolated class Document {
             return error Error(documentBuilder.message());
         }
     }
+
+    public isolated function getEnvelope() returns xml|Error = @java:Method {
+        'class: "org.wssec.DocumentBuilder"
+    } external;
 
     public isolated function getEncryptedData() returns byte[] = @java:Method {
         'class: "org.wssec.DocumentBuilder"
