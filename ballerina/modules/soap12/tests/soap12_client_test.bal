@@ -421,6 +421,17 @@ function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
     Client soapClient = check new ("http://localhost:9091",
         {
             outboundSecurity: {
+                signatureConfig: {
+                    keystore: {
+                        path: KEY_STORE_PATH_2,
+                        password: PASSWORD
+                    },
+                    privateKeyAlias: ALIAS, 
+                    privateKeyPassword: PASSWORD,
+                    signatureAlgorithm: soap:RSA_SHA512,
+                    canonicalizationAlgorithm: soap:C14N_EXCL_OMIT_COMMENTS, 
+                    digestAlgorithm: soap:SHA512
+                },
                 encryptionConfig: {
                     keystore: {
                         path: KEY_STORE_PATH_2,
@@ -442,8 +453,7 @@ function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
             }
         }
     );
-    xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/"><soap:Body><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
+    xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/"><soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="id-9fc31395-d908-4efa-96e5-754b03963236"><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
     xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
     test:assertEquals((response/<soap11:Body>).toString(), (body/<soap11:Body>).toString());
 }
-
