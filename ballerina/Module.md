@@ -77,9 +77,9 @@ The SOAP client module introduces a robust framework for configuring security me
 
 There are two primary security configurations available for SOAP clients:
 
-- `outboundSecurity`: This configuration is applied to the SOAP envelope when a request is made. It includes various ws security policies such as Username Token, Timestamp Token, X509 Token, Symmetric Binding, Asymmetric Binding, and Transport Binding, either individually or in combination with each other.
+- `outboundSecurity`: This configuration applies WS-Security policies to outgoing SOAP messages. It supports multiple security options, such as Username Token, Timestamp Token, X.509 Token, Symmetric Binding, Asymmetric Binding, and Transport Binding. These can be used individually or in combination to secure the message.
 
-- `inboundSecurity`: This configuration is applied to the SOAP envelope when a response is received. Its purpose is to decrypt the data within the envelope and verify the digital signature for security validation.
+- `inboundSecurity`: This configuration handles the security of incoming SOAP messages. It decrypts encrypted data and verifies the digital signature to confirm the authenticity of the message.
 
 ### Policies
 
@@ -125,10 +125,8 @@ These policies empower SOAP clients to enhance the security of their web service
 
 - `InboundSecurityConfig`: Represents the record for outbound security configurations to verify and decrypt SOAP envelopes.
   - Fields:
-    - `crypto:PublicKey` verificationKey : The public key to verify the signature of the SOAP envelope
-    - `crypto:PrivateKey`|`crypto:PublicKey` decryptionKey : The private key to decrypt the SOAP envelope
-    - `SignatureAlgorithm` signatureAlgorithm : The algorithm to verify the SOAP envelope
-    - `EncryptionAlgorithm` decryptionAlgorithm : The algorithm to decrypt the SOAP body
+    - `crypto:KeyStore` decryptKeystore - The keystore to decrypt the SOAP envelope
+    - `crypto:KeyStore` signatureKeystore - The keystore to verify the signature of the SOAP envelope
 
 ### Apply Security Policies
 
@@ -183,7 +181,7 @@ public function main() returns error? {
         outboundSecurity: {
             signatureConfig: {
                 keystore: {
-                    path: KEY_STORE_PATH_2,
+                    path: KEY_STORE_PATH,
                     password: PASSWORD
                 }, 
                 privateKeyAlias: ALIAS, 
@@ -201,11 +199,14 @@ public function main() returns error? {
             }
         },
         inboundSecurity: {
-            keystore: {
+            decryptKeystore: {
                 path: KEY_STORE_PATH_2,
                 password: PASSWORD
             },
-            decryptionAlgorithm: wssec:AES_128
+            signatureKeystore: {
+                path: KEY_STORE_PATH,
+                password: PASSWORD
+            }
         }
     });
     xml envelope = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
