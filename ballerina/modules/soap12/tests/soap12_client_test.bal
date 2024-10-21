@@ -414,13 +414,13 @@ function testSoapEndpoint() returns error? {
 }
 
 @test:Config {
-    groups: ["soap12", "send_receive", "new2"]
+    groups: ["soap12", "send_receive"]
 }
 function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
-    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap11;
+    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
     Client soapClient = check new ("http://localhost:9091",
         {
-            outboundSecurity: {
+            outboundSecurity: [{
                 signatureConfig: {
                     keystore: {
                         path: KEY_STORE_PATH_2,
@@ -440,7 +440,7 @@ function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
                     publicKeyAlias: ALIAS,
                     encryptionAlgorithm: wssec:AES_128
                 }
-            },
+            }],
             inboundSecurity: {
                 decryptKeystore: {
                     path: KEY_STORE_PATH_2,
@@ -455,5 +455,62 @@ function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
     );
     xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/"><soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="id-9fc31395-d908-4efa-96e5-754b03963236"><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
     xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
-    test:assertEquals((response/<soap11:Body>).toString(), (body/<soap11:Body>).toString());
+    test:assertEquals((response/<soap12:Body>).toString(), (body/<soap12:Body>).toString());
+}
+
+@test:Config {
+    groups: ["soap12", "send_receive"]
+}
+function testSoapReceiveWithArrayOfOutboundConfigAndInboundConfig() returns error? {
+    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap12;
+    Client soapClient = check new ("http://localhost:9091",
+        {
+            outboundSecurity: [{
+                signatureConfig: {
+                    keystore: {
+                        path: KEY_STORE_PATH_2,
+                        password: PASSWORD
+                    },
+                    privateKeyAlias: ALIAS, 
+                    privateKeyPassword: PASSWORD,
+                    signatureAlgorithm: soap:RSA_SHA512,
+                    canonicalizationAlgorithm: soap:C14N_EXCL_OMIT_COMMENTS, 
+                    digestAlgorithm: soap:SHA512
+                },
+                encryptionConfig: {
+                    keystore: {
+                        path: KEY_STORE_PATH_2,
+                        password: PASSWORD
+                    },
+                    publicKeyAlias: ALIAS,
+                    encryptionAlgorithm: wssec:AES_128
+                }
+            }, {
+                timeToLive: 1
+            }, {
+                username: "user",
+                password: "password",
+                passwordType: wssec:TEXT
+            }],
+            inboundSecurity: {
+                decryptKeystore: {
+                    path: KEY_STORE_PATH_2,
+                    password: PASSWORD
+                },
+                signatureKeystore: {
+                    path: KEY_STORE_PATH_2,
+                    password: PASSWORD
+                }
+            }
+        }
+    );
+    xml body = xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding/"><soap:Body xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="id-9fc31395-d908-4efa-96e5-754b03963236"><quer:Add xmlns:quer="http://tempuri.org/"><quer:intA>2</quer:intA><quer:intB>3</quer:intB></quer:Add></soap:Body></soap:Envelope>`;
+    xml response = check soapClient->sendReceive(body, "http://tempuri.org/Add");
+    string:RegExp usernameTokenTag = re `<wsse:UsernameToken .*>.*</wsse:UsernameToken>`;
+    string:RegExp usernameTag = re `<wsse:Username>user</wsse:Username>`;
+    test:assertTrue(response.toString().includesMatch(usernameTokenTag));
+    test:assertTrue(response.toString().includesMatch(usernameTag));
+    string:RegExp passwordTag = re `<wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">password</wsse:Password>`;
+    test:assertTrue(response.toString().includesMatch(passwordTag));
+    test:assertEquals((response/<soap12:Body>).toString(), (body/<soap12:Body>).toString());
 }

@@ -58,7 +58,7 @@ public isolated function applySecurityPolicies(wssec:OutboundSecurityConfig|wsse
     } else {
         xml securedEnvelope = envelope.clone();
         foreach wssec:OutboundSecurityConfig policy in security {
-            securedEnvelope = check applySecurityPolicies(policy, securedEnvelope);
+            securedEnvelope = check applySecurityPolicies(policy, securedEnvelope, soap12);
         }
         return securedEnvelope;
     }
