@@ -387,7 +387,7 @@ function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
     xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap11;
     Client soapClient = check new ("http://localhost:9090",
         {
-            outboundSecurity: {
+            outboundSecurity: [{
                 signatureConfig: {
                     keystore: {
                         path: KEY_STORE_PATH_2,
@@ -408,6 +408,9 @@ function testSoapReceiveWithAsymmetricBindingAndInboundConfig() returns error? {
                     encryptionAlgorithm: wssec:AES_128
                 }
             },
+            {
+                timeToLive: 1
+            }],
             inboundSecurity: {
                 decryptKeystore: {
                     path: KEY_STORE_PATH_2,
