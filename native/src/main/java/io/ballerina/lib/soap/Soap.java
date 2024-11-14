@@ -28,36 +28,33 @@ public class Soap {
 
     public static Object sendReceive11(Environment env, BObject soap11, Object body, BString action,
                                        BMap<BString, BString[]> headers, BString path, BTypedesc typeDesc) {
-        env.yieldAndRun(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 Object[] arguments = new Object[]{body, action, headers, path};
-                Object result = env.getRuntime().call(soap11, REMOTE_FUNCTION, arguments);
+                Object result = env.getRuntime().callMethod(soap11, REMOTE_FUNCTION, null, arguments);
                 if (result instanceof BError) {
                     ((BError) result).printStackTrace();
-                    System.exit(1);
-
                 }
+                return result;
             } catch (BError bError) {
                 bError.printStackTrace();
                 System.exit(1);
             }
             return null;
         });
-        return null;
     }
 
     public static Object sendReceive12(Environment env, BObject soap12, Object body, Object action,
                                        BMap<BString, BString[]> headers, BString path, BTypedesc typeDesc) {
-        env.yieldAndRun(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 Object[] arguments = new Object[]{body, action, headers, path};
-                env.getRuntime().call(soap12, REMOTE_FUNCTION, arguments);
+                return env.getRuntime().callMethod(soap12, REMOTE_FUNCTION, null, arguments);
             } catch (BError bError) {
                 bError.printStackTrace();
                 System.exit(1);
             }
             return null;
         });
-        return null;
     }
 }
