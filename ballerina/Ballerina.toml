@@ -1,14 +1,14 @@
 [package]
 org = "ballerina"
 name = "soap"
-version = "2.0.1"
+version = "2.1.0"
 authors = ["Ballerina"]
 export=["soap", "soap.soap11", "soap.soap12"]
 keywords = ["soap"]
 repository = "https://github.com/ballerina-platform/module-ballerina-soap"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.10.0-20241011-161100-51978649"
+distribution = "2201.11.0-20241112-214900-6b80ab87"
 
 [build-options]
 observabilityIncluded = true
@@ -19,8 +19,8 @@ graalvmCompatible = true
 [[platform.java21.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "soap-native"
-version = "2.0.1"
-path = "../native/build/libs/soap-native-2.0.1-SNAPSHOT.jar"
+version = "2.1.0"
+path = "../native/build/libs/soap-native-2.1.0-SNAPSHOT.jar"
 
 [[platform.java21.dependency]]
 groupId = "org.apache.wss4j"
