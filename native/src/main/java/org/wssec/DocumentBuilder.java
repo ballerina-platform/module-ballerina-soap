@@ -31,13 +31,14 @@ import static org.wssec.Constants.NATIVE_DOCUMENT;
 import static org.wssec.Utils.createError;
 import static org.wssec.WsSecurityUtils.convertDocumentToString;
 
-public class DocumentBuilder {
+public final class DocumentBuilder {
     private final Document document;
 
     public DocumentBuilder(BObject documentBuilder, BXml xmlPayload) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
-        this.document = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xmlPayload.toString())));
+        this.document = factory.newDocumentBuilder().parse(new InputSource(
+                new StringReader(xmlPayload.toString())));
         documentBuilder.addNativeData(NATIVE_DOCUMENT, this.document);
     }
 
