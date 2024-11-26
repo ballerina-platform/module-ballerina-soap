@@ -17,7 +17,7 @@
   -->
 <FindBugsFilter>
     <Match>
-        <Class name="io.ballerina.lib.soap.ExecutionCallback"/>
+        <Class name="io.ballerina.lib.soap.Soap"/>
         <Bug pattern="DM_EXIT"/>
     </Match>
 </FindBugsFilter>

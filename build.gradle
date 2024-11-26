@@ -91,6 +91,7 @@ subprojects {
         ballerinaStdLibs "io.ballerina.stdlib:os-ballerina:${project.stdlibOsVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:url-ballerina:${project.stdlibUrlVersion}"
         ballerinaStdLibs "io.ballerina.stdlib:io-ballerina:${project.stdlibIoVersion}"
+        ballerinaStdLibs "io.ballerina.lib:data.jsondata-ballerina:${stdlibDataJsonDataVersion}"
 
         externalJars (group: 'org.apache.wss4j', name: 'wss4j-ws-security-dom', version: "${wsSecurityDomVersion}") {
             transitive = false

@@ -17,47 +17,44 @@
 package io.ballerina.lib.soap;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Future;
-import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.api.async.StrandMetadata;
-import io.ballerina.runtime.api.creators.TypeCreator;
-import io.ballerina.runtime.api.types.UnionType;
+import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BTypedesc;
 
-import static org.wssec.ModuleUtils.getModule;
-
 public class Soap {
     private static final String REMOTE_FUNCTION = "generateResponse";
-    public static final StrandMetadata REMOTE_EXECUTION_STRAND = new StrandMetadata(
-            getModule().getOrg(),
-            getModule().getName(),
-            getModule().getMajorVersion(),
-            REMOTE_FUNCTION);
 
     public static Object sendReceive11(Environment env, BObject soap11, Object body, BString action,
                                        BMap<BString, BString[]> headers, BString path, BTypedesc typeDesc) {
-        Future future = env.markAsync();
-        ExecutionCallback executionCallback = new ExecutionCallback(future);
-        UnionType typeUnion = TypeCreator.createUnionType(PredefinedTypes.TYPE_XML, PredefinedTypes.TYPE_ANYDATA_ARRAY,
-                PredefinedTypes.TYPE_ERROR);
-        Object[] arguments = new Object[]{body, true, action, true, headers, true, path, true};
-        env.getRuntime().invokeMethodAsyncConcurrently(soap11, REMOTE_FUNCTION, null, REMOTE_EXECUTION_STRAND,
-                executionCallback, null, typeUnion, arguments);
-        return null;
+        return env.yieldAndRun(() -> {
+            try {
+                Object[] arguments = new Object[]{body, action, headers, path};
+                Object result = env.getRuntime().callMethod(soap11, REMOTE_FUNCTION, null, arguments);
+                if (result instanceof BError) {
+                    ((BError) result).printStackTrace();
+                }
+                return result;
+            } catch (BError bError) {
+                bError.printStackTrace();
+                System.exit(1);
+            }
+            return null;
+        });
     }
 
     public static Object sendReceive12(Environment env, BObject soap12, Object body, Object action,
                                        BMap<BString, BString[]> headers, BString path, BTypedesc typeDesc) {
-        Future future = env.markAsync();
-        ExecutionCallback executionCallback = new ExecutionCallback(future);
-        UnionType typeUnion = TypeCreator.createUnionType(PredefinedTypes.TYPE_XML, PredefinedTypes.TYPE_ANYDATA_ARRAY,
-                                                          PredefinedTypes.TYPE_ERROR);
-        Object[] arguments = new Object[]{body, true, action, true, headers, true, path, true};
-        env.getRuntime().invokeMethodAsyncConcurrently(soap12, REMOTE_FUNCTION, null, REMOTE_EXECUTION_STRAND,
-                                                       executionCallback, null, typeUnion, arguments);
-        return null;
+        return env.yieldAndRun(() -> {
+            try {
+                Object[] arguments = new Object[]{body, action, headers, path};
+                return env.getRuntime().callMethod(soap12, REMOTE_FUNCTION, null, arguments);
+            } catch (BError bError) {
+                bError.printStackTrace();
+                System.exit(1);
+            }
+            return null;
+        });
     }
 }
