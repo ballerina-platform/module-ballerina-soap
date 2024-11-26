@@ -25,7 +25,7 @@ import ballerina/test;
 const KEY_ALIAS = "wss40";
 const KEY_PASSWORD = "security";
 const IMAGE_PATH = "../ballerina/icon.png";
-const FILE_PATH = "../ballerina/Module.md";
+const FILE_PATH = "../ballerina/README.md";
 const KEY_STORE_PATH = "modules/wssec/tests/resources/wss40.p12";
 const X509_KEY_STORE_PATH = "modules/wssec/tests/resources/x509_certificate.p12";
 const X509_KEY_STORE_PATH_2 = "modules/wssec/tests/resources/x509_certificate_2.p12";
