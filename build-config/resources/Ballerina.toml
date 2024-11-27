@@ -8,7 +8,7 @@ keywords = ["soap"]
 repository = "https://github.com/ballerina-platform/module-ballerina-soap"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.11.0-20241112-214900-6b80ab87"
+distribution = "2201.11.0"
 
 [build-options]
 observabilityIncluded = true
