@@ -5,7 +5,7 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.12.0"
+distribution-version = "2201.12.11"
 
 [[package]]
 org = "ballerina"
@@ -281,7 +281,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "soap"
-version = "2.3.0"
+version = "2.3.1"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "http"},
