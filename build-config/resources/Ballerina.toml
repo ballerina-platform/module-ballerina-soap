@@ -8,33 +8,33 @@ keywords = ["soap"]
 repository = "https://github.com/ballerina-platform/module-ballerina-soap"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.12.0"
+distribution = "2201.14.0-20260527-050400-74f7e6bf"
 
 [build-options]
 observabilityIncluded = true
 
-[platform.java21]
+[platform.java25]
 graalvmCompatible = true
 
-[[platform.java21.dependency]]
+[[platform.java25.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "soap-native"
 version = "@toml.version@"
 path = "../native/build/libs/soap-native-@project.version@.jar"
 
-[[platform.java21.dependency]]
+[[platform.java25.dependency]]
 groupId = "org.apache.wss4j"
 artifactId = "wss4j-ws-security-dom"
 version = "@wssecuritydom.version@"
 path = "./lib/wss4j-ws-security-dom-@wssecuritydom.version@.jar"
 
-[[platform.java21.dependency]]
+[[platform.java25.dependency]]
 groupId = "org.apache.wss4j"
 artifactId = "wss4j-ws-security-common"
 version = "@wssecuritycommon.version@"
 path = "./lib/wss4j-ws-security-common-@wssecuritycommon.version@.jar"
 
-[[platform.java21.dependency]]
+[[platform.java25.dependency]]
 groupId = "org.apache.santuario"
 artifactId = "xmlsec"
 version = "@xmlsec.version@"
