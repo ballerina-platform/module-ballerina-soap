@@ -1,8 +1,12 @@
-# Overview
+## Overview
 
-This module offers a set of APIs that facilitate the transmission of XML requests to a SOAP backend. It excels in managing security policies within SOAP requests, ensuring the transmission of secured SOAP envelopes. Moreover, it possesses the capability to efficiently extract data from security-applied SOAP responses.
+This module provides APIs to transmit XML requests to a SOAP backend, abstracting the creation of SOAP envelopes, headers, and message bodies. It manages security policies within SOAP requests and can extract data from security-applied SOAP responses.
 
-SOAP module abstracts out the details of the creation of a SOAP envelope, headers, and the body in a SOAP message.
+## Key Features
+
+- SOAP 1.1 and SOAP 1.2 clients
+- Security policy configuration and application for SOAP requests
+- Data extraction from secured SOAP responses
 
 ## Client
 
