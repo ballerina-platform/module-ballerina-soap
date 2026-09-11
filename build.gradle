@@ -124,7 +124,16 @@ release {
     }
 }
 
-tasks.named('build') {
-    dependsOn('soap-native:build')
-    dependsOn('soap-ballerina:build')
+if (tasks.names.contains('build')) {
+    tasks.named('build') {
+        dependsOn('soap-native:build')
+        dependsOn('soap-ballerina:build')
+
+    }
+} else {
+    tasks.register('build') {
+        dependsOn('soap-native:build')
+        dependsOn('soap-ballerina:build')
+
+    }
 }
