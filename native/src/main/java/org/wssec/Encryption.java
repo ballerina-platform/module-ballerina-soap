@@ -23,6 +23,9 @@ import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import static org.wssec.Constants.NATIVE_ENCRYPTION;
 import static org.wssec.Utils.createError;
 
@@ -52,7 +55,7 @@ public class Encryption {
     public static Object getEncryptedKeyElements(BArray encryptedData) {
         try {
             return WsSecurityUtils.getEncryptedKeyElement(encryptedData.getByteArray());
-        } catch (Exception e) {
+        } catch (ParserConfigurationException | TransformerException e) {
             return createError(e.getMessage());
         }
     }
