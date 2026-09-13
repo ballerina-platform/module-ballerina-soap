@@ -46,6 +46,7 @@ import org.w3c.dom.Element;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -57,6 +58,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
 
 import static org.apache.wss4j.common.WSS4JConstants.AES_128_GCM;
 import static org.apache.wss4j.common.WSS4JConstants.ELEM_HEADER;
@@ -156,7 +158,7 @@ public final class WsSecurity {
             WsSecurityUtils.setEncryptedData(xmlDocument, encryption.getEncryptedData(),
                                              encryption.getEncryptionAlgorithm());
             return convertDocumentToString(xmlDocument);
-        } catch (Exception e) {
+        } catch (WSSecurityException | TransformerException e) {
             return createError(e.getMessage());
         }
     }
@@ -171,7 +173,7 @@ public final class WsSecurity {
     }
 
     public static Document createSignatureTags(WsSecurityHeader wsSecurityHeader,
-                                               Object x509FilePath) throws Exception {
+                                               Object x509FilePath) throws WSSecurityException {
         RequestData reqData = new RequestData();
         reqData.setSecHeader(wsSecurityHeader.getWsSecHeader());
         reqData.setWssConfig(WSSConfig.getNewInstance());
@@ -231,7 +233,7 @@ public final class WsSecurity {
             generateSignature(privateKeyPassword, privateKeyAlias, digestAlgorithm,
                               canonicalizationAlgorithm, signatureAlgorithm, crypto, secHeader);
             return convertDocumentToString(document);
-        } catch (Exception e) {
+        } catch (WSSecurityException | TransformerException e) {
             return createError(e.getMessage());
         }
     }
@@ -331,7 +333,7 @@ public final class WsSecurity {
             secHeader.insertSecurityHeader();
             generateEncryption(publicKeyAlias, crypto, secHeader, encryptionAlgorithm);
             return convertDocumentToString(document);
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | WSSecurityException | TransformerException e) {
             return createError(e.getMessage());
         }
     }
@@ -361,13 +363,14 @@ public final class WsSecurity {
                               canonicalizationAlgorithm, signatureAlgorithm, crypto, secHeader);
             generateEncryption(publicKeyAlias, crypto, secHeader, encryptionAlgorithm);
             return convertDocumentToString(document);
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | WSSecurityException | TransformerException e) {
             return createError(e.getMessage());
         }
     }
 
     private static void generateEncryption(String publicKeyAlias, Crypto crypto,
-                                           WSSecHeader secHeader, String encryptionAlgorithm) throws Exception {
+                                           WSSecHeader secHeader, String encryptionAlgorithm)
+            throws NoSuchAlgorithmException, WSSecurityException {
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo(publicKeyAlias);
         encrypt.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
@@ -389,7 +392,7 @@ public final class WsSecurity {
         signature.build(crypto);
     }
 
-    public static SecretKey generateSymmetricKey() throws Exception {
+    public static SecretKey generateSymmetricKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGen = KeyGenerator.getInstance(AES);
         keyGen.init(128);
         return keyGen.generateKey();
