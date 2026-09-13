@@ -29,7 +29,7 @@ pluginManagement {
 }
 
 plugins {
-    id "com.gradle.enterprise" version "3.13.2"
+    id "com.gradle.develocity" version "3.19.2"
 }
 
 include ':checkstyle'
@@ -40,9 +40,9 @@ project(':checkstyle').projectDir = file("build-config${File.separator}checkstyl
 project(':soap-native').projectDir = file('native')
 project(':soap-ballerina').projectDir = file('ballerina')
 
-gradleEnterprise {
+develocity {
     buildScan {
-        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-        termsOfServiceAgree = 'yes'
+        termsOfUseUrl = 'https://gradle.com/help/legal-terms-of-use'
+        termsOfUseAgree = 'yes'
     }
 }
