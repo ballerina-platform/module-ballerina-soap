@@ -22,10 +22,13 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BXml;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import static org.wssec.Constants.NATIVE_DOCUMENT;
 import static org.wssec.Utils.createError;
@@ -34,7 +37,8 @@ import static org.wssec.WsSecurityUtils.convertDocumentToString;
 public final class DocumentBuilder {
     private final Document document;
 
-    public DocumentBuilder(BObject documentBuilder, BXml xmlPayload) throws Exception {
+    public DocumentBuilder(BObject documentBuilder, BXml xmlPayload) throws ParserConfigurationException,
+            SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         this.document = factory.newDocumentBuilder().parse(new InputSource(
