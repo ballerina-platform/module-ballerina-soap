@@ -19,6 +19,7 @@ package org.wssec;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
@@ -34,7 +35,9 @@ import java.util.List;
 
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -63,7 +66,7 @@ public final class WsSecurityUtils {
 
     private WsSecurityUtils() {}
 
-    public static void buildSignature(RequestData reqData, WSSecSignature sign) throws Exception {
+    public static void buildSignature(RequestData reqData, WSSecSignature sign) throws WSSecurityException {
         List<WSEncryptionPart> parts = new ArrayList<>(1);
         Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
         parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
@@ -99,7 +102,8 @@ public final class WsSecurityUtils {
         return Base64.getDecoder().decode(encryptedText);
     }
 
-    public static Object getEncryptedKeyElement(byte[] encryptKey) throws Exception {
+    public static Object getEncryptedKeyElement(byte[] encryptKey) throws ParserConfigurationException,
+            TransformerException {
         Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         Element encryptedKey = document.createElement(ENCRYPTED_KEY_TAG);
         encryptedKey.setAttribute(XML_ENC_NS, ENC_NS);
@@ -129,7 +133,7 @@ public final class WsSecurityUtils {
         }
     }
 
-    public static Object convertDocumentToString(Document document) throws Exception {
+    public static Object convertDocumentToString(Document document) throws TransformerException {
         if (document == null) {
             return ErrorCreator.createError(StringUtils.fromString(EMPTY_XML_DOCUMENT_ERROR));
         }
