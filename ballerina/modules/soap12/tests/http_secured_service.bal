@@ -21,4 +21,11 @@ service / on new http:Listener(9091) {
     resource function post .(http:Request request) returns xml|error {
         return check request.getXmlPayload();
     }
+
+    resource function post getSoapFault() returns http:Response {
+        http:Response response = new;
+        response.statusCode = 500;
+        response.setXmlPayload(xml `<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><soap:Body><soap:Fault><soap:Code><soap:Value>soap:Receiver</soap:Value></soap:Code><soap:Reason><soap:Text xml:lang="en">UserAlreadyExistingUsernameException</soap:Text></soap:Reason></soap:Fault></soap:Body></soap:Envelope>`);
+        return response;
+    }
 }

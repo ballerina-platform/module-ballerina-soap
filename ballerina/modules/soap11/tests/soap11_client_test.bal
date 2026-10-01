@@ -169,6 +169,68 @@ function testSendReceiveWithMime3() returns error? {
 }
 
 @test:Config {
+    groups: ["soap11", "send"]
+}
+function testSend() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    check soapClient->send(body, "http://tempuri.org/Add");
+}
+
+@test:Config {
+    groups: ["soap11", "send"]
+}
+function testSendWithSoapFault() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    Error? response = soapClient->send(body, "http://tempuri.org/Add", path = "/getSoapFault");
+    test:assertTrue(response is Error);
+    error? cause = (<Error>response).cause();
+    test:assertTrue(cause is error);
+    test:assertTrue((<error>cause).message().includes("HTTP 500"));
+}
+
+@test:Config {
+    groups: ["soap11", "send"]
+}
+function testSendError() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("error-url");
+    Error? response = soapClient->send(body, "http://tempuri.org/Add", path = "/error");
+    test:assertTrue(response is Error);
+}
+
+@test:Config {
     groups: ["soap11", "send_only"]
 }
 function testSendOnly() returns error? {
