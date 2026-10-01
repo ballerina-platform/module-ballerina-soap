@@ -213,6 +213,86 @@ function testSendWithSoapFault() returns error? {
 @test:Config {
     groups: ["soap11", "send"]
 }
+function testSendWithNonXmlError() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    Error? response = soapClient->send(body, "http://tempuri.org/Add", path = "/getTextError");
+    test:assertTrue(response is Error);
+    error? cause = (<Error>response).cause();
+    test:assertTrue(cause is error);
+    test:assertTrue((<error>cause).message().includes("HTTP 500"));
+}
+
+@test:Config {
+    groups: ["soap11", "send"]
+}
+function testSendWithHeaders() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    check soapClient->send(body, "http://tempuri.org/Add", headers = {foo: ["bar1", "bar2"]});
+}
+
+@test:Config {
+    groups: ["soap11", "send", "mime"]
+}
+function testSendWithMime() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    mime:Entity[] mtomMessage = [];
+    mime:Entity envelope = new;
+    check envelope.setContentType("application/xop+xml");
+    envelope.setContentId("<soap@envelope>");
+    envelope.setBody(body);
+    mtomMessage.push(envelope);
+
+    mime:Entity bytesPart = new;
+    string readContent = check io:fileReadString(FILE_PATH);
+    bytesPart.setFileAsEntityBody(FILE_PATH);
+    string|byte[]|io:ReadableByteChannel|mime:EncodeError bytes = mime:base64Encode(readContent.toBytes());
+    if bytes !is byte[] {
+        return error("error");
+    }
+    bytesPart.setBody(bytes);
+    check bytesPart.setContentType("image/jpeg");
+    bytesPart.setContentId("<image1>");
+    mtomMessage.push(bytesPart);
+
+    Client soapClient = check new ("http://localhost:9091");
+    check soapClient->send(mtomMessage, "http://tempuri.org/Add", path = "/getMimePayload");
+}
+
+@test:Config {
+    groups: ["soap11", "send"]
+}
 function testSendError() returns error? {
     xml body = xml `<soap:Envelope
                         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"

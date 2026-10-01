@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/mime;
 
 service / on new http:Listener(9091) {
 
@@ -26,6 +27,26 @@ service / on new http:Listener(9091) {
         http:Response response = new;
         response.statusCode = 500;
         response.setXmlPayload(xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><soap:Fault><faultcode>soap:Server</faultcode><faultstring>UserAlreadyExistingUsernameException</faultstring></soap:Fault></soap:Body></soap:Envelope>`);
+        return response;
+    }
+
+    resource function post getTextError() returns http:Response {
+        http:Response response = new;
+        response.statusCode = 500;
+        response.setTextPayload("Internal Server Error");
+        return response;
+    }
+
+    resource function post getMimePayload(http:Request request) returns http:Response|error {
+        http:Response response = new;
+        mime:Entity[] mtomMessage = [];
+        mime:Entity envelope = new;
+        check envelope.setContentType("application/xop+xml");
+        envelope.setContentId("<soap@envelope>");
+        envelope.setBody(check (check request.getBodyParts())[0].getXml());
+        mtomMessage.push(envelope);
+        response.setBodyParts(mtomMessage);
+        response.setPayload(mtomMessage);
         return response;
     }
 }
