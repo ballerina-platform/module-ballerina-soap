@@ -102,6 +102,33 @@ public isolated client class Client {
         }
     }
 
+    # Sends SOAP request and checks for SOAP faults in the response. This is suitable for
+    # robust in-only operations where no response body is expected, but the server may
+    # return a SOAP fault indicating a failure.
+    # ```ballerina
+    # check soapClient->send(body, "urn:addUser");
+    # ```
+    #
+    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + action - SOAP action as a `string`
+    # + headers - SOAP headers as a `map<string|string[]>`
+    # + path - The resource path
+    # + return - If successful, returns `nil`. Else, returns an error containing the SOAP fault details
+    remote isolated function send(xml|mime:Entity[] body, string? action = (),
+                                  map<string|string[]> headers = {}, string path = "") returns Error? {
+        do {
+            xml securedBody;
+            xml mimeEntity = body is xml ? body : check body[0].getXml();
+            lock {
+                xml envelope = body is xml ? body.clone() : mimeEntity.clone();
+                securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone());
+            }
+            return check soap:send(securedBody, self.soapClient, action, headers, path);
+        } on fail error soapError {
+            return error Error(SOAP_ERROR, soapError);
+        }
+    }
+
     # Fires and forgets requests. Sends the request without the possibility of any response from the
     # service (even an error).
     # ```ballerina
