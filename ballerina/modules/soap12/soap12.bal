@@ -123,6 +123,10 @@ public isolated client class Client {
                 xml envelope = body is xml ? body.clone() : mimeEntity.clone();
                 securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone());
             }
+            if body is mime:Entity[] {
+                body[0].setXml(securedBody);
+                return check soap:send(body, self.soapClient, action, headers, path);
+            }
             return check soap:send(securedBody, self.soapClient, action, headers, path);
         } on fail error soapError {
             return error Error(SOAP_ERROR, soapError);
