@@ -112,6 +112,31 @@ public isolated function sendOnly(xml|mime:Entity[] body, http:Client httpClient
     }
 }
 
+public isolated function send(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
+                              map<string|string[]> headers = {}, string path = "", boolean soap12 = true)
+    returns Error? {
+    http:Request req = soap12 ? createSoap12HttpRequest(body, soapAction, headers)
+        : createSoap11HttpRequest(body, <string>soapAction, headers);
+    http:Response|http:ClientError response = httpClient->post(path, req);
+    if response is http:ClientError {
+        return error Error(response.message());
+    }
+    if response.statusCode < 200 || response.statusCode >= 300 {
+        xml|error responsePayload = response.getXmlPayload();
+        if responsePayload is xml {
+            return error Error(
+                string `${SOAP_RESPONSE_ERROR}: HTTP ${response.statusCode}`,
+                httpStatusCode = response.statusCode,
+                detail = responsePayload.toString()
+            );
+        }
+        return error Error(
+            string `${SOAP_RESPONSE_ERROR}: HTTP ${response.statusCode}`,
+            httpStatusCode = response.statusCode
+        );
+    }
+}
+
 isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAction,
                                           map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;
