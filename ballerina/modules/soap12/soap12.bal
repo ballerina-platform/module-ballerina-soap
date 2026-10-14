@@ -106,7 +106,7 @@ public isolated client class Client {
     # robust in-only operations where no response body is expected, but the server may
     # return a SOAP fault indicating a failure.
     # ```ballerina
-    # check soapClient->send(body, "urn:addUser");
+    # check soapClient->sendRobust(body, "urn:addUser");
     # ```
     #
     # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
@@ -114,8 +114,8 @@ public isolated client class Client {
     # + headers - SOAP headers as a `map<string|string[]>`
     # + path - The resource path
     # + return - If successful, returns `nil`. Else, returns an error containing the SOAP fault details
-    remote isolated function send(xml|mime:Entity[] body, string? action = (),
-                                  map<string|string[]> headers = {}, string path = "") returns Error? {
+    remote isolated function sendRobust(xml|mime:Entity[] body, string? action = (),
+                                        map<string|string[]> headers = {}, string path = "") returns Error? {
         do {
             xml securedBody;
             xml mimeEntity = body is xml ? body : check body[0].getXml();
@@ -125,10 +125,16 @@ public isolated client class Client {
             }
             if body is mime:Entity[] {
                 body[0].setXml(securedBody);
-                return check soap:send(body, self.soapClient, action, headers, path);
+                return check soap:sendRobust(body, self.soapClient, action, headers, path);
             }
-            return check soap:send(securedBody, self.soapClient, action, headers, path);
+            return check soap:sendRobust(securedBody, self.soapClient, action, headers, path);
         } on fail error soapError {
+            if soapError is soap:SoapFaultError {
+                return error SoapFaultError(soapError.message(), soapError, httpStatusCode = soapError.detail()["httpStatusCode"], detail = soapError.detail()["detail"]);
+            }
+            if soapError is soap:NetworkError {
+                return error NetworkError(soapError.message(), soapError, httpStatusCode = soapError.detail()["httpStatusCode"]);
+            }
             return error Error(SOAP_ERROR, soapError);
         }
     }
