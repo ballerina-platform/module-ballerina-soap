@@ -20,7 +20,7 @@ soap12:Client soapClient = check new ("http://www.dneonline.com/calculator.asmx?
 
 - **Send & Receive**: Sends SOAP request and receives a response.
 - **Send Only**: Fires and forgets requests. Sends the request without the possibility of any response from the service (true one-way).
-- **Send**: Sends SOAP request and checks for SOAP faults in the response. Suitable for robust in-only operations where no response body is expected, but the server may return a SOAP fault indicating a failure.
+- **Send Robust**: Sends SOAP request and checks for SOAP faults in the response. Suitable for robust in-only operations where no response body is expected, but the server may return a SOAP fault indicating a failure.
 
 The SOAP 1.1 specification requires the inclusion of the `action` parameter as a mandatory component within its APIs. In contrast, SOAP 1.2 relaxes this requirement, making the action parameter optional.
 
@@ -64,7 +64,7 @@ public function main() returns error? {
 }
 ```
 
-### Example: Send (Robust In-Only)
+### Example: Send Robust (Robust In-Only)
 
 ```ballerina
 import ballerina/soap.soap12;
@@ -80,7 +80,7 @@ public function main() returns error? {
                             </quer:Add>
                             </soap:Body>
                         </soap:Envelope>`;
-    check soapClient->send(envelope, "http://tempuri.org/Add");
+    check soapClient->sendRobust(envelope, "http://tempuri.org/Add");
 }
 ```
 
