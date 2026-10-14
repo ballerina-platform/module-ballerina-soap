@@ -17,5 +17,11 @@
 # Defines the common error type for the module.
 public type Error distinct error;
 
+# Represents a SOAP fault returned by the server.
+public type SoapFaultError distinct Error;
+
+# Represents a network-level error that occurs during SOAP communication.
+public type NetworkError distinct Error;
+
 const SOAP_RESPONSE_ERROR = "Failed to create SOAP response";
 const INVALID_PROTOCOL_ERROR = "Invalid protocol detected: Please use the `https` protocol instead of `http`.";

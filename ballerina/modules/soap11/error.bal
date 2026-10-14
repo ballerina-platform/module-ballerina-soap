@@ -17,6 +17,12 @@
 # Defines the common error type for the SOAP 1.1 module.
 public type Error distinct error;
 
+# Represents a SOAP fault returned by the server.
+public type SoapFaultError distinct Error;
+
+# Represents a network-level error that occurs during SOAP communication.
+public type NetworkError distinct Error;
+
 const SOAP_RESPONSE_ERROR = "Failed to create SOAP response";
 const SOAP_CLIENT_ERROR = "Failed to initialize SOAP 1.1 client";
 const SOAP_ERROR = "Error occurred while executing the API";
