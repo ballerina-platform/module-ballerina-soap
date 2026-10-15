@@ -115,7 +115,7 @@ public isolated client class Client {
     # + path - The resource path
     # + return - If successful, returns `nil`. Else, returns an error containing the SOAP fault details
     remote isolated function sendRobust(xml|mime:Entity[] body, string? action = (),
-                                        map<string|string[]> headers = {}, string path = "") returns Error? {
+                                        map<string|string[]> headers = {}, string path = "") returns soap:Error? {
         do {
             xml securedBody;
             xml mimeEntity = body is xml ? body : check body[0].getXml();
@@ -125,21 +125,11 @@ public isolated client class Client {
             }
             if body is mime:Entity[] {
                 body[0].setXml(securedBody);
-                return check soap:sendRobust(body, self.soapClient, action, headers, path);
+                return soap:sendRobust(body, self.soapClient, action, headers, path);
             }
-            return check soap:sendRobust(securedBody, self.soapClient, action, headers, path);
+            return soap:sendRobust(securedBody, self.soapClient, action, headers, path);
         } on fail error soapError {
-            if soapError is soap:SoapFaultError {
-                return error SoapFaultError(soapError.message(), soapError, httpStatusCode = soapError.detail().httpStatusCode, soapFault = soapError.detail().soapFault);
-            }
-            if soapError is soap:NetworkError {
-                int? statusCode = soapError.detail().httpStatusCode;
-                if statusCode is int {
-                    return error NetworkError(soapError.message(), soapError, httpStatusCode = statusCode);
-                }
-                return error NetworkError(soapError.message(), soapError);
-            }
-            return error Error(SOAP_ERROR, soapError);
+            return error soap:Error(SOAP_ERROR, soapError);
         }
     }
 
