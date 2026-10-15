@@ -24,14 +24,14 @@ The conforming implementation of the specification is released and included in t
     * 2.2 [Supported APIs](#22-supported-apis)
         * 2.2.1 [Send & Receive](#221-send--receive)
         * 2.2.2 [Send Only](#222-send-only)
-        * 2.2.3 [Send (Robust In-Only)](#223-send-robust-in-only)
+        * 2.2.3 [Send Robust (Robust In-Only)](#223-send-robust-robust-in-only)
         * 2.2.4 [Examples](#224-examples)
             * 2.2.4.1 [`sendReceive()` with SOAP 1.1](#2241-sendreceive-with-soap-11)
             * 2.2.4.2 [`sendReceive()` with SOAP 1.2](#2242-sendreceive-with-soap-12)
             * 2.2.4.3 [`sendOnly()` with SOAP 1.1](#2243-sendonly-with-soap-11)
             * 2.2.4.4 [`sendOnly()` with SOAP 1.2](#2244-sendonly-with-soap-12)
-            * 2.2.4.5 [`send()` with SOAP 1.1](#2245-send-with-soap-11)
-            * 2.2.4.6 [`send()` with SOAP 1.2](#2246-send-with-soap-12)
+            * 2.2.4.5 [`sendRobust()` with SOAP 1.1](#2245-sendrobust-with-soap-11)
+            * 2.2.4.6 [`sendRobust()` with SOAP 1.2](#2246-sendrobust-with-soap-12)
     * 2.3 [Response Types](#23-response-types)
         * 2.3.1 [`xml`](#231-xml)
         * 2.3.2 [`mime:Entity[]`](#232-mimeentity)
@@ -102,9 +102,9 @@ The `sendReceive()` API provides a mechanism to send SOAP requests to a specifie
 
 The `sendOnly()` API is designed for true one-way operations where the client needs to send a SOAP request but does not require or expect any response from the service — including error responses. It follows the "fire and forget" approach, where the client sends a SOAP request to the service without inspecting the HTTP response. This API is suitable for WSDL one-way operations that have only an `<input>` message with no `<output>` or `<fault>` declared.
 
-### 2.2.3 Send (Robust In-Only)
+### 2.2.3 Send Robust (Robust In-Only)
 
-The `send()` API is designed for robust in-only operations where the client sends a SOAP request and does not expect a response body, but the server may return a SOAP fault indicating a failure. Unlike `sendOnly()`, this API inspects the HTTP response status code and returns an error if the server responds with a non-2xx status, attaching the SOAP fault body (if present) to the error detail.
+The `sendRobust()` API is designed for robust in-only operations where the client sends a SOAP request and does not expect a response body, but the server may return a SOAP fault indicating a failure. Unlike `sendOnly()`, this API inspects the HTTP response status code and returns an error if the server responds with a non-2xx status, attaching the SOAP fault body (if present) to the error detail.
 
 This corresponds to the Robust In-Only message exchange pattern defined in WSDL 2.0 (§2.3.2), which applies the "Message Triggers Fault" propagation rule. Its SOAP binding (§5.10.4.4) maps to a SOAP request-response exchange where the response can contain a SOAP fault. This API is suitable for WSDL operations that have an `<input>` and `<fault>` declared but no `<output>`.
 
@@ -112,7 +112,7 @@ The SOAP 1.1 specification requires the inclusion of the `action` parameter as a
 
 ### 2.2.4 Examples
 
-Following examples provides practical use cases for `sendReceive()`, `sendOnly()`, and `send()` APIs.
+Following examples provides practical use cases for `sendReceive()`, `sendOnly()`, and `sendRobust()` APIs.
 
 #### 2.2.4.1 `sendReceive()` with SOAP 1.1
 
@@ -200,7 +200,7 @@ public function main () returns error? {
 }
 ```
 
-#### 2.2.4.5 `send()` with SOAP 1.1
+#### 2.2.4.5 `sendRobust()` with SOAP 1.1
 
 ```ballerina
 import ballerina/soap.soap11;
@@ -216,11 +216,11 @@ public function main() returns error? {
                             </quer:Add>
                             </soap:Body>
                         </soap:Envelope>`;
-    check soapClient->send(envelope, "http://tempuri.org/Add");
+    check soapClient->sendRobust(envelope, "http://tempuri.org/Add");
 }
 ```
 
-#### 2.2.4.6 `send()` with SOAP 1.2
+#### 2.2.4.6 `sendRobust()` with SOAP 1.2
 
 ```ballerina
 import ballerina/soap.soap12;
@@ -237,7 +237,7 @@ public function main() returns error? {
                             </quer:Add>
                         </soap:Body>
                     </soap:Envelope>`;
-    check soapClient->send(envelope, "http://tempuri.org/Add");
+    check soapClient->sendRobust(envelope, "http://tempuri.org/Add");
 }
 ```
 
