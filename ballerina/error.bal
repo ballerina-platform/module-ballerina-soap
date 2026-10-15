@@ -17,29 +17,61 @@
 # Defines the common error type for the module.
 public type Error distinct error;
 
-# Detail record for SOAP fault errors.
+# Detail record for SOAP 1.1 fault errors per the SOAP 1.1 specification.
 #
-# + httpStatusCode - The HTTP status code of the response
-# + soapFault - The SOAP fault XML payload
-public type SoapFaultDetail record {|
-    int httpStatusCode;
-    xml soapFault;
+# + faultcode - The fault code identifying the fault (e.g., `soap:Server`)
+# + faultstring - A human-readable explanation of the fault
+# + faultactor - The URI of the SOAP actor that caused the fault, or nil if the fault
+# source is the ultimate destination
+# + detail - Application-specific error information, or nil if the fault is not related to
+# Body processing
+public type Soap11FaultDetail record {|
+    string faultcode;
+    string faultstring;
+    string? faultactor;
+    xml? detail;
 |};
 
-# Represents a SOAP fault returned by the server.
-public type SoapFaultError distinct Error & error<SoapFaultDetail>;
+# Represents a SOAP 1.1 fault returned by the server.
+public type Soap11FaultError distinct Error & error<Soap11FaultDetail>;
 
-# Detail record for network errors.
+# Detail record for SOAP 1.2 fault errors per the SOAP 1.2 specification.
 #
-# + httpStatusCode - The HTTP status code of the response
-public type NetworkErrorDetail record {|
-    int httpStatusCode?;
+# + codeValue - The fault code value (e.g., `soap:Receiver`)
+# + codeSubcode - The application-defined subcode value, or nil if not present
+# + reasonText - A human-readable explanation of the fault
+# + node - The URI of the SOAP node that generated the fault, or nil if not specified
+# + role - The role the node was operating in when the fault occurred, or nil if not specified
+# + detail - Application-specific error information, or nil if not present
+public type Soap12FaultDetail record {|
+    string codeValue;
+    string? codeSubcode;
+    string reasonText;
+    string? node;
+    string? role;
+    xml? detail;
 |};
 
-# Represents an error that occurs when a SOAP response cannot be interpreted as a SOAP fault.
-# This includes transport-level failures (e.g., connection refused) and server error responses
-# with non-XML bodies that cannot be parsed as SOAP faults.
-public type NetworkError distinct Error & error<NetworkErrorDetail>;
+# Represents a SOAP 1.2 fault returned by the server.
+public type Soap12FaultError distinct Error & error<Soap12FaultDetail>;
+
+# Union type representing any SOAP fault error.
+public type SoapFaultError Soap11FaultError|Soap12FaultError;
+
+# Represents a transport-level error (e.g., connection refused, DNS failure).
+public type TransportError distinct Error;
+
+# Detail record for HTTP application errors.
+#
+# + statusCode - The HTTP status code of the response
+# + responseBody - The response body text, or nil if the body could not be read
+public type HttpErrorDetail record {|
+    int statusCode;
+    string? responseBody;
+|};
+
+# Represents a non-2xx HTTP response that could not be parsed as a SOAP fault.
+public type HttpApplicationError distinct Error & error<HttpErrorDetail>;
 
 const SOAP_RESPONSE_ERROR = "Failed to create SOAP response";
 const INVALID_PROTOCOL_ERROR = "Invalid protocol detected: Please use the `https` protocol instead of `http`.";
