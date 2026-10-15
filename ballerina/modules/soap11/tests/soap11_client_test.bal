@@ -205,9 +205,12 @@ function testSendRobustWithSoapFault() returns error? {
     Client soapClient = check new ("http://localhost:9091");
     Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/getSoapFault");
     test:assertTrue(response is SoapFaultError);
-    error? cause = (<Error>response).cause();
-    test:assertTrue(cause is error);
-    test:assertTrue((<error>cause).message().includes("HTTP 500"));
+    SoapFaultError faultErr = <SoapFaultError>response;
+    test:assertEquals(faultErr.detail().httpStatusCode, 500);
+    xml expectedFault = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><soap:Fault><faultcode>soap:Server</faultcode><faultstring>UserAlreadyExistingUsernameException</faultstring></soap:Fault></soap:Body></soap:Envelope>`;
+    test:assertEquals(faultErr.detail().soapFault.strip().toString(), expectedFault.toString());
+    error cause = <error>faultErr.cause();
+    test:assertEquals(cause.message(), "Failed to create SOAP response");
 }
 
 @test:Config {
@@ -228,9 +231,10 @@ function testSendRobustWithNonXmlError() returns error? {
     Client soapClient = check new ("http://localhost:9091");
     Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/getTextError");
     test:assertTrue(response is NetworkError);
-    error? cause = (<Error>response).cause();
-    test:assertTrue(cause is error);
-    test:assertTrue((<error>cause).message().includes("HTTP 500"));
+    NetworkError networkErr = <NetworkError>response;
+    test:assertEquals(networkErr.detail().httpStatusCode, 500);
+    error cause = <error>networkErr.cause();
+    test:assertEquals(cause.message(), "Failed to create SOAP response");
 }
 
 @test:Config {
@@ -308,6 +312,8 @@ function testSendRobustError() returns error? {
     Client soapClient = check new ("error-url");
     Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/error");
     test:assertTrue(response is NetworkError);
+    NetworkError networkErr = <NetworkError>response;
+    test:assertEquals(networkErr.detail().httpStatusCode, ());
 }
 
 @test:Config {
