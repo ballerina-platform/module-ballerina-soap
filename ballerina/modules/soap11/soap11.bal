@@ -130,10 +130,14 @@ public isolated client class Client {
             return check soap:sendRobust(securedBody, self.soapClient, action, headers, path, false);
         } on fail error soapError {
             if soapError is soap:SoapFaultError {
-                return error SoapFaultError(soapError.message(), soapError, httpStatusCode = soapError.detail()["httpStatusCode"], detail = soapError.detail()["detail"]);
+                return error SoapFaultError(soapError.message(), soapError, httpStatusCode = soapError.detail().httpStatusCode, soapFault = soapError.detail().soapFault);
             }
             if soapError is soap:NetworkError {
-                return error NetworkError(soapError.message(), soapError, httpStatusCode = soapError.detail()["httpStatusCode"]);
+                int? statusCode = soapError.detail().httpStatusCode;
+                if statusCode is int {
+                    return error NetworkError(soapError.message(), soapError, httpStatusCode = statusCode);
+                }
+                return error NetworkError(soapError.message(), soapError);
             }
             return error Error(SOAP_ERROR, soapError);
         }
@@ -158,6 +162,10 @@ public isolated client class Client {
             lock {
                 xml envelope = body is xml ? body.clone() : mimeEntity.clone();
                 securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone(), false);
+            }
+            if body is mime:Entity[] {
+                body[0].setXml(securedBody);
+                return check soap:sendOnly(body, self.soapClient, action, headers, path, false);
             }
             return check soap:sendOnly(securedBody, self.soapClient, action, headers, path, false);
         } on fail error soapError {

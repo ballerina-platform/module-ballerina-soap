@@ -125,13 +125,13 @@ public isolated function sendRobust(xml|mime:Entity[] body, http:Client httpClie
         xml|error responsePayload = response.getXmlPayload();
         if responsePayload is xml {
             return error SoapFaultError(
-                string `${SOAP_RESPONSE_ERROR}: HTTP ${response.statusCode}`,
+                SOAP_RESPONSE_ERROR,
                 httpStatusCode = response.statusCode,
-                detail = responsePayload.toString()
+                soapFault = responsePayload
             );
         }
         return error NetworkError(
-            string `${SOAP_RESPONSE_ERROR}: HTTP ${response.statusCode}`,
+            SOAP_RESPONSE_ERROR,
             httpStatusCode = response.statusCode
         );
     }
