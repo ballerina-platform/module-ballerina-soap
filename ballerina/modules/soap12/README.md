@@ -80,7 +80,7 @@ public function main() returns error? {
                             </quer:Add>
                             </soap:Body>
                         </soap:Envelope>`;
-    check soapClient->sendRobust(envelope, "http://tempuri.org/Add");
+    check soapClient->sendRobust(envelope);
 }
 ```
 
