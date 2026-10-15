@@ -68,10 +68,9 @@ public isolated client class Client {
                                        map<string|string[]> headers = {}, string path = "")
         returns xml|mime:Entity[]|Error {
         do {
+            xml envelope = body is xml ? body : check body[0].getXml();
             xml securedBody;
-            xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
-                xml envelope = body is xml ? body.clone() : mimeEntity.clone();
                 securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone(), false);
             }
             xml|mime:Entity[] response;
@@ -117,10 +116,9 @@ public isolated client class Client {
     remote isolated function sendRobust(xml|mime:Entity[] body, string action,
                                         map<string|string[]> headers = {}, string path = "") returns soap:Error? {
         do {
+            xml envelope = body is xml ? body : check body[0].getXml();
             xml securedBody;
-            xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
-                xml envelope = body is xml ? body.clone() : mimeEntity.clone();
                 securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone(), false);
             }
             if body is mime:Entity[] {
@@ -147,10 +145,9 @@ public isolated client class Client {
     remote isolated function sendOnly(xml|mime:Entity[] body, string action,
                                       map<string|string[]> headers = {}, string path = "") returns Error? {
         do {
+            xml envelope = body is xml ? body : check body[0].getXml();
             xml securedBody;
-            xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
-                xml envelope = body is xml ? body.clone() : mimeEntity.clone();
                 securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone(), false);
             }
             if body is mime:Entity[] {
