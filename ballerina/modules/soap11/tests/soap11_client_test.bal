@@ -203,14 +203,13 @@ function testSendRobustWithSoapFault() returns error? {
                     </soap:Envelope>`;
 
     Client soapClient = check new ("http://localhost:9091");
-    Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/getSoapFault");
-    test:assertTrue(response is SoapFaultError);
-    SoapFaultError faultErr = <SoapFaultError>response;
-    test:assertEquals(faultErr.detail().httpStatusCode, 500);
-    xml expectedFault = xml `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><soap:Fault><faultcode>soap:Server</faultcode><faultstring>UserAlreadyExistingUsernameException</faultstring></soap:Fault></soap:Body></soap:Envelope>`;
-    test:assertEquals(faultErr.detail().soapFault.strip().toString(), expectedFault.toString());
-    error cause = <error>faultErr.cause();
-    test:assertEquals(cause.message(), "Failed to create SOAP response");
+    soap:Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/getSoapFault");
+    test:assertTrue(response is soap:Soap11FaultError);
+    soap:Soap11FaultError faultErr = <soap:Soap11FaultError>response;
+    test:assertEquals(faultErr.detail().faultcode, "soap:Server");
+    test:assertEquals(faultErr.detail().faultstring, "UserAlreadyExistingUsernameException");
+    test:assertEquals(faultErr.detail().faultactor, ());
+    test:assertEquals(faultErr.detail().detail, ());
 }
 
 @test:Config {
@@ -229,12 +228,11 @@ function testSendRobustWithNonXmlError() returns error? {
                     </soap:Envelope>`;
 
     Client soapClient = check new ("http://localhost:9091");
-    Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/getTextError");
-    test:assertTrue(response is NetworkError);
-    NetworkError networkErr = <NetworkError>response;
-    test:assertEquals(networkErr.detail().httpStatusCode, 500);
-    error cause = <error>networkErr.cause();
-    test:assertEquals(cause.message(), "Failed to create SOAP response");
+    soap:Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/getTextError");
+    test:assertTrue(response is soap:HttpApplicationError);
+    soap:HttpApplicationError httpErr = <soap:HttpApplicationError>response;
+    test:assertEquals(httpErr.detail().statusCode, 500);
+    test:assertEquals(httpErr.detail().responseBody, "Internal Server Error");
 }
 
 @test:Config {
@@ -310,10 +308,8 @@ function testSendRobustError() returns error? {
                     </soap:Envelope>`;
 
     Client soapClient = check new ("error-url");
-    Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/error");
-    test:assertTrue(response is NetworkError);
-    NetworkError networkErr = <NetworkError>response;
-    test:assertEquals(networkErr.detail().httpStatusCode, ());
+    soap:Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/error");
+    test:assertTrue(response is soap:TransportError);
 }
 
 @test:Config {
