@@ -281,7 +281,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "soap"
-version = "2.3.3"
+version = "2.4.0"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "http"},
