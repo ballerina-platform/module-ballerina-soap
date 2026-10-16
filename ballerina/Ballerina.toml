@@ -20,7 +20,7 @@ graalvmCompatible = true
 groupId = "io.ballerina.stdlib"
 artifactId = "soap-native"
 version = "2.4.0"
-path = "../native/build/libs/soap-native-2.4.0-SNAPSHOT.jar"
+path = "../native/build/libs/soap-native-2.4.0.jar"
 
 [[platform.java21.dependency]]
 groupId = "org.apache.wss4j"
