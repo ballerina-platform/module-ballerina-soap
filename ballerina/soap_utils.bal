@@ -112,6 +112,82 @@ public isolated function sendOnly(xml|mime:Entity[] body, http:Client httpClient
     }
 }
 
+public isolated function sendRobust(xml|mime:Entity[] body, http:Client httpClient, string? soapAction = (),
+                                    map<string|string[]> headers = {}, string path = "", boolean soap12 = true)
+    returns Error? {
+    http:Request req = soap12 ? createSoap12HttpRequest(body, soapAction, headers)
+        : createSoap11HttpRequest(body, <string>soapAction, headers);
+    http:Response|http:ClientError response = httpClient->post(path, req);
+    if response is http:ClientError {
+        return error TransportError(response.message());
+    }
+    if response.statusCode < 200 || response.statusCode >= 300 {
+        string|error textPayload = response.getTextPayload();
+        if textPayload is string {
+            xml|error xmlPayload = 'xml:fromString(textPayload);
+            if xmlPayload is xml {
+                Error? faultError = soap12 ? parseSoap12Fault(xmlPayload) : parseSoap11Fault(xmlPayload);
+                if faultError is Error {
+                    return faultError;
+                }
+            }
+            return error HttpApplicationError(
+                SOAP_RESPONSE_ERROR,
+                statusCode = response.statusCode,
+                responseBody = textPayload
+            );
+        }
+        return error HttpApplicationError(
+            SOAP_RESPONSE_ERROR,
+            statusCode = response.statusCode,
+            responseBody = ()
+        );
+    }
+}
+
+isolated function parseSoap11Fault(xml responsePayload) returns Soap11FaultError? {
+    xmlns "http://schemas.xmlsoap.org/soap/envelope/" as soap;
+    xml fault = responsePayload/<soap:Body>/<soap:Fault>;
+    string faultcode = (fault/<faultcode>).data();
+    string faultstring = (fault/<faultstring>).data();
+    if faultcode == "" && faultstring == "" {
+        return ();
+    }
+    string faultactorData = (fault/<faultactor>).data();
+    xml detailXml = fault/<detail>;
+    return error Soap11FaultError(
+        faultstring,
+        faultcode = faultcode,
+        faultstring = faultstring,
+        faultactor = faultactorData != "" ? faultactorData : (),
+        detail = detailXml.length() > 0 ? detailXml : ()
+    );
+}
+
+isolated function parseSoap12Fault(xml responsePayload) returns Soap12FaultError? {
+    xmlns "http://www.w3.org/2003/05/soap-envelope" as soap;
+    xml fault = responsePayload/<soap:Body>/<soap:Fault>;
+    xml code = fault/<soap:Code>;
+    string codeValue = (code/<soap:Value>).data();
+    string reasonText = (fault/<soap:Reason>/<soap:Text>).data();
+    if codeValue == "" && reasonText == "" {
+        return ();
+    }
+    string subcodeData = (code/<soap:Subcode>/<soap:Value>).data();
+    string nodeData = (fault/<soap:Node>).data();
+    string roleData = (fault/<soap:Role>).data();
+    xml detailXml = fault/<soap:Detail>;
+    return error Soap12FaultError(
+        reasonText,
+        codeValue = codeValue,
+        codeSubcode = subcodeData != "" ? subcodeData : (),
+        reasonText = reasonText,
+        node = nodeData != "" ? nodeData : (),
+        role = roleData != "" ? roleData : (),
+        detail = detailXml.length() > 0 ? detailXml : ()
+    );
+}
+
 isolated function createSoap11HttpRequest(xml|mime:Entity[] body, string soapAction,
                                           map<string|string[]> headers = {}) returns http:Request {
     http:Request req = new;

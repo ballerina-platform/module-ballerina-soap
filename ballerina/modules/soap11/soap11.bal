@@ -68,10 +68,9 @@ public isolated client class Client {
                                        map<string|string[]> headers = {}, string path = "")
         returns xml|mime:Entity[]|Error {
         do {
+            xml envelope = body is xml ? body : check body[0].getXml();
             xml securedBody;
-            xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
-                xml envelope = body is xml ? body.clone() : mimeEntity.clone();
                 securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone(), false);
             }
             xml|mime:Entity[] response;
@@ -102,6 +101,36 @@ public isolated client class Client {
         }
     }
 
+    # Sends SOAP request and checks for SOAP faults in the response. This is suitable for
+    # robust in-only operations where no response body is expected, but the server may
+    # return a SOAP fault indicating a failure.
+    # ```ballerina
+    # check soapClient->sendRobust(body, "http://tempuri.org/Add");
+    # ```
+    #
+    # + body - SOAP request body as an `XML` or `mime:Entity[]` to work with SOAP attachments
+    # + action - SOAP action as a `string`
+    # + headers - SOAP headers as a `map<string|string[]>`
+    # + path - The resource path
+    # + return - If successful, returns `nil`. Else, returns an error containing the SOAP fault details
+    remote isolated function sendRobust(xml|mime:Entity[] body, string action,
+                                        map<string|string[]> headers = {}, string path = "") returns soap:Error? {
+        do {
+            xml envelope = body is xml ? body : check body[0].getXml();
+            xml securedBody;
+            lock {
+                securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone(), false);
+            }
+            if body is mime:Entity[] {
+                body[0].setXml(securedBody);
+                return soap:sendRobust(body, self.soapClient, action, headers, path, false);
+            }
+            return soap:sendRobust(securedBody, self.soapClient, action, headers, path, false);
+        } on fail error soapError {
+            return error soap:Error(SOAP_ERROR, soapError);
+        }
+    }
+
     # Fires and forgets requests. Sends the request without the possibility of any response from the
     # service (even an error).
     # ```ballerina
@@ -116,11 +145,14 @@ public isolated client class Client {
     remote isolated function sendOnly(xml|mime:Entity[] body, string action,
                                       map<string|string[]> headers = {}, string path = "") returns Error? {
         do {
+            xml envelope = body is xml ? body : check body[0].getXml();
             xml securedBody;
-            xml mimeEntity = body is xml ? body : check body[0].getXml();
             lock {
-                xml envelope = body is xml ? body.clone() : mimeEntity.clone();
                 securedBody = check soap:applySecurityPolicies(self.outboundSecurity.clone(), envelope.clone(), false);
+            }
+            if body is mime:Entity[] {
+                body[0].setXml(securedBody);
+                return check soap:sendOnly(body, self.soapClient, action, headers, path, false);
             }
             return check soap:sendOnly(securedBody, self.soapClient, action, headers, path, false);
         } on fail error soapError {

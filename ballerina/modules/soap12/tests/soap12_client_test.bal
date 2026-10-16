@@ -52,6 +52,167 @@ crypto:PrivateKey symmetricKey = check crypto:decodeRsaPrivateKeyFromKeyStore(ke
 crypto:PublicKey publicKey = check crypto:decodeRsaPublicKeyFromTrustStore(keyStore, KEY_ALIAS);
 
 @test:Config {
+    groups: ["soap12", "send_robust"]
+}
+function testSendRobust12() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    check soapClient->sendRobust(body, "http://tempuri.org/Add");
+}
+
+@test:Config {
+    groups: ["soap12", "send_robust"]
+}
+function testSendRobustWithSoapFault12() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    soap:Error? response = soapClient->sendRobust(body, "urn:addUser", path = "/getSoapFault");
+    test:assertTrue(response is soap:Soap12FaultError);
+    soap:Soap12FaultError faultErr = <soap:Soap12FaultError>response;
+    test:assertEquals(faultErr.detail().codeValue, "soap:Receiver");
+    test:assertEquals(faultErr.detail().reasonText, "UserAlreadyExistingUsernameException");
+}
+
+@test:Config {
+    groups: ["soap12", "send_robust"]
+}
+function testSendRobustWithNonXmlError12() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    soap:Error? response = soapClient->sendRobust(body, "urn:addUser", path = "/getTextError");
+    test:assertTrue(response is soap:HttpApplicationError);
+    soap:HttpApplicationError httpErr = <soap:HttpApplicationError>response;
+    test:assertEquals(httpErr.detail().statusCode, 500);
+    test:assertEquals(httpErr.detail().responseBody, "Internal Server Error");
+}
+
+@test:Config {
+    groups: ["soap12", "send_robust"]
+}
+function testSendRobust12WithoutAction() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    check soapClient->sendRobust(body);
+}
+
+@test:Config {
+    groups: ["soap12", "send_robust"]
+}
+function testSendRobust12WithHeaders() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("http://localhost:9091");
+    check soapClient->sendRobust(body, "http://tempuri.org/Add", headers = {foo: ["bar1", "bar2"]});
+}
+
+@test:Config {
+    groups: ["soap12", "send_robust", "mime"]
+}
+function testSendRobust12WithMime() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    mime:Entity[] mtomMessage = [];
+    mime:Entity envelope = new;
+    check envelope.setContentType("application/xop+xml");
+    envelope.setContentId("<soap@envelope>");
+    envelope.setBody(body);
+    mtomMessage.push(envelope);
+
+    mime:Entity bytesPart = new;
+    string readContent = check io:fileReadString(FILE_PATH);
+    bytesPart.setFileAsEntityBody(FILE_PATH);
+    string|byte[]|io:ReadableByteChannel|mime:EncodeError bytes = mime:base64Encode(readContent.toBytes());
+    if bytes !is byte[] {
+        return error("error");
+    }
+    bytesPart.setBody(bytes);
+    check bytesPart.setContentType("image/jpeg");
+    bytesPart.setContentId("<image1>");
+    mtomMessage.push(bytesPart);
+
+    Client soapClient = check new ("http://localhost:9091");
+    check soapClient->sendRobust(mtomMessage, "http://tempuri.org/Add", path = "/getMimePayload");
+}
+
+@test:Config {
+    groups: ["soap12", "send_robust"]
+}
+function testSendRobustError12() returns error? {
+    xml body = xml `<soap:Envelope
+                        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                        soap:encodingStyle="http://www.w3.org/2003/05/soap-encoding">
+                        <soap:Body>
+                          <quer:Add xmlns:quer="http://tempuri.org/">
+                            <quer:intA>2</quer:intA>
+                            <quer:intB>3</quer:intB>
+                          </quer:Add>
+                        </soap:Body>
+                    </soap:Envelope>`;
+
+    Client soapClient = check new ("error-url");
+    soap:Error? response = soapClient->sendRobust(body, "http://tempuri.org/Add", path = "/error");
+    test:assertTrue(response is soap:TransportError);
+}
+
+@test:Config {
     groups: ["soap12", "send_only"]
 }
 function testSendOnly12() returns error? {
