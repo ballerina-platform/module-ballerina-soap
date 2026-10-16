@@ -1,7 +1,11 @@
 # Change Log
 This file contains all the notable changes done to the Ballerina SOAP package through the releases.
 
-## [Unreleased]
+## [2.4.0] - 2026-10-16
+
+### Added
+- [Add the `sendRobust` API to the SOAP 1.1 and SOAP 1.2 clients to support the robust in-only message exchange pattern, reporting SOAP faults and network errors](https://github.com/ballerina-platform/module-ballerina-soap/pull/175)
+- [Add the `soap:SoapFaultError` and `soap:NetworkError` subtypes of `soap:Error`, with typed detail records](https://github.com/ballerina-platform/module-ballerina-soap/pull/175)
 
 ### Changed
 
