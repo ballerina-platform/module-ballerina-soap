@@ -1,0 +1,7 @@
+# bal scan rules excluded for this package (false positives):
+# - ballerina/crypto:1 flags `crypto:encryptRsaEcb` (default PKCS1 padding) in the WS-Security wssec module. The
+#   padding is dictated by the WS-Security/XML-Encryption key transport algorithm (rsa-1_5, declared in the
+#   EncryptedKey element by the native WsSecurityUtils) and must match what peer SOAP services expect.
+#   Changing it would alter the wire format and break interoperability, so it is excluded rather than changed.
+[rule]
+exclude = ["ballerina/crypto:1"]
