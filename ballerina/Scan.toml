@@ -1,0 +1,14 @@
+# bal scan rule excluded for this package: ballerina/crypto:1 (RSA encryption with the default PKCS1 padding).
+#
+# This is a KNOWN WEAKNESS, not a false positive. `crypto:encryptRsaEcb` is used in the WS-Security (wssec)
+# module with PKCS#1 v1.5 padding, and the EncryptedKey is declared as `rsa-1_5` by the native WsSecurityUtils.
+# The padding has to match the declared key-transport algorithm that peer SOAP services expect, so it cannot be
+# changed in isolation without breaking the wire format.
+#
+# The proper fix (RSA-OAEP as an opt-in algorithm, then as the default) is tracked in
+# https://github.com/wso2/product-integrator/issues/2821. Remove this exclusion when that is done.
+#
+# NOTE: bal scan can only exclude a rule for the whole package, so other uses of `crypto:encryptRsaEcb` in
+# this package are not flagged while this exclusion is in place. Review such code by hand.
+[rule]
+exclude = ["ballerina/crypto:1"]
