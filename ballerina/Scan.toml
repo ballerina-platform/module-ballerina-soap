@@ -15,5 +15,8 @@
 # `passwordTag`, which are regular expressions for XML elements (e.g. `<wsse:SecurityTokenReference ...>`) used to
 # build/assert SOAP envelopes (wssec/ws_security_methods.bal and the soap_utils.bal assertion helpers, where the
 # password is a function parameter). No secret value is hardcoded.
+# TODO: replace this rule exclusion with a targeted scan suppression (with a reason) once `bal scan` supports it
+# (planned for v0.13.0), and fix the false positives on the scan tool side: a secret-named identifier should only be
+# reported when it is assigned a fixed value.
 [rule]
 exclude = ["ballerina/crypto:1", "ballerina:14"]
