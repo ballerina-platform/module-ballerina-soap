@@ -10,5 +10,10 @@
 #
 # NOTE: bal scan can only exclude a rule for the whole package, so other uses of `crypto:encryptRsaEcb` in
 # this package are not flagged while this exclusion is in place. Review such code by hand.
+#
+# ballerina:14 is a false positive. It matches the identifier names `securityToken`, `usernameTokenTag` and
+# `passwordTag`, which are regular expressions for XML elements (e.g. `<wsse:SecurityTokenReference ...>`) used to
+# build/assert SOAP envelopes (wssec/ws_security_methods.bal and the soap_utils.bal assertion helpers, where the
+# password is a function parameter). No secret value is hardcoded.
 [rule]
-exclude = ["ballerina/crypto:1"]
+exclude = ["ballerina/crypto:1", "ballerina:14"]
